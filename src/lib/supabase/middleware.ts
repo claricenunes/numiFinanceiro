@@ -5,8 +5,14 @@ import type { Database } from "@/types/database";
 const PUBLIC_ROUTES = ["/", "/login", "/register", "/forgot-password", "/reset-password"];
 const AUTH_ROUTES   = ["/login", "/register", "/forgot-password"];
 
+const isSupabaseConfigured =
+  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your-project-ref");
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
+
+  if (!isSupabaseConfigured) return response;
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

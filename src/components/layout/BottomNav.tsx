@@ -6,10 +6,10 @@ import { useUIStore } from "@/stores/useUIStore";
 
 const NAV = [
   { label: "Início",   href: "/app/dashboard",    icon: HomeIcon },
-  { label: "Contas",   href: "/app/accounts",     icon: CardIcon },
-  { label: "Orçamento",href: "/app/budget",       icon: ChartIcon },
-  { label: "Metas",    href: "/app/goals",        icon: TargetIcon },
-  { label: "Investir", href: "/app/investments",  icon: TrendIcon },
+  { label: "Contas",   href: "/app/contas",       icon: CardIcon },
+  { label: "Orçamento",href: "/app/orcamento",    icon: ChartIcon },
+  { label: "Metas",    href: "/app/metas",        icon: TargetIcon },
+  { label: "Investir", href: "/app/investimentos",icon: TrendIcon },
 ];
 
 export function BottomNav() {

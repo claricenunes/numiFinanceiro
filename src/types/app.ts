@@ -144,3 +144,34 @@ export interface AccountFormValues {
   billingDay?: number;
   dueDay?: number;
 }
+
+/* ── Orçamento (UI) ──────────────────────────────────── */
+
+export interface BudgetItem {
+  id: string;
+  categoryId: string;
+  categoryName: string;
+  categoryIcon: string;
+  categoryColor: string;
+  budgeted: number;
+  spent: number;
+}
+
+/* ── Investimentos — portfólio ────────────────────────── */
+
+export interface AllocationEntry {
+  type: string;
+  label: string;
+  color: string;
+  percent: number;
+  totalValue: number;
+}
+
+export interface PortfolioSummary {
+  totalInvested: number;
+  totalCurrentValue: number;
+  profitLoss: number;
+  profitLossPercent: number;
+  monthlyReturn: number;
+  allocation: AllocationEntry[];
+}

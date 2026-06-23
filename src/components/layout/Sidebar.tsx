@@ -8,11 +8,11 @@ import { useRouter } from "next/navigation";
 
 const NAV = [
   { label: "Dashboard",    href: "/app/dashboard",     icon: DashboardIcon },
-  { label: "Contas",       href: "/app/accounts",      icon: AccountsIcon },
-  { label: "Transações",   href: "/app/transactions",  icon: TransactionsIcon },
-  { label: "Orçamento",    href: "/app/budget",        icon: BudgetIcon },
-  { label: "Metas",        href: "/app/goals",         icon: GoalsIcon },
-  { label: "Investimentos",href: "/app/investments",   icon: InvestmentsIcon },
+  { label: "Contas",       href: "/app/contas",        icon: AccountsIcon },
+  { label: "Transações",   href: "/app/transacoes",    icon: TransactionsIcon },
+  { label: "Orçamento",    href: "/app/orcamento",     icon: BudgetIcon },
+  { label: "Metas",        href: "/app/metas",         icon: GoalsIcon },
+  { label: "Investimentos",href: "/app/investimentos", icon: InvestmentsIcon },
   { label: "Insights",     href: "/app/insights",      icon: InsightsIcon },
 ];
 
