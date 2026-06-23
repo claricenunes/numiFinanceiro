@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/lib/utils/currency";
+import { CSVImport } from "./CSVImport";
 import type { TransactionRow } from "@/types/app";
 
 /* ── Helpers ─────────────────────────────────────────── */
@@ -35,6 +37,7 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
   const [search,     setSearch]     = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [category,   setCategory]   = useState("all");
+  const [showImport, setShowImport] = useState(false);
 
   const categories = useMemo(() => {
     const names = new Set(transactions.map(t => t.categoryName).filter(Boolean) as string[]);
@@ -62,7 +65,24 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
   return (
     <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
       {/* Header */}
-      <h1 className="text-xl font-bold text-[#F1F5F9] mb-4">Transações</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-bold text-[#F1F5F9]">Transações</h1>
+        <button
+          onClick={() => setShowImport(true)}
+          className="text-sm font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors"
+          style={{ background: "#131929", border: "1px solid #1E2D45", color: "#94A3B8" }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.borderColor = "#34D39944";
+            (e.currentTarget as HTMLElement).style.color = "#F1F5F9";
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.borderColor = "#1E2D45";
+            (e.currentTarget as HTMLElement).style.color = "#94A3B8";
+          }}
+        >
+          <span>↑</span> Importar CSV
+        </button>
+      </div>
 
       {/* Summary strip */}
       <div className="grid grid-cols-3 gap-3 mb-5">
@@ -128,6 +148,11 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
           ))}
         </select>
       </div>
+
+      {/* CSV Import modal */}
+      <AnimatePresence>
+        {showImport && <CSVImport onClose={() => setShowImport(false)} />}
+      </AnimatePresence>
 
       {/* Transaction groups */}
       {groups.length === 0 ? (

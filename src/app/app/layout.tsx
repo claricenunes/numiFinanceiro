@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { ToastContainer } from "@/components/common/ToastContainer";
+import { MobileDrawer } from "@/components/layout/MobileDrawer";
 import { UserProfileSync } from "./UserProfileSync";
 import type { UserProfile } from "@/types/database";
 
@@ -23,6 +25,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </main>
         </div>
         <BottomNav />
+        <MobileDrawer />
+        <ToastContainer />
       </div>
     );
   }
@@ -61,6 +65,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       {/* Sincroniza o perfil no Zustand client-side */}
       {profile && <UserProfileSync profile={profile} />}
+
+      <MobileDrawer />
+      <ToastContainer />
     </div>
   );
 }

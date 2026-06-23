@@ -5,7 +5,7 @@ import { useUserStore } from "@/stores/useUserStore";
 import { PeriodSelector } from "./PeriodSelector";
 
 export function Header() {
-  const { toggleSidebar } = useUIStore();
+  const { toggleSidebar, toggleMobileMenu } = useUIStore();
   const { profile } = useUserStore();
 
   return (
@@ -13,8 +13,18 @@ export function Header() {
       className="flex items-center justify-between px-5 lg:px-6 h-16 flex-shrink-0 sticky top-0 z-40"
       style={{ background: "#0B1020", borderBottom: "1px solid #1E2D45" }}
     >
-      {/* Esquerda: toggle sidebar (desktop) + logo mobile */}
+      {/* Esquerda: toggle menu (mobile) + toggle sidebar (desktop) + logo mobile */}
       <div className="flex items-center gap-3">
+        {/* Mobile: abre o drawer */}
+        <button
+          onClick={toggleMobileMenu}
+          className="flex lg:hidden w-8 h-8 items-center justify-center rounded-lg text-[#94A3B8] hover:bg-[#131929] hover:text-[#F1F5F9] transition-colors"
+          aria-label="Abrir menu"
+        >
+          <MenuIcon className="w-4 h-4" />
+        </button>
+
+        {/* Desktop: colapsa/expande sidebar */}
         <button
           onClick={toggleSidebar}
           className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg text-[#94A3B8] hover:bg-[#131929] hover:text-[#F1F5F9] transition-colors"

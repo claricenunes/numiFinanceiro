@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { formatCurrency } from "@/lib/utils/currency";
 import { mockGoals } from "@/lib/mock-data";
 import type { GoalWithProgress } from "@/types/app";
+import { ProgressBar } from "@/components/common/ProgressBar";
+import { FadeIn } from "@/components/common/FadeIn";
 
 export const metadata: Metadata = { title: "Metas" };
 
@@ -25,7 +27,7 @@ export default function MetasPage() {
   const completed = goals.filter(g => g.status === "completed").length;
 
   return (
-    <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
+    <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-xl font-bold text-[#F1F5F9]">Metas</h1>
@@ -57,7 +59,7 @@ export default function MetasPage() {
           <p className="text-sm text-[#475569] mt-1">Crie uma meta para começar a acompanhar seu progresso</p>
         </div>
       )}
-    </div>
+    </FadeIn>
   );
 }
 
@@ -124,11 +126,8 @@ function GoalCard({ goal }: { goal: GoalWithProgress }) {
           </div>
 
           {/* Progress bar */}
-          <div className="rounded-full overflow-hidden mb-2" style={{ height: 6, background: "#1E2D45" }}>
-            <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${Math.min(goal.progressPercent, 100)}%`, background: color }}
-            />
+          <div className="mb-2">
+            <ProgressBar percent={goal.progressPercent} color={color} />
           </div>
 
           {/* Status line */}

@@ -1,7 +1,7 @@
 import { getCurrentPeriod } from "./utils/date";
 import type {
   DashboardSummary, CategorySpending, GoalWithProgress, TransactionRow,
-  AccountWithBalance, PositionRow, BudgetItem, PortfolioSummary,
+  AccountWithBalance, PositionRow, BudgetItem, PortfolioSummary, InsightItem,
 } from "@/types/app";
 
 export const mockSummary: DashboardSummary = {
@@ -187,6 +187,25 @@ export const mockPortfolioSummary: PortfolioSummary = {
     { type: "fii",          label: "FIIs",       color: "#FBBF24", percent: 4.4,  totalValue: 1085  },
   ],
 };
+
+export const mockAllInsights: InsightItem[] = [
+  // Alertas
+  { id: "i1", type: "budget_exceeded", severity: "alert",   category: "alert",    icon: "⛔", title: "Lazer acima do orçamento",       description: "Você gastou R$ 140 além do limite de R$ 200 em Lazer. Considere reduzir até o fim do mês." },
+  { id: "i2", type: "budget_exceeded", severity: "alert",   category: "alert",    icon: "📦", title: "Outros acima do orçamento",       description: "Categoria 'Outros' ultrapassou em R$ 98,50. Detalhe as despesas para identificar onde cortar." },
+  { id: "i3", type: "bill_due",        severity: "warning", category: "alert",    icon: "⚡", title: "Conta de luz vence em 3 dias",    description: "Estimativa: R$ 127,40. Vencimento: 25/06. Verifique se há saldo em Conta Corrente." },
+  { id: "i4", type: "budget_warning",  severity: "warning", category: "alert",    icon: "🏠", title: "Moradia ultrapassou o orçamento", description: "R$ 57,40 acima do limite de R$ 1.900. Aluguel (R$ 1.450) + Condomínio (R$ 380) + Luz (R$ 127) = R$ 1.957." },
+  // Tendências
+  { id: "i5", type: "spending_trend",  severity: "info",    category: "trend",    icon: "📈", title: "Alimentação +18% vs. maio",       description: "Você gastou R$ 620, 18% mais do que em maio (R$ 526). iFood e restaurantes = 38% do total." },
+  { id: "i6", type: "income_boost",    severity: "info",    category: "trend",    icon: "💰", title: "Renda extra em junho",             description: "R$ 1.200 de Freelance Design além do salário elevaram a renda para R$ 6.600. Mês acima da média." },
+  { id: "i7", type: "spending_drop",   severity: "info",    category: "trend",    icon: "📉", title: "Assinaturas 40% abaixo do limite", description: "Você usou apenas R$ 77,80 dos R$ 130 orçados em Assinaturas. Ótima eficiência neste mês." },
+  // Conquistas
+  { id: "i8", type: "savings_rate",    severity: "info",    category: "win",      icon: "🎉", title: "Taxa de poupança de 47%",          description: "Incrível! Você economizou R$ 2.552 este mês — superando a meta de 30%. Continue assim." },
+  { id: "i9", type: "budget_win",      severity: "info",    category: "win",      icon: "❤️", title: "Saúde dentro do orçamento",       description: "R$ 10,60 abaixo do limite de Saúde. Equilíbrio entre bem-estar físico e financeiro." },
+  // Previsões
+  { id: "i10", type: "goal_forecast",  severity: "info",    category: "forecast", icon: "🛡️", title: "Reserva: prazo estimado Jun 2028", description: "No ritmo atual (R$ 350/mês), a Reserva de Emergência fica pronta em Jun 2028. Aportando R$ 766/mês, antecipa para Dez 2027." },
+  { id: "i11", type: "goal_forecast",  severity: "info",    category: "forecast", icon: "✈️", title: "Viagem Europa: no caminho certo",  description: "Mantendo os aportes, você atinge R$ 8.000 antes de Jul 2027. Faltam R$ 5.200 — cerca de 9 meses." },
+  { id: "i12", type: "budget_forecast",severity: "info",    category: "forecast", icon: "📊", title: "Projeção de gastos: R$ 3.820",     description: "Com base no ritmo atual, você deve gastar R$ 3.820 no mês — R$ 290 acima do orçado. Lazer e Moradia são as principais causas." },
+];
 
 export const mockInsights = [
   {

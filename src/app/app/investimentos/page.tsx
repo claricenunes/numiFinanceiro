@@ -3,6 +3,7 @@ import { formatCurrency } from "@/lib/utils/currency";
 import { mockPositions, mockPortfolioSummary } from "@/lib/mock-data";
 import type { PositionRow } from "@/types/app";
 import { AllocationChart } from "./AllocationChart";
+import { FadeIn } from "@/components/common/FadeIn";
 
 export const metadata: Metadata = { title: "Investimentos" };
 
@@ -21,7 +22,7 @@ export default function InvestimentosPage() {
   const plPositive = summary.profitLoss >= 0;
 
   return (
-    <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
+    <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
       {/* Header */}
       <h1 className="text-xl font-bold text-[#F1F5F9] mb-5">Investimentos</h1>
 
@@ -115,7 +116,7 @@ export default function InvestimentosPage() {
           <PositionCard key={p.id} pos={p} />
         ))}
       </div>
-    </div>
+    </FadeIn>
   );
 }
 

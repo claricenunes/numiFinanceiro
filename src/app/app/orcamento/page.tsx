@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { formatCurrency } from "@/lib/utils/currency";
 import { mockBudgetItems } from "@/lib/mock-data";
 import type { BudgetItem } from "@/types/app";
+import { ProgressBar } from "@/components/common/ProgressBar";
+import { FadeIn } from "@/components/common/FadeIn";
 
 export const metadata: Metadata = { title: "Orçamento" };
 
@@ -23,7 +25,7 @@ export default function OrcamentoPage() {
   const sorted = [...items].sort((a, b) => (b.spent / b.budgeted) - (a.spent / a.budgeted));
 
   return (
-    <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
+    <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -65,15 +67,12 @@ export default function OrcamentoPage() {
         </div>
 
         {/* Overall progress bar */}
-        <div className="rounded-full overflow-hidden" style={{ height: 8, background: "#1E2D45" }}>
-          <div
-            className="h-full rounded-full transition-all"
-            style={{
-              width: `${totalPct}%`,
-              background: totalPct > 100 ? "#F87171" : totalPct > 85 ? "#FBBF24" : "#34D399",
-            }}
-          />
-        </div>
+        <ProgressBar
+          percent={totalPct}
+          color={totalPct > 100 ? "#F87171" : totalPct > 85 ? "#FBBF24" : "#34D399"}
+          height={8}
+          delay={0.15}
+        />
         <div className="flex justify-between mt-1.5">
           <p className="text-xs text-[#475569]">{totalPct.toFixed(0)}% utilizado</p>
           <p className="text-xs" style={{ color: totalSpent > totalBudgeted ? "#F87171" : "#475569" }}>
@@ -93,7 +92,7 @@ export default function OrcamentoPage() {
           <BudgetCard key={item.id} item={item} />
         ))}
       </div>
-    </div>
+    </FadeIn>
   );
 }
 
@@ -141,12 +140,7 @@ function BudgetCard({ item }: { item: BudgetItem }) {
       </div>
 
       {/* Progress bar */}
-      <div className="rounded-full overflow-hidden" style={{ height: 6, background: "#1E2D45" }}>
-        <div
-          className="h-full rounded-full"
-          style={{ width: `${barWidth}%`, background: barColor }}
-        />
-      </div>
+      <ProgressBar percent={barWidth} color={barColor} />
     </div>
   );
 }

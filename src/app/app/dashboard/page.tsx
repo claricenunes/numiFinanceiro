@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FadeIn } from "@/components/common/FadeIn";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
 import { ExpenseChart } from "@/components/dashboard/ExpenseChart";
 import { FlowChart } from "@/components/dashboard/FlowChart";
@@ -28,7 +29,7 @@ export default function DashboardPage() {
   const firstName = "";
 
   return (
-    <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
+    <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
       {/* Saudação */}
       <div className="mb-5">
         <h1 className="text-xl font-bold text-[#F1F5F9]">
@@ -59,6 +60,6 @@ export default function DashboardPage() {
         {/* Linha 4 — Insights */}
         <InsightsBanner insights={insights} />
       </div>
-    </div>
+    </FadeIn>
   );
 }

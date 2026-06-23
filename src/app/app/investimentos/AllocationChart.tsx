@@ -25,7 +25,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
 
 export function AllocationChart({ data }: { data: AllocationEntry[] }) {
   return (
-    <ResponsiveContainer width="100%" height={200}>
+    <ResponsiveContainer width="100%" height={200} minWidth={0}>
       <PieChart>
         <Pie
           data={data}

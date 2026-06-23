@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { formatCurrency } from "@/lib/utils/currency";
 import { mockAccounts } from "@/lib/mock-data";
 import type { AccountWithBalance } from "@/types/app";
+import { FadeIn } from "@/components/common/FadeIn";
 
 export const metadata: Metadata = { title: "Contas" };
 
@@ -42,7 +43,7 @@ export default function ContasPage() {
   const netWorth  = netLiquid + invested;
 
   return (
-    <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
+    <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-[#F1F5F9]">Contas</h1>
@@ -91,7 +92,7 @@ export default function ContasPage() {
           <AccountCard key={a.id} account={a} />
         ))}
       </div>
-    </div>
+    </FadeIn>
   );
 }
 

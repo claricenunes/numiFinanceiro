@@ -36,7 +36,7 @@ export function FlowChart({ data }: Props) {
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={180}>
+      <ResponsiveContainer width="100%" height={180} minWidth={0}>
         <BarChart data={data} barCategoryGap="30%" barGap={4}>
           <CartesianGrid
             strokeDasharray="3 3"

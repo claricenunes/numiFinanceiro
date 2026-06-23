@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import { formatCurrency } from "@/lib/utils/currency";
 import type { CategorySpending } from "@/types/app";
 
@@ -24,36 +17,34 @@ export function ExpenseChart({ categories }: Props) {
 
       <div className="flex flex-col lg:flex-row items-center gap-4">
         {/* Donut */}
-        <div style={{ width: 180, height: 180, flexShrink: 0 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={categories}
-                dataKey="amount"
-                nameKey="categoryName"
-                cx="50%"
-                cy="50%"
-                innerRadius={52}
-                outerRadius={72}
-                paddingAngle={2}
-                strokeWidth={0}
-              >
-                {categories.map((cat) => (
-                  <Cell key={cat.categoryId} fill={cat.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                formatter={(value) => [formatCurrency(Number(value)), ""]}
-                contentStyle={{
-                  background: "#131929",
-                  border: "1px solid #1E2D45",
-                  borderRadius: "10px",
-                  fontSize: "12px",
-                  color: "#F1F5F9",
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+        <div style={{ flexShrink: 0 }}>
+          <PieChart width={180} height={180}>
+            <Pie
+              data={categories}
+              dataKey="amount"
+              nameKey="categoryName"
+              cx="50%"
+              cy="50%"
+              innerRadius={52}
+              outerRadius={72}
+              paddingAngle={2}
+              strokeWidth={0}
+            >
+              {categories.map((cat) => (
+                <Cell key={cat.categoryId} fill={cat.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(value) => [formatCurrency(Number(value)), ""]}
+              contentStyle={{
+                background: "#131929",
+                border: "1px solid #1E2D45",
+                borderRadius: "10px",
+                fontSize: "12px",
+                color: "#F1F5F9",
+              }}
+            />
+          </PieChart>
         </div>
 
         {/* Lista */}

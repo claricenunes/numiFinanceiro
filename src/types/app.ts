@@ -157,6 +157,18 @@ export interface BudgetItem {
   spent: number;
 }
 
+/* ── Insights ────────────────────────────────────────── */
+
+export interface InsightItem {
+  id: string;
+  type: string;
+  severity: "alert" | "warning" | "info";
+  category: "alert" | "trend" | "win" | "forecast";
+  title: string;
+  description: string;
+  icon: string;
+}
+
 /* ── Investimentos — portfólio ────────────────────────── */
 
 export interface AllocationEntry {
