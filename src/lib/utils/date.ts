@@ -51,6 +51,31 @@ export function getPeriod(type: PeriodType, custom?: { start: string; end: strin
   return getCurrentPeriod();
 }
 
+/** Constrói um Period a partir dos searchParams da URL (?from=&to=&pt=) */
+export function parsePeriodFromParams(
+  from?: string,
+  to?: string,
+  pt?: string,
+): Period {
+  if (from && to) {
+    const type = (pt ?? "custom") as PeriodType;
+    // Presets recalculados server-side para freshness
+    if (type !== "custom") return getPeriod(type);
+    return {
+      type: "custom",
+      startDate: from,
+      endDate: to,
+      label: `${formatDateShort(from)} – ${formatDateShort(to)}`,
+    };
+  }
+  if (pt && pt !== "current_month") return getPeriod(pt as PeriodType);
+  return getCurrentPeriod();
+}
+
+function formatDateShort(iso: string): string {
+  return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+}
+
 export function formatDate(iso: string, opts?: Intl.DateTimeFormatOptions): string {
   return new Date(iso + "T12:00:00").toLocaleDateString(LOCALE, opts ?? { day: "2-digit", month: "2-digit", year: "numeric" });
 }

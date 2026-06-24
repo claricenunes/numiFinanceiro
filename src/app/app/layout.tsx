@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { ToastContainer } from "@/components/common/ToastContainer";
 import { MobileDrawer } from "@/components/layout/MobileDrawer";
 import { UserProfileSync } from "./UserProfileSync";
+import { QuickAddModal } from "@/components/common/QuickAddModal";
 import type { UserProfile } from "@/types/database";
 
 const isSupabaseConfigured =
@@ -26,6 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
         <BottomNav />
         <MobileDrawer />
+        <QuickAddModal />
         <ToastContainer />
       </div>
     );
@@ -67,6 +69,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {profile && <UserProfileSync profile={profile} />}
 
       <MobileDrawer />
+      <QuickAddModal />
       <ToastContainer />
     </div>
   );

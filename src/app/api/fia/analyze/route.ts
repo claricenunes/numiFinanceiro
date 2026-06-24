@@ -234,7 +234,15 @@ function getMock(): FIAAnalysis {
 }
 
 /* ── Route handler ────────────────────────────────────── */
-export async function POST(): Promise<Response> {
+export async function POST(req: Request): Promise<Response> {
+  // Verifica autenticação via cookie de sessão
+  const { createClient: createServerClient } = await import("@/lib/supabase/server");
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
   const providers = [tryGemini, tryDeepSeek] as const;
 
   for (const provider of providers) {
