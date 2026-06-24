@@ -1,4 +1,28 @@
 import type { FIAAnalysis, AIProvider } from "@/types/fia";
+import { getDashboardData } from "@/lib/supabase/queries/dashboard";
+import { getInvestments }   from "@/lib/supabase/queries/investments";
+import { getBudgetItems }   from "@/lib/supabase/queries/budgets";
+
+/* ── Rate limiting ────────────────────────────────────── */
+// In-memory store: resets on cold start (acceptable for serverless MVP)
+const RL_WINDOW_MS = 60 * 60 * 1000; // 1 hora
+const RL_LIMIT     = 5;               // max 5 req/user/hora
+const rlStore      = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; remaining: number; resetAt: number } {
+  const now   = Date.now();
+  const entry = rlStore.get(userId);
+
+  if (!entry || now > entry.resetAt) {
+    rlStore.set(userId, { count: 1, resetAt: now + RL_WINDOW_MS });
+    return { allowed: true, remaining: RL_LIMIT - 1, resetAt: now + RL_WINDOW_MS };
+  }
+  if (entry.count >= RL_LIMIT) {
+    return { allowed: false, remaining: 0, resetAt: entry.resetAt };
+  }
+  entry.count++;
+  return { allowed: true, remaining: RL_LIMIT - entry.count, resetAt: entry.resetAt };
+}
 
 /* ── Env ──────────────────────────────────────────────── */
 const GEMINI_KEY   = process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? "";
@@ -7,28 +31,89 @@ const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY ?? "";
 const GEMINI_ACTIVE   = !!GEMINI_KEY   && !GEMINI_KEY.includes("your-");
 const DEEPSEEK_ACTIVE = !!DEEPSEEK_KEY && !DEEPSEEK_KEY.includes("your-");
 
+/* ── Real-data context ────────────────────────────────── */
+
+type UserCtx = {
+  periodLabel:    string;
+  income:         number;
+  expense:        number;
+  savingsRate:    number;
+  availableCash:  number;
+  invested:       number;
+  netWorth:       number;
+  goals:          Array<{ name: string; pct: number; onTrack: boolean; monthlyNeeded: number | null; deadline: string | null }>;
+  budgetOverages: Array<{ name: string; overPct: number }>;
+  allocation:     Array<{ label: string; pct: number }>;
+};
+
+function fmt(n: number) { return `R$ ${n.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`; }
+
+async function fetchUserContext(): Promise<UserCtx | null> {
+  try {
+    const now       = new Date();
+    const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+    const endDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+    const periodLabel = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(now);
+
+    const [dash, inv, budgets] = await Promise.all([
+      getDashboardData({ type: "current_month", startDate, endDate, label: periodLabel }),
+      getInvestments(),
+      getBudgetItems(startDate, endDate),
+    ]);
+
+    const { summary, goals } = dash;
+
+    return {
+      periodLabel,
+      income:        summary.income,
+      expense:       summary.expense,
+      savingsRate:   summary.savingsRate,
+      availableCash: summary.availableCash,
+      invested:      summary.invested,
+      netWorth:      summary.netWorth,
+      goals: goals.map(g => ({
+        name:          g.name,
+        pct:           Math.round(g.progressPercent),
+        onTrack:       g.isOnTrack,
+        monthlyNeeded: g.monthlyNeeded,
+        deadline:      g.deadline,
+      })),
+      budgetOverages: budgets
+        .filter(b => b.spent > b.budgeted && b.budgeted > 0)
+        .map(b => ({ name: b.categoryName, overPct: Math.round((b.spent / b.budgeted - 1) * 100) })),
+      allocation: inv.summary.allocation.map(a => ({ label: a.label, pct: Math.round(a.percent) })),
+    };
+  } catch {
+    return null;
+  }
+}
+
 /* ── Prompt ───────────────────────────────────────────── */
-function buildPrompt(): string {
+function buildPrompt(ctx: UserCtx | null): string {
+  const data = ctx
+    ? `DADOS DO USUÁRIO (${ctx.periodLabel}):
+- Renda mensal: ${fmt(ctx.income)}
+- Despesas mensais: ${fmt(ctx.expense)}
+- Saldo disponível: ${fmt(ctx.availableCash)}
+- Patrimônio total: ${fmt(ctx.netWorth)} | Investimentos: ${fmt(ctx.invested)}
+- Taxa de poupança: ${ctx.savingsRate.toFixed(0)}%
+${ctx.allocation.length > 0 ? `- Carteira: ${ctx.allocation.map(a => `${a.label} ${a.pct}%`).join(" | ")}` : ""}
+
+METAS:
+${ctx.goals.length > 0
+      ? ctx.goals.map(g => `- ${g.name}: ${g.pct}% ${g.onTrack ? "(no ritmo)" : g.monthlyNeeded ? `(fora do ritmo, precisaria ${fmt(g.monthlyNeeded)}/mês)` : "(sem prazo)"}${g.deadline ? ` — prazo: ${g.deadline}` : ""}`).join("\n")
+      : "- Nenhuma meta cadastrada"}
+
+ORÇAMENTO: ${ctx.budgetOverages.length > 0
+      ? ctx.budgetOverages.map(b => `${b.name} +${b.overPct}% acima do limite`).join(", ")
+      : "dentro do orçamento"}`
+    : `DADOS DO USUÁRIO: Dados não disponíveis. Forneça análise genérica de qualidade para investidor brasileiro.`;
+
   return `Você é um analista financeiro especialista no Brasil.
 
 Analise os dados do usuário e retorne APENAS JSON válido, sem markdown, sem texto extra.
 
-DADOS DO USUÁRIO (Junho 2026):
-- Renda mensal: R$ 6.600 (salário R$ 5.400 + freelance R$ 1.200)
-- Despesas mensais: R$ 2.848
-- Saldo disponível: R$ 4.180
-- Reserva de emergência: R$ 8.240 / R$ 18.000 (46% completo)
-- Patrimônio: R$ 38.420 | Investimentos: R$ 22.500
-- Taxa de poupança: 47%
-- Carteira: Ações 44% | ETFs 24% | Renda Fixa 16% | Cripto 11% | FIIs 4%
-- Posições: PETR4 +4,6% | MGLU3 -26,2% | BOVA11 +7% | BTC +20%
-
-METAS:
-- Reserva de Emergência: 23% (fora do ritmo, precisaria R$ 766/mês)
-- Viagem Europa Jul/2027: 35% (no ritmo)
-- Notebook: 30% (sem prazo)
-
-ORÇAMENTO: Lazer +70%, Outros +33%, Moradia +3% acima do limite
+${data}
 
 Formato obrigatório (apenas este JSON, exatamente 5 ativos no allocation, percentuais somando 100):
 {
@@ -89,7 +174,7 @@ async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
 
 /* ── Providers ────────────────────────────────────────── */
 
-async function tryGemini(): Promise<FIAAnalysis | null> {
+async function tryGemini(prompt: string): Promise<FIAAnalysis | null> {
   if (!GEMINI_ACTIVE) return null;
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
@@ -98,7 +183,7 @@ async function tryGemini(): Promise<FIAAnalysis | null> {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: buildPrompt() }] }],
+        contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           responseMimeType: "application/json",
           temperature: 0.4,
@@ -117,7 +202,7 @@ async function tryGemini(): Promise<FIAAnalysis | null> {
   return stamp(parseJSON(text), "gemini");
 }
 
-async function tryDeepSeek(): Promise<FIAAnalysis | null> {
+async function tryDeepSeek(prompt: string): Promise<FIAAnalysis | null> {
   if (!DEEPSEEK_ACTIVE) return null;
 
   const res = await withTimeout(
@@ -135,7 +220,7 @@ async function tryDeepSeek(): Promise<FIAAnalysis | null> {
             content:
               "Você é um analista financeiro especialista no Brasil. Responda APENAS com JSON válido.",
           },
-          { role: "user", content: buildPrompt() },
+          { role: "user", content: prompt },
         ],
         response_format: { type: "json_object" },
         temperature: 0.3,
@@ -162,7 +247,7 @@ function getMock(): FIAAnalysis {
       min: 450,
       max: 850,
       reason:
-        "Renda R$ 6.600 − despesas R$ 2.848 − reserva operacional R$ 1.500 = R$ 2.252 disponíveis. Recomendamos alocar 20-38% (R$ 450-850) em investimentos.",
+        "Com base na diferença entre receitas e despesas, recomendamos alocar 20-38% do excedente em investimentos mensais.",
     },
     allocation: [
       {
@@ -173,7 +258,7 @@ function getMock(): FIAAnalysis {
         expectedReturn: "~13,25% a.a.",
         timeframe: "Imediato",
         rationale:
-          "Reserva de emergência em 46% — liquidez é prioridade. Tesouro Selic rende ~CDI com resgate D+1, ideal para completar a reserva.",
+          "Liquidez é prioridade. Tesouro Selic rende ~CDI com resgate D+1, ideal para reserva de emergência.",
       },
       {
         asset: "BOVA11 — ETF Ibovespa",
@@ -183,7 +268,7 @@ function getMock(): FIAAnalysis {
         expectedReturn: "12-18% a.a. (longo prazo)",
         timeframe: "3+ anos",
         rationale:
-          "Você já tem 24% em ETFs. BOVA11 reforça diversificação com custo mínimo (0,10% a.a.) e liquidez diária.",
+          "Diversificação com custo mínimo (0,10% a.a.) e liquidez diária.",
       },
       {
         asset: "Tesouro IPCA+ 2029",
@@ -193,7 +278,7 @@ function getMock(): FIAAnalysis {
         expectedReturn: "IPCA + 6,2% a.a.",
         timeframe: "2-3 anos",
         rationale:
-          "Proteção contra inflação + prazo alinhado à meta Viagem Europa (Jul/2027). Pode resgatar no mercado secundário antes do vencimento.",
+          "Proteção contra inflação com prazo adequado para metas de médio prazo.",
       },
       {
         asset: "MXRF11 — FII de Papel",
@@ -203,7 +288,7 @@ function getMock(): FIAAnalysis {
         expectedReturn: "~11% a.a. (dividendos)",
         timeframe: "1-2 anos",
         rationale:
-          "Dividendos mensais isentos de IR. Sua carteira tem apenas 4% em FIIs — abaixo do ideal (8-12%) para perfil moderado.",
+          "Dividendos mensais isentos de IR. Complementa a carteira com renda passiva.",
       },
       {
         asset: "PETR4 — Petrobras PN",
@@ -213,21 +298,21 @@ function getMock(): FIAAnalysis {
         expectedReturn: "Variável + dividendos",
         timeframe: "1-2 anos",
         rationale:
-          "Você tem PETR4 com +4,6%. Reforço moderado com bom histórico de dividendos e exposição ao setor de energia.",
+          "Exposição ao setor de energia com bom histórico de dividendos.",
       },
     ],
     insights: [
-      "🟡 Reserva de emergência em 46% — direcione parte do freelance (R$ 1.200 este mês) para ela antes de ampliar renda variável.",
-      "📈 Taxa de poupança de 47% coloca você no top 10% dos investidores. Mantendo esse ritmo, você atinge R$ 100k investidos em ~18 meses.",
-      "⚠️ MGLU3 acumula -26% na sua carteira. Não aporte mais agora. Avalie stop-loss ou aguarde recuperação de fundamentos.",
-      "💡 Com renda extra este mês, considere aporte único de R$ 800–1.000 priorizando Tesouro Selic para acelerar a reserva.",
+      "💡 Mantenha sua reserva de emergência como prioridade antes de ampliar renda variável.",
+      "📈 Uma taxa de poupança consistente é o maior acelerador de patrimônio no longo prazo.",
+      "⚖️ Diversifique entre renda fixa e variável para equilibrar segurança e crescimento.",
+      "🎯 Revise suas metas a cada 3 meses para ajustar aportes conforme a evolução.",
     ],
     nextSteps: [
-      "Deposite entre R$ 450–850 distribuídos conforme carteira sugerida ainda esta quinzena",
-      "Configure aporte automático de R$ 500/mês via débito programado",
-      "Reavalie posição em MGLU3 em 30 dias ou se cair mais 5%",
+      "Defina um aporte mensal fixo e automatize via débito programado",
+      "Avalie seu perfil de risco antes de aumentar exposição em renda variável",
+      "Priorize completar a reserva de emergência (6x despesas mensais)",
     ],
-    confidence: 82,
+    confidence: 65,
     generatedAt: new Date().toISOString(),
     aiProvider: "mock",
   };
@@ -235,7 +320,6 @@ function getMock(): FIAAnalysis {
 
 /* ── Route handler ────────────────────────────────────── */
 export async function POST(req: Request): Promise<Response> {
-  // Verifica autenticação via cookie de sessão
   const { createClient: createServerClient } = await import("@/lib/supabase/server");
   const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -243,18 +327,41 @@ export async function POST(req: Request): Promise<Response> {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  const providers = [tryGemini, tryDeepSeek] as const;
+  // Rate limiting por usuário
+  const rl = checkRateLimit(user.id);
+  if (!rl.allowed) {
+    const retryAfter = Math.ceil((rl.resetAt - Date.now()) / 1000);
+    return new Response(
+      JSON.stringify({ error: "Muitas requisições. Tente novamente em alguns minutos.", retryAfter }),
+      {
+        status: 429,
+        headers: {
+          "Retry-After":       String(retryAfter),
+          "X-RateLimit-Limit": String(RL_LIMIT),
+          "X-RateLimit-Reset": String(Math.floor(rl.resetAt / 1000)),
+        },
+      }
+    );
+  }
+
+  // Busca contexto real do usuário para o prompt
+  const ctx    = await fetchUserContext();
+  const prompt = buildPrompt(ctx);
+
+  const providers = [
+    () => tryGemini(prompt),
+    () => tryDeepSeek(prompt),
+  ] as const;
 
   for (const provider of providers) {
     try {
       const result = await provider();
       if (result) return Response.json(result);
     } catch (err) {
-      console.warn(`[FIA] Provider ${provider.name} failed:`, err);
+      console.warn(`[FIA] Provider failed:`, err);
     }
   }
 
-  // Mock fallback com latência simulada
   await new Promise((r) => setTimeout(r, 700 + Math.random() * 500));
   return Response.json(getMock());
 }

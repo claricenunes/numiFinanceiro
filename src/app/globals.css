@@ -32,6 +32,34 @@
   --radius-xl: 24px;
 }
 
+/* ── Paleta runtime (dark por padrão) ───────────── */
+:root {
+  --numi-bg:          #0B1020;
+  --numi-surface:     #131929;
+  --numi-elevated:    #0D1526;
+  --numi-modal:       #0F1B2D;
+  --numi-border:      #1E2D45;
+  --numi-text:        #F1F5F9;
+  --numi-text-2:      #94A3B8;
+  --numi-text-3:      #475569;
+  --numi-text-4:      #64748B;
+  --numi-input-bg:    #131929;
+}
+
+/* ── Modo claro ─────────────────────────────────── */
+html.light {
+  --numi-bg:          #F1F5F9;
+  --numi-surface:     #FFFFFF;
+  --numi-elevated:    #F8FAFC;
+  --numi-modal:       #FFFFFF;
+  --numi-border:      #E2E8F0;
+  --numi-text:        #0F172A;
+  --numi-text-2:      #334155;
+  --numi-text-3:      #64748B;
+  --numi-text-4:      #94A3B8;
+  --numi-input-bg:    #F8FAFC;
+}
+
 /* ── Reset global ───────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -44,9 +72,10 @@ html {
 }
 
 body {
-  background-color: #0B1020;
-  color: #F1F5F9;
+  background-color: var(--numi-bg);
+  color: var(--numi-text);
   min-height: 100dvh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ── Scrollbar custom ───────────────────────────── */

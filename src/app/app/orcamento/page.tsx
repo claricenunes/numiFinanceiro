@@ -100,6 +100,7 @@ export default async function OrcamentoPage({
 
 // ── Client components ───────────────────────────────────
 import { NewBudgetButton } from "./NewBudgetButton";
+import { BudgetCardActions } from "./BudgetCardActions";
 
 function BudgetCard({ item }: { item: BudgetItem }) {
   const pct      = item.budgeted > 0 ? (item.spent / item.budgeted) * 100 : 0;
@@ -132,6 +133,11 @@ function BudgetCard({ item }: { item: BudgetItem }) {
         </div>
       </div>
       <ProgressBar percent={Math.min(pct, 100)} color={barColor} />
+      <BudgetCardActions
+        budgetId={item.id}
+        budgeted={item.budgeted}
+        categoryName={item.categoryName}
+      />
     </div>
   );
 }

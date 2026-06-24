@@ -4,6 +4,8 @@ import { getInvestments } from "@/lib/supabase/queries/investments";
 import type { PositionRow } from "@/types/app";
 import { AllocationChart } from "./AllocationChart";
 import { FadeIn } from "@/components/common/FadeIn";
+import { NewPositionButton } from "./NewPositionButton";
+import { UpdatePricesButton } from "./UpdatePricesButton";
 
 export const metadata: Metadata = { title: "Investimentos" };
 
@@ -24,7 +26,15 @@ export default async function InvestimentosPage() {
 
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
-      <h1 className="text-xl font-bold text-[#F1F5F9] mb-5">Investimentos</h1>
+      <div className="flex items-center justify-between mb-5">
+        <h1 className="text-xl font-bold text-[#F1F5F9]">Investimentos</h1>
+        <div className="flex items-center gap-2">
+          <UpdatePricesButton
+            positions={positions.map((p) => ({ id: p.id, name: p.name, ticker: p.ticker }))}
+          />
+          <NewPositionButton />
+        </div>
+      </div>
 
       <div className="rounded-2xl p-5 mb-6" style={{ background: "#131929", border: "1px solid #1E2D45" }}>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">

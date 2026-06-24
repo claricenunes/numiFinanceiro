@@ -11,7 +11,7 @@ export function Header() {
   return (
     <header
       className="flex items-center justify-between px-5 lg:px-6 h-16 flex-shrink-0 sticky top-0 z-40"
-      style={{ background: "#0B1020", borderBottom: "1px solid #1E2D45" }}
+      style={{ background: "var(--numi-bg)", borderBottom: "1px solid var(--numi-border)" }}
     >
       {/* Esquerda: toggle menu (mobile) + toggle sidebar (desktop) + logo mobile */}
       <div className="flex items-center gap-3">

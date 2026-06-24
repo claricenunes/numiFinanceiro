@@ -1,15 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
-interface Insight {
-  id: string;
-  type: string;
-  severity: "info" | "warning" | "alert";
-  title: string;
-  description: string;
-  icon: string;
-}
+import type { Insight } from "@/lib/supabase/queries/insights";
 
 interface Props {
   insights: Insight[];

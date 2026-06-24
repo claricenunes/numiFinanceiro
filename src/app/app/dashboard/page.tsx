@@ -7,6 +7,8 @@ import { GoalsPreview } from "@/components/dashboard/GoalsPreview";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { InsightsBanner } from "@/components/dashboard/InsightsBanner";
 import { getDashboardData } from "@/lib/supabase/queries/dashboard";
+import { getBudgetItems }   from "@/lib/supabase/queries/budgets";
+import { generateInsights } from "@/lib/supabase/queries/insights";
 import { parsePeriodFromParams } from "@/lib/utils/date";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -19,8 +21,13 @@ export default async function DashboardPage({
   const { from, to, pt } = await searchParams;
   const period = parsePeriodFromParams(from, to, pt);
 
-  const { summary, categories, weeklyFlow, goals, transactions, firstName } =
-    await getDashboardData(period);
+  const [dashData, budgetItems] = await Promise.all([
+    getDashboardData(period),
+    getBudgetItems(period.startDate, period.endDate),
+  ]);
+
+  const { summary, categories, weeklyFlow, goals, transactions, firstName } = dashData;
+  const insights = generateInsights(dashData, budgetItems);
 
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
@@ -46,7 +53,7 @@ export default async function DashboardPage({
           <RecentTransactions transactions={transactions} />
         </div>
 
-        <InsightsBanner insights={[]} />
+        <InsightsBanner insights={insights} />
       </div>
     </FadeIn>
   );

@@ -20,9 +20,9 @@ export function BottomNav() {
     <nav
       className="lg:hidden fixed bottom-0 inset-x-0 z-50 flex items-center justify-around px-2 pb-safe"
       style={{
-        background: "rgba(13, 21, 38, 0.95)",
+        background: "color-mix(in srgb, var(--numi-bg) 92%, transparent)",
         backdropFilter: "blur(12px)",
-        borderTop: "1px solid #1E2D45",
+        borderTop: "1px solid var(--numi-border)",
         height: "64px",
       }}
     >

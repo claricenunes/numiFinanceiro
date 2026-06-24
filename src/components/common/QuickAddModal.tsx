@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useUIStore } from "@/stores/useUIStore";
 import { useToastStore } from "@/stores/useToastStore";
@@ -35,6 +35,7 @@ export function QuickAddModal() {
   const [accounts, setAccounts] = useState<Account[]>([]);
 
   const amountRef = useRef<HTMLInputElement>(null);
+  const panelRef  = useRef<HTMLDivElement>(null);
 
   // Sync type when store changes (e.g. BottomNav opens as "expense")
   useEffect(() => {
@@ -43,6 +44,22 @@ export function QuickAddModal() {
       setTimeout(() => amountRef.current?.focus(), 80);
     }
   }, [quickAddOpen, quickAddType]);
+
+  // Focus trap
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") { e.preventDefault(); handleClose(); return; }
+    if (e.key !== "Tab" || !panelRef.current) return;
+    const SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const els   = Array.from(panelRef.current.querySelectorAll<HTMLElement>(SELECTOR));
+    const first = els[0];
+    const last  = els[els.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+    } else {
+      if (document.activeElement === last)  { e.preventDefault(); first?.focus(); }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quickAddOpen]);
 
   // Fetch categories + accounts once on open
   useEffect(() => {
@@ -76,6 +93,12 @@ export function QuickAddModal() {
     reset();
     closeQuickAdd();
   }
+
+  useEffect(() => {
+    if (!quickAddOpen) return;
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [quickAddOpen, handleKeyDown]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -135,7 +158,7 @@ export function QuickAddModal() {
       className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
       role="dialog"
       aria-modal="true"
-      aria-label="Nova transação"
+      aria-labelledby="quick-add-title"
     >
       {/* Backdrop */}
       <div
@@ -146,12 +169,13 @@ export function QuickAddModal() {
 
       {/* Sheet */}
       <div
+        ref={panelRef}
         className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
         style={{ background: "#0F1B2D", border: "1px solid #1E2D45", maxHeight: "92dvh", overflowY: "auto" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-[#F1F5F9]">Nova transação</h2>
+          <h2 id="quick-add-title" className="text-base font-semibold text-[#F1F5F9]">Nova transação</h2>
           <button
             onClick={handleClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg text-[#64748B] hover:text-[#F1F5F9] hover:bg-[#1E2D45] transition-colors"

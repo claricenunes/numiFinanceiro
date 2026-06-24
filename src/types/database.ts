@@ -1,10 +1,9 @@
 /**
  * Tipos do banco de dados Supabase.
  *
- * Para regenerar automaticamente após migrations:
- *   npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/types/database.ts
- *
- * Os tipos abaixo são o stub inicial — substitua pelo output do CLI após aplicar as migrations.
+ * Para regenerar após migrations:
+ *   npx supabase login          # uma vez
+ *   npm run gen:types           # regenera este arquivo
  */
 
 export type Json =
@@ -65,7 +64,7 @@ export interface Database {
       };
       ledger_entries: {
         Row: LedgerEntry;
-        Insert: never;
+        Insert: Omit<LedgerEntry, "id" | "created_at">;
         Update: never;
       };
       credit_card_bills: {
@@ -85,12 +84,12 @@ export interface Database {
       };
       monthly_snapshots: {
         Row: MonthlySnapshot;
-        Insert: never;
-        Update: never;
+        Insert: Omit<MonthlySnapshot, "id" | "computed_at">;
+        Update: Partial<Omit<MonthlySnapshot, "id" | "user_id">>;
       };
       financial_events: {
         Row: FinancialEvent;
-        Insert: never;
+        Insert: Omit<FinancialEvent, "id" | "created_at" | "is_read">;
         Update: Pick<FinancialEvent, "is_read">;
       };
     };
