@@ -4,6 +4,7 @@ import type { TransactionRow } from "@/types/app";
 type RawTx = {
   id: string; date: string; description: string | null;
   type: string; amount: number; status: string; currency_code: string;
+  installment_number: number | null; installment_total: number | null;
   user_categories: { name: string; icon: string | null; color: string | null } | null;
   accounts: { name: string; color: string | null } | null;
 };
@@ -22,6 +23,8 @@ function mapTx(t: RawTx): TransactionRow {
     categoryColor: t.user_categories?.color ?? null,
     accountName:   t.accounts?.name  ?? "—",
     accountColor:  t.accounts?.color ?? null,
+    installmentNumber: t.installment_number ?? null,
+    installmentTotal:  t.installment_total  ?? null,
   };
 }
 
@@ -35,7 +38,7 @@ export async function getTransactions(
 
   let query = supabase
     .from("transactions")
-    .select("id,date,description,type,amount,status,currency_code,user_categories(name,icon,color),accounts(name,color)")
+    .select("id,date,description,type,amount,status,currency_code,installment_number,installment_total,user_categories(name,icon,color),accounts(name,color)")
     .eq("user_id", user.id)
     .is("deleted_at", null)
     .order("date", { ascending: false })
@@ -63,7 +66,7 @@ export async function getMonthTransactions(
 
   const { data } = await supabase
     .from("transactions")
-    .select("id,date,description,type,amount,status,currency_code,user_categories(name,icon,color),accounts(name,color)")
+    .select("id,date,description,type,amount,status,currency_code,installment_number,installment_total,user_categories(name,icon,color),accounts(name,color)")
     .eq("user_id", user.id)
     .is("deleted_at", null)
     .neq("status", "cancelled")

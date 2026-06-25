@@ -76,6 +76,8 @@ export interface TransactionRow {
   accountName: string;
   accountColor: string | null;
   currencyCode: string;
+  installmentNumber?: number | null;
+  installmentTotal?: number | null;
 }
 
 /* ── Metas (computado) ───────────────────────────────── */

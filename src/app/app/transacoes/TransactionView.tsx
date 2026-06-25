@@ -451,10 +451,16 @@ function TxRow({
 
       {/* Description + meta */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 min-w-0">
           <p className="text-sm font-medium text-[#F1F5F9] truncate">
             {tx.description ?? "—"}
           </p>
+          {tx.installmentNumber && tx.installmentTotal && (
+            <span className="text-xs px-1.5 py-0.5 rounded-full shrink-0 font-semibold"
+              style={{ background: "rgba(99,102,241,0.15)", color: "#818CF8", border: "1px solid rgba(99,102,241,0.3)" }}>
+              {tx.installmentNumber}/{tx.installmentTotal}
+            </span>
+          )}
           {tx.status === "pending" && (
             <span className="text-xs px-1.5 py-0.5 rounded-full shrink-0"
               style={{ background: "#FBBF2422", color: "#FBBF24", border: "1px solid #FBBF2444" }}>
