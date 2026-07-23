@@ -9,6 +9,7 @@ import { MobileDrawer } from "@/components/layout/MobileDrawer";
 import { UserProfileSync } from "./UserProfileSync";
 import { QuickAddModal } from "@/components/common/QuickAddModal";
 import { ThemeProvider } from "@/components/common/ThemeProvider";
+import { PageTransition } from "@/components/common/motion/PageTransition";
 import type { UserProfile } from "@/types/database";
 
 const isSupabaseConfigured =
@@ -18,12 +19,12 @@ const isSupabaseConfigured =
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   if (!isSupabaseConfigured) {
     return (
-      <div className="flex h-dvh overflow-hidden" style={{ background: "#0B1020" }}>
+      <div className="flex h-dvh overflow-hidden numi-ambient-bg">
         <Sidebar userName="Dev" userAvatar={undefined} notifCount={0} />
         <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
           <Header />
           <main className="flex-1 overflow-y-auto pb-20 lg:pb-0" id="main-content">
-            {children}
+            <PageTransition>{children}</PageTransition>
           </main>
         </div>
         <BottomNav />
@@ -59,8 +60,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Full-screen layout for onboarding (no sidebar/header)
   if (isOnboarding) {
     return (
-      <div className="min-h-dvh" style={{ background: "#0B1020" }}>
-        {children}
+      <div className="min-h-dvh numi-ambient-bg">
+        <PageTransition>{children}</PageTransition>
         {profile && <UserProfileSync profile={profile} />}
         <ToastContainer />
       </div>
@@ -68,7 +69,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex h-dvh overflow-hidden" style={{ background: "var(--numi-bg)" }}>
+    <div className="flex h-dvh overflow-hidden numi-ambient-bg">
       <Sidebar
         userName={profile?.full_name ?? user.email}
         userAvatar={profile?.avatar_url}
@@ -82,14 +83,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           className="flex-1 overflow-y-auto pb-20 lg:pb-0"
           id="main-content"
         >
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
 
       <BottomNav />
 
       {profile && <UserProfileSync profile={profile} />}
-      <ThemeProvider initialTheme={profile?.theme ?? "dark"} />
+      <ThemeProvider initialTheme={profile?.theme ?? "light"} />
 
       <MobileDrawer />
       <QuickAddModal />

@@ -36,7 +36,7 @@ export function BottomNav() {
               <button
                 onClick={() => openQuickAdd("expense")}
                 className="w-12 h-12 rounded-full flex items-center justify-center text-[#0B1020] font-bold text-xl shadow-lg transition-transform active:scale-95"
-                style={{ background: "#34D399", boxShadow: "0 4px 20px rgba(52,211,153,0.4)" }}
+                style={{ background: "var(--numi-income)", boxShadow: "0 4px 20px rgba(52,211,153,0.4)" }}
                 aria-label="Nova transação"
               >
                 +
@@ -50,7 +50,7 @@ export function BottomNav() {
             key={href}
             href={href}
             className="flex flex-col items-center gap-1 min-w-[48px] transition-colors"
-            style={{ color: active ? "#34D399" : "#475569" }}
+            style={{ color: active ? "var(--numi-income)" : "var(--numi-text-3)" }}
           >
             <Icon className="w-5 h-5" />
             <span className="text-[10px] font-medium">{label}</span>

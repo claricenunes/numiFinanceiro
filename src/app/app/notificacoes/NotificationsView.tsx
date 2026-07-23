@@ -13,9 +13,9 @@ const SEVERITY_ICON: Record<string, string> = {
 };
 
 const SEVERITY_COLOR: Record<string, string> = {
-  alert:   "#F87171",
-  warning: "#FBBF24",
-  info:    "#38BDF8",
+  alert:   "var(--numi-expense)",
+  warning: "var(--numi-warning)",
+  info:    "var(--numi-info)",
 };
 
 function timeAgo(dateStr: string): string {
@@ -64,8 +64,8 @@ export function NotificationsView({ notifications: initial }: Props) {
     return (
       <div className="text-center py-24">
         <p className="text-4xl mb-3">🔔</p>
-        <p className="text-[#94A3B8] font-medium">Nenhuma notificação</p>
-        <p className="text-sm text-[#475569] mt-1">
+        <p className="text-[var(--numi-text-2)] font-medium">Nenhuma notificação</p>
+        <p className="text-sm text-[var(--numi-text-3)] mt-1">
           Você receberá alertas sobre orçamentos, metas e movimentações importantes
         </p>
       </div>
@@ -76,13 +76,13 @@ export function NotificationsView({ notifications: initial }: Props) {
     <div>
       {unreadCount > 0 && (
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-[#64748B]">
+          <p className="text-sm text-[var(--numi-text-4)]">
             {unreadCount} não lida{unreadCount !== 1 ? "s" : ""}
           </p>
           <button
             onClick={markAllRead}
             disabled={loading}
-            className="text-xs font-medium text-[#34D399] hover:text-[#6EE7B7] transition-colors disabled:opacity-50"
+            className="text-xs font-medium text-[var(--numi-income)] hover:opacity-80 transition-colors disabled:opacity-50"
           >
             Marcar tudo como lido
           </button>
@@ -91,15 +91,15 @@ export function NotificationsView({ notifications: initial }: Props) {
 
       <div className="flex flex-col gap-2">
         {items.map((n) => {
-          const color = SEVERITY_COLOR[n.severity] ?? "#34D399";
+          const color = SEVERITY_COLOR[n.severity] ?? "var(--numi-income)";
           return (
             <div
               key={n.id}
               onClick={() => !n.is_read && markOneRead(n.id)}
               className="rounded-2xl p-4 transition-colors"
               style={{
-                background: n.is_read ? "#131929" : "#0D1D33",
-                border:     `1px solid ${n.is_read ? "#1E2D45" : "#1E3A5F"}`,
+                background: n.is_read ? "var(--numi-elevated)" : "color-mix(in srgb, var(--numi-info) 6%, var(--numi-elevated))",
+                border:     `1px solid ${n.is_read ? "var(--numi-border)" : "rgba(59,130,246,0.3)"}`,
                 cursor:     n.is_read ? "default" : "pointer",
               }}
             >
@@ -109,7 +109,7 @@ export function NotificationsView({ notifications: initial }: Props) {
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-[#F1F5F9] leading-tight">{n.title}</p>
+                    <p className="text-sm font-semibold text-[var(--numi-text)] leading-tight">{n.title}</p>
                     {!n.is_read && (
                       <span
                         className="w-2 h-2 rounded-full flex-shrink-0"
@@ -118,9 +118,9 @@ export function NotificationsView({ notifications: initial }: Props) {
                     )}
                   </div>
                   {n.description && (
-                    <p className="text-xs text-[#64748B] mt-1 leading-relaxed">{n.description}</p>
+                    <p className="text-xs text-[var(--numi-text-4)] mt-1 leading-relaxed">{n.description}</p>
                   )}
-                  <p className="text-xs text-[#475569] mt-2">{timeAgo(n.created_at)}</p>
+                  <p className="text-xs text-[var(--numi-text-3)] mt-2">{timeAgo(n.created_at)}</p>
                 </div>
               </div>
             </div>

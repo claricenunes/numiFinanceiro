@@ -12,7 +12,7 @@ create table if not exists public.user_profiles (
   avatar_url      text,
   currency_code   text not null default 'BRL',
   timezone        text not null default 'America/Sao_Paulo',
-  theme           text not null default 'dark' check (theme in ('dark','light','system')),
+  theme           text not null default 'light' check (theme in ('dark','light','system')),
   onboarding_step int  not null default 0,
   created_at      timestamptz not null default now(),
   updated_at      timestamptz not null default now()
@@ -68,6 +68,10 @@ create table if not exists public.user_categories (
   updated_at         timestamptz not null default now(),
   deleted_at         timestamptz
 );
+
+create unique index if not exists user_categories_user_system_uniq
+  on public.user_categories (user_id, system_category_id)
+  where system_category_id is not null;
 
 -- ── transactions ───────────────────────────────────────────────────
 create table if not exists public.transactions (

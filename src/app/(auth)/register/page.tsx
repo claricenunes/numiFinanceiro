@@ -77,11 +77,11 @@ export default function RegisterPage() {
              style={{ background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.3)" }}>
           <span className="text-2xl">✉️</span>
         </div>
-        <h2 className="text-xl font-bold text-[#F1F5F9] mb-2">Confirme seu e-mail</h2>
-        <p className="text-sm text-[#94A3B8] mb-6">
+        <h2 className="text-xl font-bold text-[var(--numi-text)] mb-2">Confirme seu e-mail</h2>
+        <p className="text-sm text-[var(--numi-text-2)] mb-6">
           Enviamos um link de confirmação para o seu e-mail. Clique nele para ativar sua conta.
         </p>
-        <Link href="/login" className="text-sm text-[#34D399] hover:underline">
+        <Link href="/login" className="text-sm text-[var(--numi-income)] hover:underline">
           Voltar para o login
         </Link>
       </div>
@@ -90,8 +90,8 @@ export default function RegisterPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-[#F1F5F9] mb-1">Criar conta</h1>
-      <p className="text-sm text-[#94A3B8] mb-6">Comece a organizar suas finanças hoje.</p>
+      <h1 className="text-2xl font-bold text-[var(--numi-text)] mb-1">Criar conta</h1>
+      <p className="text-sm text-[var(--numi-text-2)] mb-6">Comece a organizar suas finanças hoje.</p>
 
       <button
         type="button"
@@ -104,9 +104,9 @@ export default function RegisterPage() {
       </button>
 
       <div className="flex items-center gap-3 mb-4">
-        <div className="flex-1 h-px bg-[#1E2D45]" />
-        <span className="text-xs text-[#475569]">ou com e-mail</span>
-        <div className="flex-1 h-px bg-[#1E2D45]" />
+        <div className="flex-1 h-px bg-[var(--numi-border)]" />
+        <span className="text-xs text-[var(--numi-text-3)]">ou com e-mail</span>
+        <div className="flex-1 h-px bg-[var(--numi-border)]" />
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
@@ -162,7 +162,7 @@ export default function RegisterPage() {
         {serverError && (
           <div
             role="alert"
-            className="rounded-lg px-4 py-3 text-sm text-[#F87171]"
+            className="rounded-lg px-4 py-3 text-sm text-[var(--numi-expense)]"
             style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}
           >
             {serverError}
@@ -178,9 +178,9 @@ export default function RegisterPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[#94A3B8]">
+      <p className="mt-6 text-center text-sm text-[var(--numi-text-2)]">
         Já tem conta?{" "}
-        <Link href="/login" className="text-[#34D399] font-medium hover:underline">
+        <Link href="/login" className="text-[var(--numi-income)] font-medium hover:underline">
           Entrar
         </Link>
       </p>
@@ -201,10 +201,10 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-[#94A3B8]">{label}</label>
+      <label className="text-sm font-medium text-[var(--numi-text-2)]">{label}</label>
       {children}
-      {hint && !error && <span className="text-xs text-[#475569]">{hint}</span>}
-      {error && <span className="text-xs text-[#F87171]">{error}</span>}
+      {hint && !error && <span className="text-xs text-[var(--numi-text-3)]">{hint}</span>}
+      {error && <span className="text-xs text-[var(--numi-expense)]">{error}</span>}
     </div>
   );
 }

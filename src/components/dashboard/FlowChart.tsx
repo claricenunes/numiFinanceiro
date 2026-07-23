@@ -25,13 +25,13 @@ export function FlowChart({ data }: Props) {
   return (
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-[#F1F5F9]">Fluxo do período</p>
-        <div className="flex items-center gap-3 text-xs text-[#94A3B8]">
+        <p className="text-sm font-semibold text-[var(--numi-text)]">Fluxo do período</p>
+        <div className="flex items-center gap-3 text-xs text-[var(--numi-text-2)]">
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-sm bg-[#34D399]" /> Receita
+            <span className="w-2 h-2 rounded-sm bg-[var(--numi-income)]" /> Receita
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-sm bg-[#F87171]" /> Despesas
+            <span className="w-2 h-2 rounded-sm bg-[var(--numi-expense)]" /> Despesas
           </span>
         </div>
       </div>
@@ -40,17 +40,17 @@ export function FlowChart({ data }: Props) {
         <BarChart data={data} barCategoryGap="30%" barGap={4}>
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#1E2D45"
+            stroke="var(--numi-border)"
             vertical={false}
           />
           <XAxis
             dataKey="label"
-            tick={{ fill: "#475569", fontSize: 11 }}
+            tick={{ fill: "var(--numi-text-3)", fontSize: 11 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: "#475569", fontSize: 11 }}
+            tick={{ fill: "var(--numi-text-3)", fontSize: 11 }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(v) => `${v / 1000}k`}
@@ -62,16 +62,16 @@ export function FlowChart({ data }: Props) {
               name === "income" ? "Receita" : "Despesas",
             ]}
             contentStyle={{
-              background: "#131929",
-              border: "1px solid #1E2D45",
+              background: "var(--numi-elevated)",
+              border: "1px solid var(--numi-border)",
               borderRadius: "10px",
               fontSize: "12px",
-              color: "#F1F5F9",
+              color: "var(--numi-text)",
             }}
-            cursor={{ fill: "rgba(255,255,255,0.03)" }}
+            cursor={{ fill: "color-mix(in srgb, var(--numi-text) 4%, transparent)" }}
           />
-          <Bar dataKey="income"  fill="#34D399" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="expense" fill="#F87171" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="income"  fill="var(--numi-income)" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="expense" fill="var(--numi-expense)" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

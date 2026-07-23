@@ -109,12 +109,12 @@ function EditTxModal({ tx, onClose }: { tx: TransactionRow; onClose: () => void 
       <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={onClose} />
       <div
         className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-        style={{ background: "#0F1B2D", border: "1px solid #1E2D45", maxHeight: "92dvh", overflowY: "auto" }}
+        style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)", maxHeight: "92dvh", overflowY: "auto" }}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-[#F1F5F9]">Editar transação</h2>
+          <h2 className="text-base font-semibold text-[var(--numi-text)]">Editar transação</h2>
           <button onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#64748B] hover:text-[#F1F5F9] hover:bg-[#1E2D45]">
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">
             ✕
           </button>
         </div>
@@ -128,9 +128,9 @@ function EditTxModal({ tx, onClose }: { tx: TransactionRow; onClose: () => void 
                   onClick={() => setForm(f => ({ ...f, type: t, categoryId: "" }))}
                   className="flex-1 py-2 rounded-xl text-sm font-semibold"
                   style={{
-                    background: form.type === t ? (t === "income" ? "#34D39922" : "#F8717122") : "#131929",
-                    border: `1px solid ${form.type === t ? (t === "income" ? "#34D399" : "#F87171") : "#1E2D45"}`,
-                    color: form.type === t ? (t === "income" ? "#34D399" : "#F87171") : "#64748B",
+                    background: form.type === t ? (t === "income" ? "rgba(16,185,129,0.14)" : "rgba(239,68,68,0.14)") : "var(--numi-input-bg)",
+                    border: `1px solid ${form.type === t ? (t === "income" ? "var(--numi-income)" : "var(--numi-expense)") : "var(--numi-border)"}`,
+                    color: form.type === t ? (t === "income" ? "var(--numi-income)" : "var(--numi-expense)") : "var(--numi-text-4)",
                   }}>
                   {t === "income" ? "Receita" : "Despesa"}
                 </button>
@@ -140,38 +140,38 @@ function EditTxModal({ tx, onClose }: { tx: TransactionRow; onClose: () => void 
 
           {/* Descrição */}
           <div>
-            <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Descrição</label>
+            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Descrição</label>
             <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Ex: Supermercado, Salário..."
-              className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-              style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
           </div>
 
           {/* Valor */}
           <div>
-            <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Valor (R$)</label>
+            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Valor (R$)</label>
             <input value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
               type="text" inputMode="decimal" placeholder="0,00" required
-              className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-              style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
           </div>
 
           {/* Data */}
           <div>
-            <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Data</label>
+            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Data</label>
             <input value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
               type="date" required
-              className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-              style={{ border: "1px solid #1E2D45", background: "#131929", colorScheme: "dark" }} />
+              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)", colorScheme: "light" }} />
           </div>
 
           {/* Categoria */}
           {filtered.length > 0 && (
             <div>
-              <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Categoria</label>
+              <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Categoria</label>
               <select value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}
-                className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                style={{ border: "1px solid #1E2D45", background: "#131929" }}>
+                className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}>
                 <option value="">— Sem categoria —</option>
                 {filtered.map(c => (
                   <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
@@ -182,7 +182,7 @@ function EditTxModal({ tx, onClose }: { tx: TransactionRow; onClose: () => void 
 
           <button type="submit" disabled={loading}
             className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-            style={{ background: "#34D399", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
+            style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
             {loading ? "Salvando..." : "Salvar alterações"}
           </button>
         </form>
@@ -217,21 +217,21 @@ function DeleteModal({ txId, description, onClose }: { txId: string; description
       <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={onClose} />
       <div
         className="relative w-full max-w-sm mx-4 rounded-2xl p-5 flex flex-col gap-4"
-        style={{ background: "#0F1B2D", border: "1px solid #F8717133" }}
+        style={{ background: "var(--numi-modal)", border: "1px solid rgba(239,68,68,0.2)" }}
       >
-        <p className="text-base font-semibold text-[#F1F5F9]">Excluir transação?</p>
-        <p className="text-sm text-[#64748B]">
+        <p className="text-base font-semibold text-[var(--numi-text)]">Excluir transação?</p>
+        <p className="text-sm text-[var(--numi-text-4)]">
           {description ? `"${description}"` : "Esta transação"} será removida permanentemente.
         </p>
         <div className="flex gap-3">
           <button onClick={onClose}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
-            style={{ background: "#1E2D45", color: "#94A3B8" }}>
+            style={{ background: "var(--numi-border)", color: "var(--numi-text-2)" }}>
             Cancelar
           </button>
           <button onClick={handleDelete} disabled={loading}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
-            style={{ background: "#F87171", color: "#fff", opacity: loading ? 0.6 : 1 }}>
+            style={{ background: "var(--numi-expense)", color: "#fff", opacity: loading ? 0.6 : 1 }}>
             {loading ? "Excluindo..." : "Excluir"}
           </button>
         </div>
@@ -280,18 +280,18 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
     <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-[#F1F5F9]">Transações</h1>
+        <h1 className="text-xl font-bold text-[var(--numi-text)]">Transações</h1>
         <button
           onClick={() => setShowImport(true)}
           className="text-sm font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors"
-          style={{ background: "#131929", border: "1px solid #1E2D45", color: "#94A3B8" }}
+          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)", color: "var(--numi-text-2)" }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.borderColor = "#34D39944";
-            (e.currentTarget as HTMLElement).style.color = "#F1F5F9";
+            (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)";
+            (e.currentTarget as HTMLElement).style.color = "var(--numi-text)";
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.borderColor = "#1E2D45";
-            (e.currentTarget as HTMLElement).style.color = "#94A3B8";
+            (e.currentTarget as HTMLElement).style.borderColor = "var(--numi-border)";
+            (e.currentTarget as HTMLElement).style.color = "var(--numi-text-2)";
           }}
         >
           <span>↑</span> Importar CSV
@@ -300,17 +300,17 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
 
       {/* Summary strip */}
       <div className="grid grid-cols-3 gap-3 mb-5">
-        <div className="rounded-2xl p-3 text-center" style={{ background: "#131929", border: "1px solid #1E2D45" }}>
-          <p className="text-xs text-[#94A3B8] mb-0.5">Receitas</p>
-          <p className="text-base font-bold" style={{ color: "#34D399" }}>{formatCurrency(totalIncome)}</p>
+        <div className="rounded-2xl p-3 text-center" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
+          <p className="text-xs text-[var(--numi-text-2)] mb-0.5">Receitas</p>
+          <p className="text-base font-bold" style={{ color: "var(--numi-income)" }}>{formatCurrency(totalIncome)}</p>
         </div>
-        <div className="rounded-2xl p-3 text-center" style={{ background: "#131929", border: "1px solid #1E2D45" }}>
-          <p className="text-xs text-[#94A3B8] mb-0.5">Despesas</p>
-          <p className="text-base font-bold" style={{ color: "#F87171" }}>{formatCurrency(totalExpense)}</p>
+        <div className="rounded-2xl p-3 text-center" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
+          <p className="text-xs text-[var(--numi-text-2)] mb-0.5">Despesas</p>
+          <p className="text-base font-bold" style={{ color: "var(--numi-expense)" }}>{formatCurrency(totalExpense)}</p>
         </div>
-        <div className="rounded-2xl p-3 text-center" style={{ background: "#131929", border: "1px solid #1E2D45" }}>
-          <p className="text-xs text-[#94A3B8] mb-0.5">Saldo</p>
-          <p className="text-base font-bold" style={{ color: balance >= 0 ? "#38BDF8" : "#F87171" }}>
+        <div className="rounded-2xl p-3 text-center" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
+          <p className="text-xs text-[var(--numi-text-2)] mb-0.5">Saldo</p>
+          <p className="text-base font-bold" style={{ color: balance >= 0 ? "var(--numi-info)" : "var(--numi-expense)" }}>
             {formatCurrency(balance)}
           </p>
         </div>
@@ -335,9 +335,9 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
                 onClick={() => setTypeFilter(f)}
                 className="text-xs font-medium px-3 py-1.5 rounded-full shrink-0 transition-colors"
                 style={{
-                  background: active ? "#34D399" : "#131929",
-                  color:      active ? "#0B1020" : "#94A3B8",
-                  border:     active ? "none" : "1px solid #1E2D45",
+                  background: active ? "var(--numi-income)" : "var(--numi-elevated)",
+                  color:      active ? "#0B1020" : "var(--numi-text-2)",
+                  border:     active ? "none" : "1px solid var(--numi-border)",
                 }}
               >
                 {labels[f]}
@@ -379,25 +379,25 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
       {groups.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-3">🔍</p>
-          <p className="text-[#94A3B8] font-medium">Nenhuma transação encontrada</p>
-          <p className="text-sm text-[#475569] mt-1">Tente ajustar os filtros</p>
+          <p className="text-[var(--numi-text-2)] font-medium">Nenhuma transação encontrada</p>
+          <p className="text-sm text-[var(--numi-text-3)] mt-1">Tente ajustar os filtros</p>
         </div>
       ) : (
         <div className="flex flex-col gap-6">
           {groups.map(([date, rows]) => (
             <div key={date}>
               <div className="flex items-center gap-3 mb-2">
-                <p className="text-xs font-semibold text-[#475569] uppercase tracking-wider">
+                <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider">
                   {formatGroupHeader(date)}
                 </p>
-                <div className="flex-1 h-px" style={{ background: "#1E2D45" }} />
-                <p className="text-xs text-[#475569]">
+                <div className="flex-1 h-px" style={{ background: "var(--numi-border)" }} />
+                <p className="text-xs text-[var(--numi-text-3)]">
                   {rows.length} {rows.length === 1 ? "item" : "itens"}
                 </p>
               </div>
               <div
                 className="rounded-2xl overflow-hidden"
-                style={{ background: "#131929", border: "1px solid #1E2D45" }}
+                style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
               >
                 {rows.map((t, idx) => (
                   <TxRow
@@ -430,12 +430,12 @@ function TxRow({
   const isIncome   = tx.type === "income";
   const isTransfer = tx.type === "transfer";
   const icon       = tx.categoryIcon  ?? (isIncome ? "💰" : isTransfer ? "↔️" : "💳");
-  const iconColor  = tx.categoryColor ?? "#64748B";
+  const iconColor  = tx.categoryColor ?? "#94A3B8";
 
   return (
     <div
-      className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.02] transition-colors group"
-      style={{ borderBottom: last ? "none" : "1px solid #1E2D45" }}
+      className="flex items-center gap-3 px-4 py-3 hover:bg-[color-mix(in_srgb,var(--numi-text)_4%,transparent)] transition-colors group"
+      style={{ borderBottom: last ? "none" : "1px solid var(--numi-border)" }}
     >
       {/* Icon */}
       <span
@@ -452,26 +452,26 @@ function TxRow({
       {/* Description + meta */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 min-w-0">
-          <p className="text-sm font-medium text-[#F1F5F9] truncate">
+          <p className="text-sm font-medium text-[var(--numi-text)] truncate">
             {tx.description ?? "—"}
           </p>
           {tx.installmentNumber && tx.installmentTotal && (
             <span className="text-xs px-1.5 py-0.5 rounded-full shrink-0 font-semibold"
-              style={{ background: "rgba(99,102,241,0.15)", color: "#818CF8", border: "1px solid rgba(99,102,241,0.3)" }}>
+              style={{ background: "rgba(99,102,241,0.12)", color: "#6366F1", border: "1px solid rgba(99,102,241,0.3)" }}>
               {tx.installmentNumber}/{tx.installmentTotal}
             </span>
           )}
           {tx.status === "pending" && (
             <span className="text-xs px-1.5 py-0.5 rounded-full shrink-0"
-              style={{ background: "#FBBF2422", color: "#FBBF24", border: "1px solid #FBBF2444" }}>
+              style={{ background: "rgba(245,158,11,0.14)", color: "var(--numi-warning)", border: "1px solid rgba(245,158,11,0.28)" }}>
               Pendente
             </span>
           )}
         </div>
-        <p className="text-xs text-[#475569] truncate">
+        <p className="text-xs text-[var(--numi-text-3)] truncate">
           {tx.categoryName ?? (isTransfer ? "Transferência" : "—")}
           {" · "}
-          <span style={{ color: tx.accountColor ?? "#94A3B8" }}>{tx.accountName}</span>
+          <span style={{ color: tx.accountColor ?? "var(--numi-text-2)" }}>{tx.accountName}</span>
         </p>
       </div>
 
@@ -479,7 +479,7 @@ function TxRow({
       <p
         className="text-sm font-semibold shrink-0"
         style={{
-          color: isIncome ? "#34D399" : isTransfer ? "#94A3B8" : "#F1F5F9",
+          color: isIncome ? "var(--numi-income)" : isTransfer ? "var(--numi-text-2)" : "var(--numi-text)",
         }}
       >
         {isIncome ? "+" : isTransfer ? "" : "−"}{formatCurrency(tx.amount)}
@@ -491,9 +491,9 @@ function TxRow({
           onClick={() => onEdit(tx)}
           title="Editar"
           className="w-7 h-7 flex items-center justify-center rounded-lg text-xs transition-colors"
-          style={{ color: "#475569", background: "transparent" }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#1E2D45"; (e.currentTarget as HTMLElement).style.color = "#F1F5F9"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "#475569"; }}
+          style={{ color: "var(--numi-text-3)", background: "transparent" }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--numi-border)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text)"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text-3)"; }}
         >
           ✏️
         </button>
@@ -501,9 +501,9 @@ function TxRow({
           onClick={() => onDelete(tx.id, tx.description)}
           title="Excluir"
           className="w-7 h-7 flex items-center justify-center rounded-lg text-xs transition-colors"
-          style={{ color: "#475569", background: "transparent" }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#F8717122"; (e.currentTarget as HTMLElement).style.color = "#F87171"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "#475569"; }}
+          style={{ color: "var(--numi-text-3)", background: "transparent" }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.14)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-expense)"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text-3)"; }}
         >
           🗑
         </button>

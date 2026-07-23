@@ -5,10 +5,10 @@ import { useToastStore } from "@/stores/useToastStore";
 import type { ToastType } from "@/stores/useToastStore";
 
 const STYLE: Record<ToastType, { bg: string; border: string; color: string; symbol: string }> = {
-  success: { bg: "rgba(52,211,153,0.12)",  border: "rgba(52,211,153,0.28)",  color: "#34D399", symbol: "✓" },
-  error:   { bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.28)", color: "#F87171", symbol: "✕" },
-  warning: { bg: "rgba(251,191,36,0.12)",  border: "rgba(251,191,36,0.28)",  color: "#FBBF24", symbol: "!" },
-  info:    { bg: "rgba(56,189,248,0.12)",  border: "rgba(56,189,248,0.28)",  color: "#38BDF8", symbol: "i" },
+  success: { bg: "rgba(16,185,129,0.14)",  border: "rgba(16,185,129,0.3)",  color: "#10B981", symbol: "✓" },
+  error:   { bg: "rgba(239,68,68,0.14)",   border: "rgba(239,68,68,0.3)",   color: "#EF4444", symbol: "✕" },
+  warning: { bg: "rgba(245,158,11,0.14)",  border: "rgba(245,158,11,0.3)",  color: "#F59E0B", symbol: "!" },
+  info:    { bg: "rgba(59,130,246,0.14)",  border: "rgba(59,130,246,0.3)",  color: "#3B82F6", symbol: "i" },
 };
 
 export function ToastContainer() {
@@ -29,7 +29,7 @@ export function ToastContainer() {
               transition={{ type: "spring", stiffness: 400, damping: 32 }}
               onClick={() => dismiss(t.id)}
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-left pointer-events-auto max-w-xs shadow-2xl"
-              style={{ background: s.bg, border: `1px solid ${s.border}` }}
+              style={{ background: `linear-gradient(${s.bg}, ${s.bg}), var(--numi-elevated)`, border: `1px solid ${s.border}` }}
             >
               <span
                 className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
@@ -37,7 +37,7 @@ export function ToastContainer() {
               >
                 {s.symbol}
               </span>
-              <p className="text-sm font-medium text-[#F1F5F9] leading-snug">{t.message}</p>
+              <p className="text-sm font-medium text-[var(--numi-text)] leading-snug">{t.message}</p>
             </motion.button>
           );
         })}

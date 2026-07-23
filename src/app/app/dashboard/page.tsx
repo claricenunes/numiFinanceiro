@@ -6,6 +6,8 @@ import { FlowChart } from "@/components/dashboard/FlowChart";
 import { GoalsPreview } from "@/components/dashboard/GoalsPreview";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { InsightsBanner } from "@/components/dashboard/InsightsBanner";
+import { AIOrb } from "@/components/mascot/AIOrb";
+import { getOrbStatus } from "@/components/mascot/orbStatus";
 import { getDashboardData } from "@/lib/supabase/queries/dashboard";
 import { getBudgetItems }   from "@/lib/supabase/queries/budgets";
 import { generateInsights } from "@/lib/supabase/queries/insights";
@@ -29,15 +31,25 @@ export default async function DashboardPage({
   const { summary, categories, weeklyFlow, goals, transactions, firstName } = dashData;
   const insights = generateInsights(dashData, budgetItems);
 
+  const orbStatus = getOrbStatus(summary.savingsRate);
+  const statusMessage = {
+    good:    "Você está economizando bem este mês.",
+    warning: "Fique de olho nos gastos — sua economia caiu um pouco.",
+    alert:   "Sua economia está baixa neste período.",
+  }[orbStatus];
+
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
-      <div className="mb-5">
-        <h1 className="text-xl font-bold text-[#F1F5F9]">
-          Olá{firstName ? `, ${firstName}` : ""} 👋
-        </h1>
-        <p className="text-sm text-[#475569] mt-0.5">
-          Aqui está o resumo do seu período.
-        </p>
+      <div className="mb-5 flex items-center gap-4">
+        <AIOrb status={orbStatus} />
+        <div>
+          <h1 className="text-xl font-bold text-[var(--numi-text)]">
+            Olá{firstName ? `, ${firstName}` : ""} 👋
+          </h1>
+          <p className="text-sm text-[var(--numi-text-3)] mt-0.5">
+            {statusMessage}
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-col gap-4">

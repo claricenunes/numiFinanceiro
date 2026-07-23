@@ -70,15 +70,41 @@ export function QuickAddModal() {
     const supabase = createClient();
 
     (async () => {
-      const [userCatRes, sysCatRes, accRes] = await Promise.all([
+      const [userCatRes, accRes] = await Promise.all([
         supabase.from("user_categories").select("id,name,icon").order("name"),
-        supabase.from("system_categories").select("id,name,icon").order("sort_order"),
         supabase.from("accounts").select("id,name,type").is("deleted_at", null).order("name"),
       ]);
-      const userCats = (userCatRes.data ?? []) as Category[];
-      const sysCats  = (sysCatRes.data  ?? []) as Category[];
-      // Usa categorias do usuário; se vazias, usa as do sistema como fallback
-      setCategories(userCats.length > 0 ? userCats : sysCats);
+      let userCats = (userCatRes.data ?? []) as Category[];
+
+      // Sem categorias próprias ainda — copia as do sistema para o usuário,
+      // já que transactions.category_id só aceita ids de user_categories.
+      if (userCats.length === 0) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data: sysCats } = await supabase
+          .from("system_categories")
+          .select("id,name,icon,color,type,sort_order")
+          .eq("is_active", true);
+
+        if (user && sysCats && sysCats.length > 0) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from("user_categories") as any).upsert(
+            sysCats.map((c) => ({
+              user_id: user.id,
+              name: c.name,
+              icon: c.icon,
+              color: c.color,
+              type: c.type,
+              system_category_id: c.id,
+              sort_order: c.sort_order,
+            })),
+            { onConflict: "user_id,system_category_id", ignoreDuplicates: true }
+          );
+          const refetched = await supabase.from("user_categories").select("id,name,icon").order("name");
+          userCats = (refetched.data ?? []) as Category[];
+        }
+      }
+
+      setCategories(userCats);
       setAccounts((accRes.data ?? []) as Account[]);
     })();
   }, [quickAddOpen]);
@@ -216,14 +242,14 @@ export function QuickAddModal() {
       <div
         ref={panelRef}
         className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-        style={{ background: "#0F1B2D", border: "1px solid #1E2D45", maxHeight: "92dvh", overflowY: "auto" }}
+        style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)", maxHeight: "92dvh", overflowY: "auto" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 id="quick-add-title" className="text-base font-semibold text-[#F1F5F9]">Nova transação</h2>
+          <h2 id="quick-add-title" className="text-base font-semibold text-[var(--numi-text)]">Nova transação</h2>
           <button
             onClick={handleClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#64748B] hover:text-[#F1F5F9] hover:bg-[#1E2D45] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] transition-colors"
             aria-label="Fechar"
           >
             <XIcon />
@@ -231,7 +257,7 @@ export function QuickAddModal() {
         </div>
 
         {/* Type toggle */}
-        <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid #1E2D45" }}>
+        <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid var(--numi-border)" }}>
           {types.map((t) => (
             <button
               key={t}
@@ -243,8 +269,8 @@ export function QuickAddModal() {
                   ? t === "income" ? "rgba(52,211,153,0.18)" : t === "expense" ? "rgba(248,113,113,0.18)" : "rgba(56,189,248,0.18)"
                   : "transparent",
                 color: type === t
-                  ? t === "income" ? "#34D399" : t === "expense" ? "#F87171" : "#38BDF8"
-                  : "#64748B",
+                  ? t === "income" ? "var(--numi-income)" : t === "expense" ? "var(--numi-expense)" : "var(--numi-info)"
+                  : "var(--numi-text-4)",
               }}
             >
               {TYPE_LABELS[t]}
@@ -255,7 +281,7 @@ export function QuickAddModal() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           {/* Amount */}
           <div>
-            <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Valor (R$)</label>
+            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Valor (R$)</label>
             <input
               ref={amountRef}
               type="text"
@@ -264,27 +290,27 @@ export function QuickAddModal() {
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0,00"
               required
-              className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm bg-transparent outline-none"
-              style={{ border: "1px solid #1E2D45", background: "#131929" }}
+              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm bg-transparent outline-none"
+              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Descrição</label>
+            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Descrição</label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Ex: Mercado, Salário..."
-              className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-              style={{ border: "1px solid #1E2D45", background: "#131929" }}
+              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
             />
           </div>
 
           {/* Date */}
           <div>
-            <label className="text-xs font-medium text-[#64748B] mb-1.5 block">
+            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">
               {installment ? "Data da 1ª parcela" : "Data"}
             </label>
             <input
@@ -292,8 +318,8 @@ export function QuickAddModal() {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
-              className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-              style={{ border: "1px solid #1E2D45", background: "#131929", colorScheme: "dark" }}
+              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)", colorScheme: "light" }}
             />
           </div>
 
@@ -301,7 +327,7 @@ export function QuickAddModal() {
           {type === "expense" && (
             <div
               className="rounded-xl p-3 flex flex-col gap-3"
-              style={{ background: installment ? "rgba(99,102,241,0.08)" : "#131929", border: `1px solid ${installment ? "#6366F144" : "#1E2D45"}`, transition: "all 0.15s" }}
+              style={{ background: installment ? "rgba(99,102,241,0.08)" : "var(--numi-input-bg)", border: `1px solid ${installment ? "#6366F144" : "var(--numi-border)"}`, transition: "all 0.15s" }}
             >
               <button
                 type="button"
@@ -310,12 +336,12 @@ export function QuickAddModal() {
               >
                 <div className="flex items-center gap-2">
                   <span className="text-base">💳</span>
-                  <span className="text-sm font-medium text-[#F1F5F9]">Parcelado</span>
+                  <span className="text-sm font-medium text-[var(--numi-text)]">Parcelado</span>
                 </div>
                 {/* Toggle pill */}
                 <span
                   className="relative inline-flex items-center w-9 h-5 rounded-full transition-colors shrink-0"
-                  style={{ background: installment ? "#6366F1" : "#1E2D45" }}
+                  style={{ background: installment ? "#6366F1" : "var(--numi-border)" }}
                 >
                   <span
                     className="absolute w-3.5 h-3.5 rounded-full bg-white transition-transform"
@@ -327,13 +353,13 @@ export function QuickAddModal() {
               {installment && (
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
-                    <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Número de parcelas</label>
+                    <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Número de parcelas</label>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => setNumParcelas((v) => String(Math.max(2, parseInt(v, 10) - 1)))}
-                        className="w-8 h-8 rounded-lg text-[#F1F5F9] font-bold flex items-center justify-center shrink-0"
-                        style={{ background: "#1E2D45" }}
+                        className="w-8 h-8 rounded-lg text-[var(--numi-text)] font-bold flex items-center justify-center shrink-0"
+                        style={{ background: "var(--numi-border)" }}
                       >
                         −
                       </button>
@@ -343,14 +369,14 @@ export function QuickAddModal() {
                         max={48}
                         value={numParcelas}
                         onChange={(e) => setNumParcelas(e.target.value)}
-                        className="flex-1 px-3 py-2 rounded-lg text-[#F1F5F9] text-sm text-center outline-none"
-                        style={{ border: "1px solid #6366F144", background: "#131929" }}
+                        className="flex-1 px-3 py-2 rounded-lg text-[var(--numi-text)] text-sm text-center outline-none"
+                        style={{ border: "1px solid #6366F144", background: "var(--numi-input-bg)" }}
                       />
                       <button
                         type="button"
                         onClick={() => setNumParcelas((v) => String(Math.min(48, parseInt(v, 10) + 1)))}
-                        className="w-8 h-8 rounded-lg text-[#F1F5F9] font-bold flex items-center justify-center shrink-0"
-                        style={{ background: "#1E2D45" }}
+                        className="w-8 h-8 rounded-lg text-[var(--numi-text)] font-bold flex items-center justify-center shrink-0"
+                        style={{ background: "var(--numi-border)" }}
                       >
                         +
                       </button>
@@ -358,7 +384,7 @@ export function QuickAddModal() {
                   </div>
                   {amount && parseFloat(amount.replace(",", ".")) > 0 && (
                     <div className="text-right shrink-0">
-                      <p className="text-xs text-[#64748B]">por parcela</p>
+                      <p className="text-xs text-[var(--numi-text-4)]">por parcela</p>
                       <p className="text-sm font-bold" style={{ color: "#818CF8" }}>
                         {formatCurrency(parseFloat(amount.replace(",", ".")) / (parseInt(numParcelas, 10) || 2))}
                       </p>
@@ -371,15 +397,15 @@ export function QuickAddModal() {
 
           {/* Account */}
           <div>
-            <label className="text-xs font-medium text-[#64748B] mb-1.5 block">
+            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">
               {type === "transfer" ? "Conta de origem" : "Conta"}
             </label>
             <select
               value={accountId}
               onChange={(e) => setAccountId(e.target.value)}
               required
-              className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-              style={{ border: "1px solid #1E2D45", background: "#131929" }}
+              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
             >
               <option value="">Selecionar conta</option>
               {accounts.map((a) => (
@@ -391,12 +417,12 @@ export function QuickAddModal() {
           {/* Destination account (transfer only) */}
           {type === "transfer" && (
             <div>
-              <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Conta de destino</label>
+              <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Conta de destino</label>
               <select
                 value={toAccountId}
                 onChange={(e) => setToAccountId(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                style={{ border: "1px solid #1E2D45", background: "#131929" }}
+                className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
               >
                 <option value="">Selecionar conta</option>
                 {accounts.filter((a) => a.id !== accountId).map((a) => (
@@ -409,12 +435,12 @@ export function QuickAddModal() {
           {/* Category (not for transfers) */}
           {type !== "transfer" && (
             <div>
-              <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Categoria</label>
+              <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Categoria</label>
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                style={{ border: "1px solid #1E2D45", background: "#131929" }}
+                className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
               >
                 <option value="">Sem categoria</option>
                 {categories.map((c) => (
@@ -431,7 +457,7 @@ export function QuickAddModal() {
             disabled={loading}
             className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity mt-1"
             style={{
-              background: installment ? "#6366F1" : type === "income" ? "#34D399" : type === "expense" ? "#F87171" : "#38BDF8",
+              background: installment ? "#6366F1" : type === "income" ? "var(--numi-income)" : type === "expense" ? "var(--numi-expense)" : "var(--numi-info)",
               color: "#fff",
               opacity: loading ? 0.6 : 1,
             }}

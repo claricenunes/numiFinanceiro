@@ -15,13 +15,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B1020",
-  colorScheme: "dark",
+  themeColor: "#FAFAFA",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`h-full ${inter.variable}`}>
+    <html lang="pt-BR" className={`h-full light ${inter.variable}`}>
       <body className="min-h-full antialiased">
         <Providers>{children}</Providers>
       </body>

@@ -95,7 +95,7 @@ export function NewPositionButton() {
       <button
         onClick={() => setOpen(true)}
         className="text-sm font-semibold px-4 py-2 rounded-xl"
-        style={{ background: "#34D399", color: "#0B1020" }}
+        style={{ background: "var(--numi-income)", color: "#0B1020" }}
       >
         + Nova Posição
       </button>
@@ -106,12 +106,12 @@ export function NewPositionButton() {
 
           <div
             className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "#0F1B2D", border: "1px solid #1E2D45", maxHeight: "92dvh", overflowY: "auto" }}
+            style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)", maxHeight: "92dvh", overflowY: "auto" }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[#F1F5F9]">Nova Posição</h2>
+              <h2 className="text-base font-semibold text-[var(--numi-text)]">Nova Posição</h2>
               <button onClick={() => { setOpen(false); reset(); }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#64748B] hover:text-[#F1F5F9] hover:bg-[#1E2D45]">
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">
                 ✕
               </button>
             </div>
@@ -119,15 +119,15 @@ export function NewPositionButton() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               {/* Tipo */}
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Tipo</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Tipo</label>
                 <div className="grid grid-cols-3 gap-2">
                   {TYPE_OPTIONS.map(opt => (
                     <button key={opt.value} type="button" onClick={() => setType(opt.value)}
                       className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-xs font-medium"
                       style={{
-                        background: type === opt.value ? "rgba(52,211,153,0.15)" : "#131929",
-                        border: `1px solid ${type === opt.value ? "#34D399" : "#1E2D45"}`,
-                        color: type === opt.value ? "#34D399" : "#94A3B8",
+                        background: type === opt.value ? "rgba(52,211,153,0.15)" : "var(--numi-input-bg)",
+                        border: `1px solid ${type === opt.value ? "var(--numi-income)" : "var(--numi-border)"}`,
+                        color: type === opt.value ? "var(--numi-income)" : "var(--numi-text-2)",
                       }}>
                       <span className="text-lg">{opt.icon}</span>
                       <span>{opt.label}</span>
@@ -140,16 +140,16 @@ export function NewPositionButton() {
               <Field label="Nome / Ticker">
                 <input value={name} onChange={e => setName(e.target.value)}
                   placeholder="Ex: PETR4, BOVA11, Tesouro Selic..." required autoFocus
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
               </Field>
 
               {/* Conta */}
               {accounts.length > 0 && (
                 <Field label="Conta de investimento">
                   <select value={accountId} onChange={e => setAccountId(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                    style={{ border: "1px solid #1E2D45", background: "#131929" }}>
+                    className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                    style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}>
                     {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                   </select>
                 </Field>
@@ -159,27 +159,27 @@ export function NewPositionButton() {
                 <Field label="Quantidade">
                   <input value={quantity} onChange={e => setQuantity(e.target.value)}
                     type="text" inputMode="decimal" placeholder="0" required
-                    className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                    style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+                    className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                    style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
                 </Field>
                 <Field label="Preço médio (R$)">
                   <input value={avgPrice} onChange={e => setAvgPrice(e.target.value)}
                     type="text" inputMode="decimal" placeholder="0,00" required
-                    className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                    style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+                    className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                    style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
                 </Field>
               </div>
 
               <Field label="Cotação atual (R$) — opcional">
                 <input value={currentPrice} onChange={e => setCurrentPrice(e.target.value)}
                   type="text" inputMode="decimal" placeholder="0,00"
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
               </Field>
 
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-                style={{ background: "#34D399", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
+                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
                 {loading ? "Salvando..." : "Adicionar posição"}
               </button>
             </form>
@@ -193,7 +193,7 @@ export function NewPositionButton() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs font-medium text-[#64748B] mb-1.5 block">{label}</label>
+      <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">{label}</label>
       {children}
     </div>
   );

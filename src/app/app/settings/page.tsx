@@ -181,24 +181,24 @@ export default function SettingsPage() {
     show(theme === "light" ? "Modo claro ativado" : theme === "dark" ? "Modo escuro ativado" : "Seguindo sistema", "success");
   }
 
-  const currentTheme = profile?.theme ?? "dark";
+  const currentTheme = profile?.theme ?? "light";
 
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-2xl mx-auto">
-      <h1 className="text-xl font-bold text-[#F1F5F9] mb-8">Configurações</h1>
+      <h1 className="text-xl font-bold text-[var(--numi-text)] mb-8">Configurações</h1>
 
       {/* ── Perfil ─────────────────────────── */}
       <Section title="Perfil">
         <div className="flex items-center gap-4 mb-5 pb-5" style={{ borderBottom: "1px solid var(--numi-border)" }}>
           <div
             className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-[#0B1020] shrink-0"
-            style={{ background: "#34D399" }}
+            style={{ background: "var(--numi-income)" }}
           >
             {initial}
           </div>
           <div>
-            <p className="text-base font-semibold text-[#F1F5F9]">{displayName}</p>
-            <p className="text-sm text-[#475569]">{profile ? "Conta ativa" : "Carregando…"}</p>
+            <p className="text-base font-semibold text-[var(--numi-text)]">{displayName}</p>
+            <p className="text-sm text-[var(--numi-text-3)]">{profile ? "Conta ativa" : "Carregando…"}</p>
           </div>
         </div>
 
@@ -254,7 +254,7 @@ export default function SettingsPage() {
 
       {/* ── Aparência ──────────────────────── */}
       <Section title="Aparência">
-        <p className="text-xs text-[#64748B] mb-3">Tema</p>
+        <p className="text-xs text-[var(--numi-text-4)] mb-3">Tema</p>
         <div className="grid grid-cols-3 gap-2">
           {(["dark", "light", "system"] as const).map((t) => {
             const meta = {
@@ -270,8 +270,8 @@ export default function SettingsPage() {
                 className="py-3 px-2 rounded-xl text-sm font-medium flex flex-col items-center gap-2 transition-colors"
                 style={{
                   background: active ? "rgba(52,211,153,0.1)" : "var(--numi-elevated)",
-                  border: `1px solid ${active ? "#34D39966" : "var(--numi-border)"}`,
-                  color: active ? "#34D399" : "var(--numi-text-2)",
+                  border: `1px solid ${active ? "rgba(16,185,129,0.4)" : "var(--numi-border)"}`,
+                  color: active ? "var(--numi-income)" : "var(--numi-text-2)",
                 }}
               >
                 <span className="text-xl">{meta.icon}</span>
@@ -286,10 +286,10 @@ export default function SettingsPage() {
       <Section title="Preferências">
         <div className="space-y-4">
           <Row label="Moeda">
-            <span className="text-sm text-[#94A3B8]">{profile?.currency_code ?? "BRL"}</span>
+            <span className="text-sm text-[var(--numi-text-2)]">{profile?.currency_code ?? "BRL"}</span>
           </Row>
           <Row label="Idioma">
-            <span className="text-sm text-[#94A3B8]">Português (Brasil)</span>
+            <span className="text-sm text-[var(--numi-text-2)]">Português (Brasil)</span>
           </Row>
         </div>
       </Section>
@@ -301,14 +301,14 @@ export default function SettingsPage() {
             label="Exportar transações"
             sub="CSV com todas as transações"
             right="↓ CSV"
-            rightColor="#34D399"
+            rightColor="var(--numi-income)"
             onClick={handleExport}
           />
           <ActionRow
             label="Relatório completo"
             sub="Contas + Metas + Transações do mês"
             right="↓ CSV"
-            rightColor="#38BDF8"
+            rightColor="var(--numi-info)"
             onClick={handleFullReport}
           />
         </div>
@@ -318,12 +318,12 @@ export default function SettingsPage() {
       <Section title="Sobre">
         <div className="space-y-3">
           <Row label="Versão">
-            <span className="text-sm text-[#94A3B8]">1.0.0-beta</span>
+            <span className="text-sm text-[var(--numi-text-2)]">1.0.0-beta</span>
           </Row>
           <Row label="Banco de dados">
             <span
               className="text-xs font-medium px-2.5 py-1 rounded-full"
-              style={{ background: "rgba(52,211,153,0.15)", color: "#34D399" }}
+              style={{ background: "rgba(16,185,129,0.15)", color: "var(--numi-income)" }}
             >
               Supabase conectado
             </span>
@@ -337,15 +337,15 @@ export default function SettingsPage() {
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left"
           style={{
-            background: "rgba(248,113,113,0.08)",
-            border: "1px solid rgba(248,113,113,0.2)",
-            color: "#F87171",
+            background: "rgba(239,68,68,0.08)",
+            border: "1px solid rgba(239,68,68,0.2)",
+            color: "var(--numi-expense)",
           }}
           onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLElement).style.background = "rgba(248,113,113,0.14)")
+            ((e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.14)")
           }
           onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLElement).style.background = "rgba(248,113,113,0.08)")
+            ((e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.08)")
           }
         >
           <LogoutIcon />
@@ -361,7 +361,7 @@ export default function SettingsPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-8">
-      <p className="text-xs font-semibold text-[#475569] uppercase tracking-wider mb-3">{title}</p>
+      <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">{title}</p>
       <div className="rounded-2xl p-4" style={{ background: "var(--numi-surface)", border: "1px solid var(--numi-border)" }}>
         {children}
       </div>
@@ -372,7 +372,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <p className="text-sm text-[#94A3B8]">{label}</p>
+      <p className="text-sm text-[var(--numi-text-2)]">{label}</p>
       {children}
     </div>
   );
@@ -414,7 +414,7 @@ function EditRow({
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
-        <p className="text-sm text-[#94A3B8] shrink-0">{label}</p>
+        <p className="text-sm text-[var(--numi-text-2)] shrink-0">{label}</p>
         {editing ? (
           <div className="flex items-center gap-2 flex-1 justify-end">
             <input
@@ -435,23 +435,23 @@ function EditRow({
               onClick={save}
               disabled={loading}
               className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-opacity"
-              style={{ background: "#34D399", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
+              style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
             >
               {loading ? "…" : "Salvar"}
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="text-xs text-[#475569] hover:text-[#94A3B8] transition-colors"
+              className="text-xs text-[var(--numi-text-3)] hover:text-[var(--numi-text-2)] transition-colors"
             >
               Cancelar
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-[#94A3B8] truncate max-w-[160px]">{currentValue}</span>
+            <span className="text-sm text-[var(--numi-text-2)] truncate max-w-[160px]">{currentValue}</span>
             <button
               onClick={startEdit}
-              className="text-xs font-medium text-[#34D399] hover:text-[#6EE7B7] transition-colors shrink-0"
+              className="text-xs font-medium text-[var(--numi-income)] hover:opacity-80 transition-colors shrink-0"
             >
               Editar
             </button>
@@ -459,7 +459,7 @@ function EditRow({
         )}
       </div>
       {editing && hint && (
-        <p className="text-xs text-[#475569] mt-1 text-right">{hint}</p>
+        <p className="text-xs text-[var(--numi-text-3)] mt-1 text-right">{hint}</p>
       )}
     </div>
   );
@@ -477,12 +477,12 @@ function ActionRow({
       disabled={disabled}
       className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed"
       style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
-      onMouseEnter={(e) => { if (!disabled) (e.currentTarget as HTMLElement).style.borderColor = "#34D39944"; }}
+      onMouseEnter={(e) => { if (!disabled) (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)"; }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--numi-border)"; }}
     >
       <div>
-        <p className="text-sm font-semibold text-[#F1F5F9]">{label}</p>
-        <p className="text-xs text-[#475569] mt-0.5">{sub}</p>
+        <p className="text-sm font-semibold text-[var(--numi-text)]">{label}</p>
+        <p className="text-xs text-[var(--numi-text-3)] mt-0.5">{sub}</p>
       </div>
       <span className="text-sm font-medium shrink-0 ml-3" style={{ color: rightColor }}>{right}</span>
     </button>

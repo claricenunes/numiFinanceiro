@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Cores base ─────────────────────────────── */
+  /* ── Cores base (dark legado) ──────────────── */
   --color-background:     #0B1020;
   --color-surface:        #131929;
   --color-surface-raised: #1A2235;
@@ -11,13 +11,13 @@
   --color-primary:        #34D399;
   --color-secondary:      #2563EB;
 
-  /* ── Semânticas financeiras ─────────────────── */
+  /* ── Semânticas financeiras (dark legado) ────── */
   --color-income:         #34D399;
   --color-expense:        #F87171;
   --color-warning:        #FBBF24;
   --color-info:           #38BDF8;
 
-  /* ── Texto ──────────────────────────────────── */
+  /* ── Texto (dark legado) ─────────────────────── */
   --color-text-primary:   #F1F5F9;
   --color-text-secondary: #94A3B8;
   --color-text-muted:     #475569;
@@ -32,7 +32,7 @@
   --radius-xl: 24px;
 }
 
-/* ── Paleta runtime (dark por padrão) ───────────── */
+/* ── Paleta runtime (dark legado, escape hatch do toggle) ── */
 :root {
   --numi-bg:          #0B1020;
   --numi-surface:     #131929;
@@ -44,20 +44,49 @@
   --numi-text-3:      #475569;
   --numi-text-4:      #64748B;
   --numi-input-bg:    #131929;
+
+  --numi-income:  #34D399;
+  --numi-expense: #F87171;
+  --numi-warning: #FBBF24;
+  --numi-info:    #38BDF8;
 }
 
-/* ── Modo claro ─────────────────────────────────── */
+/* ── Modo claro (novo padrão: soft-glass + gradientes pastel) ── */
 html.light {
-  --numi-bg:          #F1F5F9;
-  --numi-surface:     #FFFFFF;
-  --numi-elevated:    #F8FAFC;
+  --numi-bg:          #FAFAFA;
+  --numi-surface:     rgba(255, 255, 255, 0.72);
+  --numi-elevated:    #FFFFFF;
   --numi-modal:       #FFFFFF;
-  --numi-border:      #E2E8F0;
+  --numi-border:      rgba(15, 23, 42, 0.06);
   --numi-text:        #0F172A;
-  --numi-text-2:      #334155;
+  --numi-text-2:      #475569;
   --numi-text-3:      #64748B;
   --numi-text-4:      #94A3B8;
   --numi-input-bg:    #F8FAFC;
+
+  --numi-income:  #10B981;
+  --numi-expense: #EF4444;
+  --numi-warning: #F59E0B;
+  --numi-info:    #3B82F6;
+
+  --numi-gradient-pink: linear-gradient(135deg, #F472B6, #A78BFA);
+  --numi-gradient-warm: linear-gradient(135deg, #FBBF24, #FB923C);
+  --numi-gradient-cool: linear-gradient(135deg, #34D399, #38BDF8);
+  --numi-gradient-alert: linear-gradient(135deg, #F87171, #EC4899);
+}
+
+/* ── Fundo ambiente (gradiente pastel de fundo, todas as telas) ── */
+.numi-ambient-bg {
+  background: var(--numi-bg);
+}
+
+html.light .numi-ambient-bg {
+  background:
+    radial-gradient(ellipse 70% 50% at 10% -10%, rgba(244,114,182,0.30) 0%, transparent 100%),
+    radial-gradient(ellipse 65% 50% at 95% -8%,  rgba(56,189,248,0.26)  0%, transparent 100%),
+    radial-gradient(ellipse 70% 55% at 50% 110%, rgba(251,191,36,0.22) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 40% at 50% 40%,  rgba(167,139,250,0.10) 0%, transparent 100%),
+    var(--numi-bg);
 }
 
 /* ── Reset global ───────────────────────────────── */
@@ -81,47 +110,52 @@ body {
 /* ── Scrollbar custom ───────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1E2D45; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #2D3F5E; }
+::-webkit-scrollbar-thumb { background: var(--numi-border); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--numi-text-4); }
 
 /* ── Focus ring padrão ──────────────────────────── */
 :focus-visible {
-  outline: 2px solid #34D399;
+  outline: 2px solid var(--numi-income);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 /* ── Componentes base reutilizáveis ─────────────── */
 .glass-card {
-  background: rgba(19, 25, 41, 0.80);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(30, 45, 69, 0.80);
-  border-radius: 16px;
+  background: var(--numi-surface);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--numi-border);
+  border-radius: 24px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+}
+
+html:not(.light) .glass-card {
+  box-shadow: none;
 }
 
 .input-base {
   width: 100%;
-  background: #0B1020;
-  border: 1px solid #1E2D45;
+  background: var(--numi-input-bg);
+  border: 1px solid var(--numi-border);
   border-radius: 10px;
   padding: 0.625rem 0.875rem;
-  color: #F1F5F9;
+  color: var(--numi-text);
   font-size: 0.9375rem;
   line-height: 1.5;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.input-base::placeholder { color: #475569; }
+.input-base::placeholder { color: var(--numi-text-3); }
 
 .input-base:focus {
   outline: none;
-  border-color: #34D399;
-  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12);
+  border-color: var(--numi-income);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--numi-income) 12%, transparent);
 }
 
 .input-base[aria-invalid="true"] {
-  border-color: #F87171;
-  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.12);
+  border-color: var(--numi-expense);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--numi-expense) 12%, transparent);
 }
 
 .btn-primary {
@@ -129,7 +163,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: #34D399;
+  background: var(--numi-income);
   color: #0B1020;
   font-weight: 600;
   font-size: 0.9375rem;
@@ -141,12 +175,13 @@ body {
   width: 100%;
 }
 
-.btn-primary:hover  { background: #2EC48A; }
-.btn-primary:active { transform: scale(0.99); }
+.btn-primary:hover  { filter: brightness(0.92); }
+.btn-primary:active { transform: scale(0.97); }
 .btn-primary:disabled {
-  background: #1E2D45;
-  color: #475569;
+  background: var(--numi-border);
+  color: var(--numi-text-3);
   cursor: not-allowed;
+  filter: none;
 }
 
 .btn-outline {
@@ -155,18 +190,39 @@ body {
   justify-content: center;
   gap: 0.5rem;
   background: transparent;
-  color: #F1F5F9;
+  color: var(--numi-text);
   font-weight: 500;
   font-size: 0.9375rem;
   padding: 0.625rem 1.25rem;
   border-radius: 10px;
-  border: 1px solid #1E2D45;
+  border: 1px solid var(--numi-border);
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
   width: 100%;
 }
 
 .btn-outline:hover {
-  background: #131929;
-  border-color: #2D3F5E;
+  background: var(--numi-elevated);
+  border-color: var(--numi-text-4);
+}
+
+.btn-outline:active {
+  transform: scale(0.97);
+}
+
+/* ── Skeleton shimmer ────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--numi-border) 40%,
+    var(--numi-elevated) 50%,
+    var(--numi-border) 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
 }

@@ -17,7 +17,7 @@ export function ProgressBar({
   return (
     <div
       className="rounded-full overflow-hidden"
-      style={{ height, background: "#1E2D45" }}
+      style={{ height, background: "color-mix(in srgb, var(--numi-text) 10%, transparent)" }}
     >
       <motion.div
         className="h-full rounded-full"

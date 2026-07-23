@@ -26,9 +26,9 @@ function riskLabel(n: number): string {
 }
 
 function riskColor(n: number): string {
-  if (n <= 30) return "#34D399";
-  if (n <= 60) return "#FBBF24";
-  return "#F87171";
+  if (n <= 30) return "var(--numi-income)";
+  if (n <= 60) return "var(--numi-warning)";
+  return "var(--numi-expense)";
 }
 
 /* ── Componentes auxiliares ──────────────────────────── */
@@ -37,11 +37,11 @@ function ScoreRing({ score }: { score: number }) {
   const r = 44;
   const circumference = 2 * Math.PI * r;
   const filled = (score / 100) * circumference;
-  const color = score >= 70 ? "#34D399" : score >= 50 ? "#FBBF24" : "#F87171";
+  const color = score >= 70 ? "var(--numi-income)" : score >= 50 ? "var(--numi-warning)" : "var(--numi-expense)";
 
   return (
     <svg width={108} height={108} viewBox="0 0 108 108">
-      <circle cx={54} cy={54} r={r} fill="none" stroke="#1E2D45" strokeWidth={8} />
+      <circle cx={54} cy={54} r={r} fill="none" stroke="var(--numi-border)" strokeWidth={8} />
       <motion.circle
         cx={54} cy={54} r={r}
         fill="none"
@@ -55,11 +55,11 @@ function ScoreRing({ score }: { score: number }) {
         transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
       />
       <text x={54} y={50} textAnchor="middle" dominantBaseline="central"
-        fill="#F1F5F9" fontSize={22} fontWeight={700} fontFamily="inherit">
+        fill="var(--numi-text)" fontSize={22} fontWeight={700} fontFamily="inherit">
         {score}
       </text>
       <text x={54} y={68} textAnchor="middle" dominantBaseline="central"
-        fill="#475569" fontSize={10} fontFamily="inherit">
+        fill="var(--numi-text-3)" fontSize={10} fontFamily="inherit">
         / 100
       </text>
     </svg>
@@ -74,7 +74,7 @@ function AllocationCard({ rec, amount }: { rec: AllocationItem; amount: number }
   return (
     <div
       className="rounded-2xl p-4"
-      style={{ background: "#131929", border: "1px solid #1E2D45" }}
+      style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
     >
       <div className="flex items-start gap-3 mb-3">
         <span
@@ -85,21 +85,21 @@ function AllocationCard({ rec, amount }: { rec: AllocationItem; amount: number }
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className="text-sm font-semibold text-[#F1F5F9] leading-snug">{rec.asset}</p>
+            <p className="text-sm font-semibold text-[var(--numi-text)] leading-snug">{rec.asset}</p>
             <div className="text-right shrink-0">
-              <p className="text-base font-bold text-[#F1F5F9]">{rec.allocation}%</p>
-              <p className="text-xs text-[#475569]">{formatCurrency(amount)}</p>
+              <p className="text-base font-bold text-[var(--numi-text)]">{rec.allocation}%</p>
+              <p className="text-xs text-[var(--numi-text-3)]">{formatCurrency(amount)}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <p className="text-xs text-[#94A3B8] leading-relaxed mb-3">{rec.rationale}</p>
+      <p className="text-xs text-[var(--numi-text-2)] leading-relaxed mb-3">{rec.rationale}</p>
 
       <div className="flex flex-wrap gap-2">
         <Tag label={`Risco: ${rLabel}`} color={rCol} />
         <Tag label={rec.expectedReturn} color={color} />
-        <Tag label={rec.timeframe} color="#475569" />
+        <Tag label={rec.timeframe} color="var(--numi-text-3)" />
       </div>
     </div>
   );
@@ -109,7 +109,11 @@ function Tag({ label, color }: { label: string; color: string }) {
   return (
     <span
       className="text-xs font-medium px-2 py-0.5 rounded-full"
-      style={{ background: `${color}18`, color, border: `1px solid ${color}28` }}
+      style={{
+        background: `color-mix(in srgb, ${color} 10%, transparent)`,
+        color,
+        border: `1px solid color-mix(in srgb, ${color} 16%, transparent)`,
+      }}
     >
       {label}
     </span>
@@ -120,21 +124,21 @@ function LoadingState() {
   return (
     <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-8 h-8 rounded-full border-2 border-[#34D399] border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--numi-income)] border-t-transparent animate-spin" />
         <div>
-          <p className="text-base font-semibold text-[#F1F5F9]">Analisando seu perfil financeiro…</p>
-          <p className="text-sm text-[#475569]">O FIA está processando seus dados</p>
+          <p className="text-base font-semibold text-[var(--numi-text)]">Analisando seu perfil financeiro…</p>
+          <p className="text-sm text-[var(--numi-text-3)]">O FIA está processando seus dados</p>
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-32 rounded-2xl bg-[#131929] animate-pulse" />
+          <div key={i} className="h-32 rounded-2xl bg-[var(--numi-elevated)] animate-pulse" />
         ))}
       </div>
-      <div className="h-64 rounded-2xl bg-[#131929] animate-pulse mb-4" />
+      <div className="h-64 rounded-2xl bg-[var(--numi-elevated)] animate-pulse mb-4" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-36 rounded-2xl bg-[#131929] animate-pulse" />
+          <div key={i} className="h-36 rounded-2xl bg-[var(--numi-elevated)] animate-pulse" />
         ))}
       </div>
     </div>
@@ -171,11 +175,11 @@ export default function FIAPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <p className="text-4xl">⚠️</p>
-        <p className="text-[#94A3B8] font-medium">{error ?? "Erro desconhecido"}</p>
+        <p className="text-[var(--numi-text-2)] font-medium">{error ?? "Erro desconhecido"}</p>
         <button
           onClick={fetchAnalysis}
           className="px-4 py-2 rounded-xl text-sm font-semibold"
-          style={{ background: "#34D399", color: "#0B1020" }}
+          style={{ background: "var(--numi-income)", color: "#0B1020" }}
         >
           Tentar novamente
         </button>
@@ -185,16 +189,16 @@ export default function FIAPage() {
 
   const { profile: prof } = analysis;
   const profileColor =
-    prof === "conservador" ? "#38BDF8" :
-    prof === "arrojado"    ? "#F87171" :
-    "#34D399";
+    prof === "conservador" ? "var(--numi-info)" :
+    prof === "arrojado"    ? "var(--numi-expense)" :
+    "var(--numi-income)";
 
   const isAI = analysis.aiProvider !== "mock";
   const badgeText =
     analysis.aiProvider === "gemini"   ? "⚡ Gemini" :
     analysis.aiProvider === "deepseek" ? "⚡ DeepSeek" :
-    "🔶 Demo";
-  const badgeColor = isAI ? "#34D399" : "#FBBF24";
+    "📊 Baseado nos seus dados";
+  const badgeColor = isAI ? "var(--numi-income)" : "var(--numi-info)";
 
   // Aporte de referência para cálculo de valores por ativo
   const aportBase = analysis.monthlyContribution.max;
@@ -223,50 +227,67 @@ export default function FIAPage() {
       <div className="flex items-start justify-between mb-6 gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl font-bold text-[#F1F5F9]">Investimento Inteligente</h1>
+            <h1 className="text-xl font-bold text-[var(--numi-text)]">Investimento Inteligente</h1>
             <span
               className="text-xs font-semibold px-2 py-0.5 rounded-full"
               style={{
-                background: `${badgeColor}22`,
+                background: `color-mix(in srgb, ${badgeColor} 14%, transparent)`,
                 color: badgeColor,
               }}
             >
               {badgeText}
             </span>
           </div>
-          <p className="text-sm text-[#475569]">
+          <p className="text-sm text-[var(--numi-text-3)]">
             Análise gerada em {generatedDate} · Confiança {analysis.confidence}%
           </p>
         </div>
         <button
           onClick={fetchAnalysis}
           className="text-sm font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shrink-0 transition-colors"
-          style={{ background: "#131929", border: "1px solid #1E2D45", color: "#94A3B8" }}
+          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)", color: "var(--numi-text-2)" }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.borderColor = "#34D39944";
-            (e.currentTarget as HTMLElement).style.color = "#F1F5F9";
+            (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)";
+            (e.currentTarget as HTMLElement).style.color = "var(--numi-text)";
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.borderColor = "#1E2D45";
-            (e.currentTarget as HTMLElement).style.color = "#94A3B8";
+            (e.currentTarget as HTMLElement).style.borderColor = "var(--numi-border)";
+            (e.currentTarget as HTMLElement).style.color = "var(--numi-text-2)";
           }}
         >
           ↻ Reanalisar
         </button>
       </div>
 
+      {/* ── Notice: análise baseada em regras ─────── */}
+      {!isAI && (
+        <div
+          className="flex items-start gap-3 rounded-xl px-4 py-3 mb-5 text-sm"
+          style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "var(--numi-info)" }}
+        >
+          <span className="text-base shrink-0 mt-0.5">💡</span>
+          <p>
+            Esta análise foi calculada a partir dos seus dados reais (renda, despesas, metas e orçamento).
+            Para recomendações com IA generativa, configure uma chave em{" "}
+            <code className="text-[var(--numi-info)] text-xs bg-[color-mix(in_srgb,var(--numi-text)_8%,transparent)] px-1 rounded">GOOGLE_GENERATIVE_AI_API_KEY</code>{" "}
+            ou{" "}
+            <code className="text-[var(--numi-info)] text-xs bg-[color-mix(in_srgb,var(--numi-text)_8%,transparent)] px-1 rounded">DEEPSEEK_API_KEY</code>.
+          </p>
+        </div>
+      )}
+
       {/* ── Score + Perfil + Capacidade ────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {/* Score */}
         <div
           className="rounded-2xl p-5 flex flex-col items-center gap-2"
-          style={{ background: "#131929", border: "1px solid #1E2D45" }}
+          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
         >
-          <p className="text-xs font-semibold text-[#475569] uppercase tracking-wider">
+          <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider">
             Score Financeiro
           </p>
           <ScoreRing score={analysis.financialScore} />
-          <p className="text-xs text-[#475569] text-center">
+          <p className="text-xs text-[var(--numi-text-3)] text-center">
             {analysis.financialScore >= 70 ? "Boa saúde financeira" :
              analysis.financialScore >= 50 ? "Situação moderada" : "Atenção necessária"}
           </p>
@@ -275,14 +296,14 @@ export default function FIAPage() {
         {/* Perfil */}
         <div
           className="rounded-2xl p-5 flex flex-col items-center justify-center gap-3"
-          style={{ background: "#131929", border: "1px solid #1E2D45" }}
+          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
         >
-          <p className="text-xs font-semibold text-[#475569] uppercase tracking-wider">
+          <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider">
             Perfil Detectado
           </p>
           <span
             className="text-2xl font-bold capitalize px-5 py-2 rounded-xl"
-            style={{ background: `${profileColor}15`, color: profileColor, border: `1px solid ${profileColor}30` }}
+            style={{ background: `color-mix(in srgb, ${profileColor} 8%, transparent)`, color: profileColor, border: `1px solid color-mix(in srgb, ${profileColor} 19%, transparent)` }}
           >
             {analysis.profile}
           </span>
@@ -291,7 +312,7 @@ export default function FIAPage() {
               <span
                 key={p}
                 className="w-2 h-2 rounded-full transition-colors"
-                style={{ background: p === analysis.profile ? profileColor : "#1E2D45" }}
+                style={{ background: p === analysis.profile ? profileColor : "var(--numi-border)" }}
               />
             ))}
           </div>
@@ -300,18 +321,18 @@ export default function FIAPage() {
         {/* Capacidade */}
         <div
           className="rounded-2xl p-5"
-          style={{ background: "#131929", border: "1px solid #1E2D45" }}
+          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
         >
-          <p className="text-xs font-semibold text-[#475569] uppercase tracking-wider mb-3">
+          <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
             Capacidade Mensal
           </p>
-          <p className="text-3xl font-bold text-[#34D399] mb-1">
+          <p className="text-3xl font-bold text-[var(--numi-income)] mb-1">
             {formatCurrency(recommended)}
           </p>
-          <p className="text-xs text-[#475569] mb-3">
+          <p className="text-xs text-[var(--numi-text-3)] mb-3">
             Faixa: {formatCurrency(analysis.monthlyContribution.min)} — {formatCurrency(analysis.monthlyContribution.max)}
           </p>
-          <p className="text-xs text-[#94A3B8] leading-relaxed">
+          <p className="text-xs text-[var(--numi-text-2)] leading-relaxed">
             {analysis.monthlyContribution.reason}
           </p>
         </div>
@@ -320,9 +341,9 @@ export default function FIAPage() {
       {/* ── Distribuição recomendada ────────────────── */}
       <div
         className="rounded-2xl p-5 mb-6"
-        style={{ background: "#131929", border: "1px solid #1E2D45" }}
+        style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
       >
-        <p className="text-sm font-semibold text-[#F1F5F9] mb-5">
+        <p className="text-sm font-semibold text-[var(--numi-text)] mb-5">
           Distribuição Recomendada — {formatCurrency(aportBase)}/mês
         </p>
         <div className="flex flex-col lg:flex-row gap-6 items-center">
@@ -346,11 +367,11 @@ export default function FIAPage() {
               <Tooltip
                 formatter={(v) => [`${v}%`, ""]}
                 contentStyle={{
-                  background: "#1A2235",
-                  border: "1px solid #1E2D45",
+                  background: "var(--numi-elevated)",
+                  border: "1px solid var(--numi-border)",
                   borderRadius: "10px",
                   fontSize: "12px",
-                  color: "#F1F5F9",
+                  color: "var(--numi-text)",
                 }}
               />
             </PieChart>
@@ -370,9 +391,9 @@ export default function FIAPage() {
                   transition={{ delay: i * 0.06 }}
                 >
                   <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
-                  <p className="text-sm text-[#F1F5F9] flex-1 truncate">{a.asset}</p>
-                  <p className="text-sm font-bold text-[#F1F5F9] shrink-0">{a.allocation}%</p>
-                  <p className="text-xs text-[#475569] w-16 text-right shrink-0">
+                  <p className="text-sm text-[var(--numi-text)] flex-1 truncate">{a.asset}</p>
+                  <p className="text-sm font-bold text-[var(--numi-text)] shrink-0">{a.allocation}%</p>
+                  <p className="text-xs text-[var(--numi-text-3)] w-16 text-right shrink-0">
                     {formatCurrency(amount)}
                   </p>
                 </motion.div>
@@ -383,7 +404,7 @@ export default function FIAPage() {
       </div>
 
       {/* ── Carteira detalhada ─────────────────────── */}
-      <p className="text-xs font-semibold text-[#475569] uppercase tracking-wider mb-3">
+      <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
         Carteira detalhada
       </p>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
@@ -403,15 +424,15 @@ export default function FIAPage() {
       </div>
 
       {/* ── Insights ──────────────────────────────── */}
-      <p className="text-xs font-semibold text-[#475569] uppercase tracking-wider mb-3">
+      <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
         Insights do FIA
       </p>
       <div className="flex flex-col gap-2 mb-6">
         {analysis.insights.map((insight, i) => (
           <motion.div
             key={i}
-            className="rounded-xl px-4 py-3 text-sm text-[#94A3B8] leading-relaxed"
-            style={{ background: "#131929", border: "1px solid #1E2D45" }}
+            className="rounded-xl px-4 py-3 text-sm text-[var(--numi-text-2)] leading-relaxed"
+            style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 + i * 0.06 }}
@@ -422,25 +443,25 @@ export default function FIAPage() {
       </div>
 
       {/* ── Próximos passos ────────────────────────── */}
-      <p className="text-xs font-semibold text-[#475569] uppercase tracking-wider mb-3">
+      <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
         Próximos Passos
       </p>
       <div
         className="rounded-2xl p-4 mb-8"
-        style={{ background: "#131929", border: "1px solid #1E2D45" }}
+        style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
       >
         <ol className="flex flex-col gap-3">
           {analysis.nextSteps.map((step, i) => (
             <motion.li
               key={i}
-              className="flex items-start gap-3 text-sm text-[#F1F5F9]"
+              className="flex items-start gap-3 text-sm text-[var(--numi-text)]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 + i * 0.08 }}
             >
               <span
                 className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5"
-                style={{ background: "rgba(52,211,153,0.15)", color: "#34D399" }}
+                style={{ background: "rgba(16,185,129,0.15)", color: "var(--numi-income)" }}
               >
                 {i + 1}
               </span>
@@ -451,7 +472,7 @@ export default function FIAPage() {
       </div>
 
       {/* ── Rodapé ────────────────────────────────── */}
-      <p className="text-xs text-center text-[#475569]">
+      <p className="text-xs text-center text-[var(--numi-text-3)]">
         {isAI
           ? `Análise gerada por ${analysis.aiProvider === "gemini" ? "Google Gemini" : "DeepSeek"} · Não constitui recomendação de investimento`
           : "Modo demo — configure GOOGLE_GENERATIVE_AI_API_KEY ou DEEPSEEK_API_KEY no .env.local para ativar a IA"}

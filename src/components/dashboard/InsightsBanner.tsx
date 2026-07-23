@@ -8,9 +8,9 @@ interface Props {
 }
 
 const SEVERITY_STYLES = {
-  alert:   { border: "rgba(248,113,113,0.2)",  bg: "rgba(248,113,113,0.06)",  text: "#F87171" },
-  warning: { border: "rgba(251,191,36,0.2)",   bg: "rgba(251,191,36,0.06)",   text: "#FBBF24" },
-  info:    { border: "rgba(52,211,153,0.15)",  bg: "rgba(52,211,153,0.06)",   text: "#34D399" },
+  alert:   { border: "rgba(239,68,68,0.22)",   bg: "rgba(239,68,68,0.07)",   text: "var(--numi-expense)" },
+  warning: { border: "rgba(245,158,11,0.22)",  bg: "rgba(245,158,11,0.07)",  text: "var(--numi-warning)" },
+  info:    { border: "rgba(16,185,129,0.18)",  bg: "rgba(16,185,129,0.07)",  text: "var(--numi-income)" },
 };
 
 export function InsightsBanner({ insights }: Props) {
@@ -19,8 +19,8 @@ export function InsightsBanner({ insights }: Props) {
   return (
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-semibold text-[#F1F5F9]">💡 Insights</p>
-        <Link href="/app/insights" className="text-xs text-[#34D399] hover:underline">
+        <p className="text-sm font-semibold text-[var(--numi-text)]">💡 Insights</p>
+        <Link href="/app/insights" className="text-xs text-[var(--numi-income)] hover:underline">
           Ver todos
         </Link>
       </div>
@@ -39,7 +39,7 @@ export function InsightsBanner({ insights }: Props) {
                 <p className="text-sm font-medium" style={{ color: style.text }}>
                   {insight.title}
                 </p>
-                <p className="text-xs text-[#94A3B8] mt-0.5">{insight.description}</p>
+                <p className="text-xs text-[var(--numi-text-2)] mt-0.5">{insight.description}</p>
               </div>
             </div>
           );

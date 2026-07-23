@@ -82,7 +82,7 @@ export function UpdatePricesButton({ positions }: Props) {
       style={{
         background: "rgba(52,211,153,0.08)",
         border: "1px solid rgba(52,211,153,0.25)",
-        color: loading ? "#475569" : "#34D399",
+        color: loading ? "var(--numi-text-3)" : "var(--numi-income)",
         opacity: loading ? 0.7 : 1,
       }}
     >

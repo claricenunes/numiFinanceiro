@@ -6,6 +6,7 @@ import { ProgressBar } from "@/components/common/ProgressBar";
 import { FadeIn } from "@/components/common/FadeIn";
 import { NewGoalButton } from "./NewGoalButton";
 import { ContributeButton } from "./ContributeButton";
+import { EditGoalButton } from "./EditGoalButton";
 
 export const metadata: Metadata = { title: "Metas" };
 
@@ -13,7 +14,7 @@ const STATUS_LABEL: Record<string, string> = {
   active: "Ativa", completed: "Concluída", cancelled: "Cancelada", paused: "Pausada",
 };
 const GOAL_COLOR: Record<string, string> = {
-  active: "#34D399", completed: "#38BDF8", cancelled: "#F87171", paused: "#FBBF24",
+  active: "var(--numi-income)", completed: "var(--numi-info)", cancelled: "var(--numi-expense)", paused: "var(--numi-warning)",
 };
 
 export default async function MetasPage() {
@@ -24,22 +25,22 @@ export default async function MetasPage() {
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-xl font-bold text-[#F1F5F9]">Metas</h1>
+        <h1 className="text-xl font-bold text-[var(--numi-text)]">Metas</h1>
         <NewGoalButton />
       </div>
 
       {goals.length > 0 && (
         <div className="flex gap-2 mb-6 flex-wrap">
-          <Pill value={active}    label="ativas"     color="#34D399" />
-          <Pill value={completed} label="concluídas" color="#38BDF8" />
+          <Pill value={active}    label="ativas"     color="var(--numi-income)" />
+          <Pill value={completed} label="concluídas" color="var(--numi-info)" />
         </div>
       )}
 
       {goals.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-4xl mb-3">🎯</p>
-          <p className="text-[#94A3B8] font-medium">Nenhuma meta cadastrada</p>
-          <p className="text-sm text-[#475569] mt-1">Clique em "+ Nova Meta" para começar a acompanhar seu progresso</p>
+          <p className="text-[var(--numi-text-2)] font-medium">Nenhuma meta cadastrada</p>
+          <p className="text-sm text-[var(--numi-text-3)] mt-1">Clique em "+ Nova Meta" para começar a acompanhar seu progresso</p>
         </div>
       ) : (
         <div className="flex flex-col gap-4">
@@ -52,14 +53,14 @@ export default async function MetasPage() {
 
 function Pill({ value, label, color }: { value: number; label: string; color: string }) {
   return (
-    <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: `${color}22`, color }}>
+    <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: `color-mix(in srgb, ${color} 14%, transparent)`, color }}>
       {value} {label}
     </span>
   );
 }
 
 function GoalCard({ goal }: { goal: GoalWithProgress }) {
-  const color       = GOAL_COLOR[goal.status] ?? "#34D399";
+  const color       = GOAL_COLOR[goal.status] ?? "var(--numi-income)";
   const remaining   = goal.targetAmount - goal.currentAmount;
   const isCompleted = goal.status === "completed";
   const isPaused    = goal.status === "paused";
@@ -67,7 +68,7 @@ function GoalCard({ goal }: { goal: GoalWithProgress }) {
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ background: "#131929", border: `1px solid ${isCompleted ? "#38BDF822" : isPaused ? "#FBBF2422" : "#1E2D45"}` }}
+      style={{ background: "var(--numi-elevated)", border: `1px solid ${isCompleted ? "rgba(59,130,246,0.22)" : isPaused ? "rgba(245,158,11,0.22)" : "var(--numi-border)"}` }}
     >
       <div className="flex gap-4">
         <div className="shrink-0">
@@ -77,42 +78,45 @@ function GoalCard({ goal }: { goal: GoalWithProgress }) {
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex items-center gap-2 min-w-0">
               {goal.icon && <span className="text-xl">{goal.icon}</span>}
-              <p className="text-base font-bold text-[#F1F5F9] leading-tight">{goal.name}</p>
+              <p className="text-base font-bold text-[var(--numi-text)] leading-tight">{goal.name}</p>
             </div>
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0" style={{ background: `${color}22`, color }}>
-              {STATUS_LABEL[goal.status]}
-            </span>
+            <div className="flex items-center gap-1 shrink-0">
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: `color-mix(in srgb, ${color} 14%, transparent)`, color }}>
+                {STATUS_LABEL[goal.status]}
+              </span>
+              <EditGoalButton goal={goal} />
+            </div>
           </div>
           <div className="flex items-baseline gap-1.5 mb-3">
-            <p className="text-xl font-bold text-[#F1F5F9]">{formatCurrency(goal.currentAmount)}</p>
-            <p className="text-sm text-[#475569]">de {formatCurrency(goal.targetAmount)}</p>
+            <p className="text-xl font-bold text-[var(--numi-text)]">{formatCurrency(goal.currentAmount)}</p>
+            <p className="text-sm text-[var(--numi-text-3)]">de {formatCurrency(goal.targetAmount)}</p>
           </div>
           <div className="mb-2">
             <ProgressBar percent={goal.progressPercent} color={color} />
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             {isCompleted ? (
-              <p className="text-xs font-semibold" style={{ color: "#38BDF8" }}>🎉 Meta concluída!</p>
+              <p className="text-xs font-semibold" style={{ color: "var(--numi-info)" }}>🎉 Meta concluída!</p>
             ) : isPaused ? (
-              <p className="text-xs text-[#FBBF24]">⏸ Meta pausada</p>
+              <p className="text-xs text-[var(--numi-warning)]">⏸ Meta pausada</p>
             ) : goal.isOnTrack ? (
-              <p className="text-xs font-semibold" style={{ color: "#34D399" }}>✓ No ritmo certo</p>
+              <p className="text-xs font-semibold" style={{ color: "var(--numi-income)" }}>✓ No ritmo certo</p>
             ) : (
-              <p className="text-xs" style={{ color: "#FBBF24" }}>
+              <p className="text-xs" style={{ color: "var(--numi-warning)" }}>
                 ⚠ Precisaria de {goal.monthlyNeeded ? formatCurrency(goal.monthlyNeeded) : "—"}/mês
               </p>
             )}
             {goal.daysRemaining !== null && !isCompleted && (
-              <p className="text-xs text-[#475569]">{goal.daysRemaining} dias restantes</p>
+              <p className="text-xs text-[var(--numi-text-3)]">{goal.daysRemaining} dias restantes</p>
             )}
             {!isCompleted && (
-              <p className="text-xs text-[#475569]">Faltam {formatCurrency(remaining)}</p>
+              <p className="text-xs text-[var(--numi-text-3)]">Faltam {formatCurrency(remaining)}</p>
             )}
           </div>
         </div>
       </div>
       {goal.status === "active" && (
-        <div className="mt-4 pt-4" style={{ borderTop: "1px solid #1E2D45" }}>
+        <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--numi-border)" }}>
           <ContributeButton goalId={goal.id} goalName={goal.name} />
         </div>
       )}
@@ -128,12 +132,12 @@ function ProgressCircle({ percent, color, size = 80 }: { percent: number; color:
   const filled = Math.min(percent / 100, 1) * circumference;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1E2D45" strokeWidth={7} />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--numi-border)" strokeWidth={7} />
       <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={7}
         strokeLinecap="round" strokeDasharray={`${filled} ${circumference}`}
         transform={`rotate(-90 ${cx} ${cy})`} />
       <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-        fill="#F1F5F9" fontSize={13} fontWeight={700} fontFamily="inherit">
+        fill="var(--numi-text)" fontSize={13} fontWeight={700} fontFamily="inherit">
         {Math.round(percent)}%
       </text>
     </svg>

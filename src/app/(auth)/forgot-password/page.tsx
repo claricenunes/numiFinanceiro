@@ -46,11 +46,11 @@ export default function ForgotPasswordPage() {
              style={{ background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.3)" }}>
           <span className="text-2xl">✉️</span>
         </div>
-        <h2 className="text-xl font-bold text-[#F1F5F9] mb-2">E-mail enviado</h2>
-        <p className="text-sm text-[#94A3B8] mb-6">
+        <h2 className="text-xl font-bold text-[var(--numi-text)] mb-2">E-mail enviado</h2>
+        <p className="text-sm text-[var(--numi-text-2)] mb-6">
           Verifique sua caixa de entrada e clique no link para redefinir sua senha.
         </p>
-        <Link href="/login" className="text-sm text-[#34D399] hover:underline">
+        <Link href="/login" className="text-sm text-[var(--numi-income)] hover:underline">
           Voltar para o login
         </Link>
       </div>
@@ -61,19 +61,19 @@ export default function ForgotPasswordPage() {
     <>
       <Link
         href="/login"
-        className="inline-flex items-center gap-1.5 text-sm text-[#94A3B8] hover:text-[#F1F5F9] mb-6 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-[var(--numi-text-2)] hover:text-[var(--numi-text)] mb-6 transition-colors"
       >
         <span aria-hidden>←</span> Voltar
       </Link>
 
-      <h1 className="text-2xl font-bold text-[#F1F5F9] mb-1">Esqueceu a senha?</h1>
-      <p className="text-sm text-[#94A3B8] mb-6">
+      <h1 className="text-2xl font-bold text-[var(--numi-text)] mb-1">Esqueceu a senha?</h1>
+      <p className="text-sm text-[var(--numi-text-2)] mb-6">
         Informe seu e-mail e enviaremos um link para criar uma nova senha.
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-[#94A3B8]">
+          <label htmlFor="email" className="text-sm font-medium text-[var(--numi-text-2)]">
             E-mail
           </label>
           <input
@@ -86,14 +86,14 @@ export default function ForgotPasswordPage() {
             {...register("email")}
           />
           {errors.email && (
-            <span className="text-xs text-[#F87171]">{errors.email.message}</span>
+            <span className="text-xs text-[var(--numi-expense)]">{errors.email.message}</span>
           )}
         </div>
 
         {serverError && (
           <div
             role="alert"
-            className="rounded-lg px-4 py-3 text-sm text-[#F87171]"
+            className="rounded-lg px-4 py-3 text-sm text-[var(--numi-expense)]"
             style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}
           >
             {serverError}

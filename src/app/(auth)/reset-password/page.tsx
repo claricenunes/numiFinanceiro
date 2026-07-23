@@ -52,14 +52,14 @@ export default function ResetPasswordPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-[#F1F5F9] mb-1">Nova senha</h1>
-      <p className="text-sm text-[#94A3B8] mb-6">
+      <h1 className="text-2xl font-bold text-[var(--numi-text)] mb-1">Nova senha</h1>
+      <p className="text-sm text-[var(--numi-text-2)] mb-6">
         Crie uma senha segura para sua conta.
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-sm font-medium text-[#94A3B8]">
+          <label htmlFor="password" className="text-sm font-medium text-[var(--numi-text-2)]">
             Nova senha
           </label>
           <input
@@ -72,13 +72,13 @@ export default function ResetPasswordPage() {
             {...register("password")}
           />
           {errors.password
-            ? <span className="text-xs text-[#F87171]">{errors.password.message}</span>
-            : <span className="text-xs text-[#475569]">Mínimo 8 caracteres, 1 maiúscula e 1 número</span>
+            ? <span className="text-xs text-[var(--numi-expense)]">{errors.password.message}</span>
+            : <span className="text-xs text-[var(--numi-text-3)]">Mínimo 8 caracteres, 1 maiúscula e 1 número</span>
           }
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="confirmPassword" className="text-sm font-medium text-[#94A3B8]">
+          <label htmlFor="confirmPassword" className="text-sm font-medium text-[var(--numi-text-2)]">
             Confirmar nova senha
           </label>
           <input
@@ -91,14 +91,14 @@ export default function ResetPasswordPage() {
             {...register("confirmPassword")}
           />
           {errors.confirmPassword && (
-            <span className="text-xs text-[#F87171]">{errors.confirmPassword.message}</span>
+            <span className="text-xs text-[var(--numi-expense)]">{errors.confirmPassword.message}</span>
           )}
         </div>
 
         {serverError && (
           <div
             role="alert"
-            className="rounded-lg px-4 py-3 text-sm text-[#F87171]"
+            className="rounded-lg px-4 py-3 text-sm text-[var(--numi-expense)]"
             style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}
           >
             {serverError}

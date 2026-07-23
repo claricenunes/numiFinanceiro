@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToastStore } from "@/stores/useToastStore";
+import { AIOrb } from "@/components/mascot/AIOrb";
 
 interface Props {
   initialStep: number;
@@ -78,7 +79,7 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
   const firstName = name.split(" ")[0] || "você";
 
   return (
-    <div className="min-h-dvh flex items-center justify-center p-4" style={{ background: "#0B1020" }}>
+    <div className="min-h-dvh flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center gap-2.5 mb-8 justify-center">
@@ -86,9 +87,9 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
             className="w-9 h-9 rounded-xl flex items-center justify-center"
             style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.3)" }}
           >
-            <span className="w-3.5 h-3.5 rounded-full bg-[#34D399] block" />
+            <span className="w-3.5 h-3.5 rounded-full bg-[var(--numi-income)] block" />
           </span>
-          <span className="text-xl font-bold text-[#F1F5F9]">Numi</span>
+          <span className="text-xl font-bold text-[var(--numi-text)]">Numi</span>
         </div>
 
         {/* Progress dots */}
@@ -100,25 +101,25 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
               style={{
                 width: i === step ? 24 : 8,
                 height: 8,
-                background: i <= step ? "#34D399" : "#1E2D45",
+                background: i <= step ? "var(--numi-income)" : "var(--numi-border)",
               }}
             />
           ))}
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl p-6" style={{ background: "#131929", border: "1px solid #1E2D45" }}>
+        <div className="rounded-2xl p-6" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
           {/* ── Step 0: Welcome + name ── */}
           {step === 0 && (
             <div className="flex flex-col gap-5">
               <div>
-                <p className="text-2xl font-bold text-[#F1F5F9] mb-2">Bem-vindo ao Numi 👋</p>
-                <p className="text-sm text-[#94A3B8] leading-relaxed">
+                <p className="text-2xl font-bold text-[var(--numi-text)] mb-2">Bem-vindo ao Numi 👋</p>
+                <p className="text-sm text-[var(--numi-text-2)] leading-relaxed">
                   Sua jornada financeira começa aqui. Vamos configurar sua conta em 2 passos rápidos.
                 </p>
               </div>
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Como você se chama?</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Como você se chama?</label>
                 <input
                   type="text"
                   value={name}
@@ -126,15 +127,15 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
                   onKeyDown={(e) => e.key === "Enter" && goToStep1()}
                   placeholder="Seu nome"
                   autoFocus
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#0D1526" }}
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
                 />
               </div>
               <button
                 onClick={goToStep1}
                 disabled={loading}
                 className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity"
-                style={{ background: "#34D399", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
+                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
               >
                 {loading ? "Salvando..." : "Continuar →"}
               </button>
@@ -145,25 +146,25 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
           {step === 1 && (
             <div className="flex flex-col gap-5">
               <div>
-                <p className="text-2xl font-bold text-[#F1F5F9] mb-2">Adicione sua primeira conta</p>
-                <p className="text-sm text-[#94A3B8]">Pode ser conta bancária, carteira ou cartão.</p>
+                <p className="text-2xl font-bold text-[var(--numi-text)] mb-2">Adicione sua primeira conta</p>
+                <p className="text-sm text-[var(--numi-text-2)]">Pode ser conta bancária, carteira ou cartão.</p>
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Nome da conta</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Nome da conta</label>
                 <input
                   type="text"
                   value={accountName}
                   onChange={(e) => setAccountName(e.target.value)}
                   placeholder="Ex: Nubank, Itaú, Carteira…"
                   autoFocus
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#0D1526" }}
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Tipo</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Tipo</label>
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
                   {ACCOUNT_TYPES.map((t) => (
                     <button
@@ -172,9 +173,9 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
                       onClick={() => setAccountType(t.value)}
                       className="py-2.5 px-2 rounded-xl text-xs font-medium flex flex-col items-center gap-1.5 transition-colors"
                       style={{
-                        background: accountType === t.value ? "rgba(52,211,153,0.1)" : "#0D1526",
-                        border: `1px solid ${accountType === t.value ? "#34D39966" : "#1E2D45"}`,
-                        color: accountType === t.value ? "#34D399" : "#64748B",
+                        background: accountType === t.value ? "rgba(16,185,129,0.1)" : "var(--numi-input-bg)",
+                        border: `1px solid ${accountType === t.value ? "rgba(16,185,129,0.4)" : "var(--numi-border)"}`,
+                        color: accountType === t.value ? "var(--numi-income)" : "var(--numi-text-4)",
                       }}
                     >
                       <span className="text-base">{t.icon}</span>
@@ -185,15 +186,15 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Saldo atual (R$)</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Saldo atual (R$)</label>
                 <input
                   type="text"
                   inputMode="decimal"
                   value={balance}
                   onChange={(e) => setBalance(e.target.value)}
                   placeholder="0,00"
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#0D1526" }}
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
                 />
               </div>
 
@@ -201,7 +202,7 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
                 onClick={goToStep2}
                 disabled={loading}
                 className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity"
-                style={{ background: "#34D399", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
+                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
               >
                 {loading ? "Salvando..." : "Criar conta →"}
               </button>
@@ -211,17 +212,18 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
           {/* ── Step 2: Done ── */}
           {step === 2 && (
             <div className="flex flex-col items-center gap-5 py-4 text-center">
-              <div className="text-5xl">🎉</div>
+              <AIOrb status="good" size={72} />
+              <div className="text-5xl -mt-2">🎉</div>
               <div>
-                <p className="text-2xl font-bold text-[#F1F5F9] mb-2">Tudo pronto, {firstName}!</p>
-                <p className="text-sm text-[#94A3B8] leading-relaxed">
+                <p className="text-2xl font-bold text-[var(--numi-text)] mb-2">Tudo pronto, {firstName}!</p>
+                <p className="text-sm text-[var(--numi-text-2)] leading-relaxed">
                   Sua conta está configurada. Explore o dashboard para ter uma visão completa das suas finanças.
                 </p>
               </div>
               <button
                 onClick={finish}
                 className="w-full py-3 rounded-xl text-sm font-semibold"
-                style={{ background: "#34D399", color: "#0B1020" }}
+                style={{ background: "var(--numi-income)", color: "#0B1020" }}
               >
                 Ir para o Dashboard →
               </button>
@@ -230,7 +232,7 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
         </div>
 
         {/* Step label */}
-        <p className="text-center text-xs text-[#475569] mt-4">
+        <p className="text-center text-xs text-[var(--numi-text-3)] mt-4">
           {step === 0 && "Passo 1 de 2 — Seu perfil"}
           {step === 1 && "Passo 2 de 2 — Primeira conta"}
           {step === 2 && "Configuração concluída!"}

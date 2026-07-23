@@ -13,7 +13,7 @@ export default function ContasLoading() {
           <div
             key={i}
             className={`rounded-2xl p-4 ${i === 0 ? "col-span-2 lg:col-span-1" : ""}`}
-            style={{ background: "#131929", border: "1px solid #1E2D45" }}
+            style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
           >
             <Skeleton className="h-3 w-24 mb-2" />
             <Skeleton className="h-7 w-32 mb-2" />
@@ -28,7 +28,7 @@ export default function ContasLoading() {
           <div
             key={i}
             className="rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "#131929", border: "1px solid #1E2D45" }}
+            style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
           >
             <div className="flex items-center gap-3">
               <Skeleton className="h-10 w-10 rounded-xl" />

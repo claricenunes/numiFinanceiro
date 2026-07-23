@@ -45,7 +45,7 @@ export function MobileDrawer() {
           {/* Drawer */}
           <motion.aside
             className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-64 flex flex-col"
-            style={{ background: "#0D1526", borderRight: "1px solid #1E2D45" }}
+            style={{ background: "var(--numi-elevated)", borderRight: "1px solid var(--numi-border)" }}
             initial={{ x: -264 }}
             animate={{ x: 0 }}
             exit={{ x: -264 }}
@@ -54,7 +54,7 @@ export function MobileDrawer() {
             {/* Header do drawer */}
             <div
               className="flex items-center justify-between px-4 py-4"
-              style={{ borderBottom: "1px solid #1E2D45", minHeight: "64px" }}
+              style={{ borderBottom: "1px solid var(--numi-border)", minHeight: "64px" }}
             >
               <div className="flex items-center gap-3">
                 <span
@@ -64,15 +64,15 @@ export function MobileDrawer() {
                     border: "1px solid rgba(52,211,153,0.3)",
                   }}
                 >
-                  <span className="w-3 h-3 rounded-full bg-[#34D399] block" />
+                  <span className="w-3 h-3 rounded-full bg-[var(--numi-income)] block" />
                 </span>
-                <span className="text-base font-semibold text-[#F1F5F9] tracking-tight">
+                <span className="text-base font-semibold text-[var(--numi-text)] tracking-tight">
                   Numi
                 </span>
               </div>
               <button
                 onClick={closeMobileMenu}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#475569] hover:text-[#F1F5F9] hover:bg-[#1E2D45] transition-colors text-xl leading-none"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-3)] hover:text-[var(--numi-text)] hover:bg-[var(--numi-border)] transition-colors text-xl leading-none"
                 aria-label="Fechar menu"
               >
                 ×
@@ -91,13 +91,13 @@ export function MobileDrawer() {
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
                     style={{
                       background: active ? "rgba(52,211,153,0.1)" : "transparent",
-                      color: active ? "#34D399" : "#94A3B8",
+                      color: active ? "var(--numi-income)" : "var(--numi-text-2)",
                     }}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     <span className="text-sm font-medium">{label}</span>
                     {active && (
-                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#34D399]" />
+                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--numi-income)]" />
                     )}
                   </Link>
                 );

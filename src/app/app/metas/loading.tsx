@@ -15,7 +15,7 @@ export default function MetasLoading() {
 
       <div className="flex flex-col gap-4">
         {[0, 1, 2].map(i => (
-          <div key={i} className="rounded-2xl p-5" style={{ background: "#131929", border: "1px solid #1E2D45" }}>
+          <div key={i} className="rounded-2xl p-5" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
             <div className="flex gap-4">
               <Skeleton className="h-20 w-20 rounded-full shrink-0" />
               <div className="flex-1">

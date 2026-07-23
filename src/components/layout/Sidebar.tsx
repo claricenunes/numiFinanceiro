@@ -41,24 +41,24 @@ export function Sidebar({ userName, userAvatar, notifCount = 0 }: Props) {
       className="hidden lg:flex flex-col h-full transition-all duration-300"
       style={{
         width: sidebarOpen ? "240px" : "64px",
-        background: "#0D1526",
-        borderRight: "1px solid #1E2D45",
+        background: "var(--numi-elevated)",
+        borderRight: "1px solid var(--numi-border)",
         flexShrink: 0,
       }}
     >
       {/* Logo */}
       <div
         className="flex items-center gap-3 px-4 py-5"
-        style={{ borderBottom: "1px solid #1E2D45", minHeight: "64px" }}
+        style={{ borderBottom: "1px solid var(--numi-border)", minHeight: "64px" }}
       >
         <span
           className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.3)" }}
         >
-          <span className="w-3 h-3 rounded-full bg-[#34D399] block" />
+          <span className="w-3 h-3 rounded-full bg-[var(--numi-income)] block" />
         </span>
         {sidebarOpen && (
-          <span className="text-base font-semibold text-[#F1F5F9] tracking-tight">Numi</span>
+          <span className="text-base font-semibold text-[var(--numi-text)] tracking-tight">Numi</span>
         )}
       </div>
 
@@ -75,15 +75,15 @@ export function Sidebar({ userName, userAvatar, notifCount = 0 }: Props) {
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150"
               style={{
                 background: active ? "rgba(52,211,153,0.1)" : "transparent",
-                color: active ? "#34D399" : "#94A3B8",
+                color: active ? "var(--numi-income)" : "var(--numi-text-2)",
               }}
               onMouseEnter={(e) => {
-                if (!active) (e.currentTarget as HTMLElement).style.background = "#131929";
-                if (!active) (e.currentTarget as HTMLElement).style.color = "#F1F5F9";
+                if (!active) (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-text) 6%, transparent)";
+                if (!active) (e.currentTarget as HTMLElement).style.color = "var(--numi-text)";
               }}
               onMouseLeave={(e) => {
                 if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
-                if (!active) (e.currentTarget as HTMLElement).style.color = "#94A3B8";
+                if (!active) (e.currentTarget as HTMLElement).style.color = "var(--numi-text-2)";
               }}
             >
               {/* Icon with optional unread badge */}
@@ -92,7 +92,7 @@ export function Sidebar({ userName, userAvatar, notifCount = 0 }: Props) {
                 {count > 0 && (
                   <span
                     className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] rounded-full flex items-center justify-center text-[9px] font-bold px-0.5"
-                    style={{ background: "#F87171", color: "#0B1020" }}
+                    style={{ background: "var(--numi-expense)", color: "#FFFFFF" }}
                   >
                     {count > 9 ? "9+" : count}
                   </span>
@@ -103,7 +103,7 @@ export function Sidebar({ userName, userAvatar, notifCount = 0 }: Props) {
                 <span className="text-sm font-medium truncate flex-1">{label}</span>
               )}
               {active && sidebarOpen && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#34D399] flex-shrink-0" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--numi-income)] flex-shrink-0" />
               )}
             </Link>
           );
@@ -111,17 +111,20 @@ export function Sidebar({ userName, userAvatar, notifCount = 0 }: Props) {
       </nav>
 
       {/* Footer */}
-      <div className="px-2 py-4" style={{ borderTop: "1px solid #1E2D45" }}>
+      <div className="px-2 py-4" style={{ borderTop: "1px solid var(--numi-border)" }}>
         <Link
           href="/app/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#94A3B8] hover:bg-[#131929] hover:text-[#F1F5F9] transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--numi-text-2)] hover:text-[var(--numi-text)] transition-colors"
+          style={{ background: "transparent" }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-text) 6%, transparent)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
         >
           <SettingsIcon className="w-5 h-5 flex-shrink-0" />
           {sidebarOpen && <span className="text-sm font-medium">Configurações</span>}
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#94A3B8] hover:bg-[#F87171]/10 hover:text-[#F87171] transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--numi-text-2)] hover:bg-[var(--numi-expense)]/10 hover:text-[var(--numi-expense)] transition-colors"
         >
           <LogoutIcon className="w-5 h-5 flex-shrink-0" />
           {sidebarOpen && <span className="text-sm font-medium">Sair</span>}

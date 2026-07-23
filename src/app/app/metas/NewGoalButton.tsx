@@ -53,7 +53,7 @@ export function NewGoalButton() {
       <button
         onClick={() => setOpen(true)}
         className="text-sm font-semibold px-4 py-2 rounded-xl"
-        style={{ background: "#34D399", color: "#0B1020" }}
+        style={{ background: "var(--numi-income)", color: "#0B1020" }}
       >
         + Nova Meta
       </button>
@@ -64,12 +64,12 @@ export function NewGoalButton() {
 
           <div
             className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "#0F1B2D", border: "1px solid #1E2D45", maxHeight: "92dvh", overflowY: "auto" }}
+            style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)", maxHeight: "92dvh", overflowY: "auto" }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[#F1F5F9]">Nova Meta</h2>
+              <h2 className="text-base font-semibold text-[var(--numi-text)]">Nova Meta</h2>
               <button onClick={() => { setOpen(false); reset(); }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#64748B] hover:text-[#F1F5F9] hover:bg-[#1E2D45]">
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">
                 ✕
               </button>
             </div>
@@ -77,14 +77,14 @@ export function NewGoalButton() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               {/* Ícone */}
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-2 block">Ícone</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-2 block">Ícone</label>
                 <div className="flex flex-wrap gap-2">
                   {GOAL_ICONS.map(i => (
                     <button key={i} type="button" onClick={() => setIcon(i)}
                       className="w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-colors"
                       style={{
-                        background: icon === i ? "rgba(52,211,153,0.15)" : "#131929",
-                        border: `1px solid ${icon === i ? "#34D399" : "#1E2D45"}`,
+                        background: icon === i ? "rgba(52,211,153,0.15)" : "var(--numi-input-bg)",
+                        border: `1px solid ${icon === i ? "var(--numi-income)" : "var(--numi-border)"}`,
                       }}>
                       {i}
                     </button>
@@ -94,34 +94,34 @@ export function NewGoalButton() {
 
               {/* Nome */}
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Nome da meta</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Nome da meta</label>
                 <input value={name} onChange={e => setName(e.target.value)}
                   placeholder="Ex: Reserva de emergência, Viagem..." required
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
               </div>
 
               {/* Valor alvo */}
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Valor alvo (R$)</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Valor alvo (R$)</label>
                 <input value={target} onChange={e => setTarget(e.target.value)}
                   type="text" inputMode="decimal" placeholder="0,00" required
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
               </div>
 
               {/* Prazo */}
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Prazo (opcional)</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Prazo (opcional)</label>
                 <input value={deadline} onChange={e => setDeadline(e.target.value)}
                   type="date" min={new Date().toISOString().slice(0, 10)}
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#131929", colorScheme: "dark" }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)", colorScheme: "light" }} />
               </div>
 
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-                style={{ background: "#34D399", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
+                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
                 {loading ? "Salvando..." : "Criar meta"}
               </button>
             </form>

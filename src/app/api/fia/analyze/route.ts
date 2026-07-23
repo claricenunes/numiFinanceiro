@@ -238,81 +238,112 @@ async function tryDeepSeek(prompt: string): Promise<FIAAnalysis | null> {
   return stamp(parseJSON(text), "deepseek");
 }
 
-/* ── Mock fallback ────────────────────────────────────── */
-function getMock(): FIAAnalysis {
+/* ── Rule-based fallback (usa dados reais do usuário) ─── */
+function generateRuleBased(ctx: UserCtx | null): FIAAnalysis {
+  // Se não há dados reais, usa valores neutros
+  const income  = ctx?.income  ?? 0;
+  const expense = ctx?.expense ?? 0;
+  const savings = Math.max(0, income - expense);
+  const savingsRate = ctx?.savingsRate ?? 0;
+  const goals   = ctx?.goals   ?? [];
+  const overages = ctx?.budgetOverages ?? [];
+
+  // ── Score (0-100) ─────────────────────────────────────
+  // Poupança (0-40 pts): 20% = 20 pts, 40% = 40 pts
+  const savingsScore = Math.min(40, savingsRate * 0.8);
+  // Orçamento (0-30 pts): -10 por categoria estourada
+  const budgetScore  = Math.max(0, 30 - overages.length * 10);
+  // Metas (0-30 pts): proporção de metas no ritmo
+  const goalScore    = goals.length > 0
+    ? (goals.filter(g => g.onTrack).length / goals.length) * 30
+    : 15;
+  const financialScore = Math.min(100, Math.round(savingsScore + budgetScore + goalScore));
+
+  // ── Perfil de risco ───────────────────────────────────
+  const profile: "conservador" | "moderado" | "arrojado" =
+    savingsRate < 10 ? "conservador" :
+    savingsRate < 25 ? "moderado"    : "arrojado";
+
+  // ── Aporte mensal recomendado ─────────────────────────
+  const minContrib = income > 0 ? Math.round(savings * 0.2 / 10) * 10 : 0;
+  const maxContrib = income > 0 ? Math.round(savings * 0.35 / 10) * 10 : 0;
+  const fmtR = (n: number) =>
+    n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+  const contribReason = income > 0
+    ? `Sua renda é ${fmtR(income)} e suas despesas são ${fmtR(expense)}. O excedente de ${fmtR(savings)} permite aportes entre 20-35% (${fmtR(minContrib)}–${fmtR(maxContrib)}).`
+    : "Registre suas receitas e despesas para receber uma recomendação personalizada.";
+
+  // ── Alocação sugerida por perfil ─────────────────────
+  const allocations: FIAAnalysis["allocation"] =
+    profile === "conservador"
+      ? [
+          { asset: "Tesouro Selic 2026", category: "fixed_income", allocation: 50, risk: 12, expectedReturn: "~13,25% a.a.", timeframe: "Imediato", rationale: "Liquidez máxima enquanto você constrói sua reserva de emergência." },
+          { asset: "CDB 100% CDI",       category: "fixed_income", allocation: 30, risk: 15, expectedReturn: "~13% a.a.",    timeframe: "1-2 anos", rationale: "Rendimento ligado ao CDI com proteção do FGC até R$250k." },
+          { asset: "Tesouro IPCA+ 2029", category: "fixed_income", allocation: 15, risk: 18, expectedReturn: "IPCA + 6,2% a.a.", timeframe: "2-3 anos", rationale: "Proteção contra inflação com prazo adequado." },
+          { asset: "BOVA11 — ETF Ibovespa", category: "etf",       allocation:  4, risk: 55, expectedReturn: "12-18% a.a.", timeframe: "5+ anos", rationale: "Pequena exposição à renda variável para começar a diversificar." },
+          { asset: "MXRF11 — FII de Papel", category: "fii",       allocation:  1, risk: 40, expectedReturn: "~11% a.a.",   timeframe: "1-2 anos", rationale: "Experiência inicial com FIIs e dividendos mensais." },
+        ]
+      : profile === "arrojado"
+      ? [
+          { asset: "BOVA11 — ETF Ibovespa",  category: "etf",          allocation: 35, risk: 55, expectedReturn: "12-18% a.a.", timeframe: "5+ anos", rationale: "Exposição ampla ao Ibovespa com custo mínimo de 0,10% a.a." },
+          { asset: "Tesouro Selic 2026",      category: "fixed_income", allocation: 20, risk: 12, expectedReturn: "~13,25% a.a.", timeframe: "Imediato", rationale: "Reserva de oportunidade e liquidez para rebalanceamento." },
+          { asset: "MXRF11 — FII de Papel",   category: "fii",          allocation: 20, risk: 45, expectedReturn: "~11% a.a.", timeframe: "1-2 anos", rationale: "Dividendos mensais isentos de IR complementam a carteira." },
+          { asset: "Ações BR (VALE3/ITUB4)",  category: "stock",        allocation: 15, risk: 70, expectedReturn: "Variável",  timeframe: "3+ anos", rationale: "Empresas sólidas do Ibovespa para retorno acima do índice." },
+          { asset: "Tesouro IPCA+ 2029",      category: "fixed_income", allocation: 10, risk: 18, expectedReturn: "IPCA + 6,2% a.a.", timeframe: "2-3 anos", rationale: "Âncora de inflação na carteira." },
+        ]
+      : [ // moderado
+          { asset: "Tesouro Selic 2026",      category: "fixed_income", allocation: 30, risk: 12, expectedReturn: "~13,25% a.a.", timeframe: "Imediato", rationale: "Liquidez e segurança para reserva de emergência." },
+          { asset: "BOVA11 — ETF Ibovespa",   category: "etf",          allocation: 25, risk: 55, expectedReturn: "12-18% a.a.", timeframe: "3+ anos", rationale: "Diversificação de baixo custo com liquidez diária." },
+          { asset: "Tesouro IPCA+ 2029",      category: "fixed_income", allocation: 20, risk: 18, expectedReturn: "IPCA + 6,2% a.a.", timeframe: "2-3 anos", rationale: "Proteção contra inflação com prazo adequado." },
+          { asset: "MXRF11 — FII de Papel",   category: "fii",          allocation: 15, risk: 45, expectedReturn: "~11% a.a.", timeframe: "1-2 anos", rationale: "Dividendos mensais isentos de IR." },
+          { asset: "PETR4 — Petrobras PN",    category: "stock",        allocation: 10, risk: 68, expectedReturn: "Variável + dividendos", timeframe: "1-2 anos", rationale: "Exposição ao setor de energia com histórico de dividendos." },
+        ];
+
+  // ── Insights baseados nos dados reais ────────────────
+  const insights: string[] = [];
+  if (income === 0) {
+    insights.push("📋 Comece registrando suas receitas e despesas para análises personalizadas.");
+  } else {
+    if (savingsRate >= 20) insights.push(`✅ Parabéns! Sua taxa de poupança de ${savingsRate.toFixed(0)}% é excelente. Continue assim para acelerar seu patrimônio.`);
+    else if (savingsRate > 0) insights.push(`📊 Sua taxa de poupança atual é ${savingsRate.toFixed(0)}%. Tente aumentar para 20% cortando despesas não essenciais.`);
+    else insights.push(`⚠️ Suas despesas superam sua renda neste período. Identifique gastos para cortar antes de investir.`);
+
+    if (overages.length > 0)
+      insights.push(`🚨 ${overages.length} categoria${overages.length > 1 ? "s" : ""} estourou o orçamento (${overages.map(o => o.name).join(", ")}). Revise esses gastos.`);
+    else
+      insights.push("✅ Você está dentro do orçamento neste mês. Ótima disciplina financeira!");
+
+    if (goals.length > 0) {
+      const onTrack = goals.filter(g => g.onTrack).length;
+      insights.push(`🎯 ${onTrack}/${goals.length} meta${goals.length > 1 ? "s" : ""} ${onTrack === 1 ? "está" : "estão"} no ritmo. ${onTrack < goals.length ? "Considere aumentar o aporte nas metas atrasadas." : "Continue com os aportes mensais."}`);
+    }
+
+    insights.push(`💰 Com ${fmtR(savings)} de excedente mensal, você pode aportar entre ${fmtR(minContrib)} e ${fmtR(maxContrib)} todo mês para construir patrimônio.`);
+  }
+
+  // ── Próximos passos ───────────────────────────────────
+  const nextSteps: string[] = [];
+  if (income === 0) {
+    nextSteps.push("Registre suas receitas e despesas do mês atual");
+    nextSteps.push("Configure um orçamento mensal por categoria");
+    nextSteps.push("Defina pelo menos uma meta financeira");
+  } else {
+    if (overages.length > 0)
+      nextSteps.push(`Corte gastos em: ${overages.slice(0, 2).map(o => o.name).join(" e ")}`);
+    else
+      nextSteps.push("Mantenha a disciplina orçamentária do mês atual");
+    nextSteps.push(`Inicie um aporte de ${fmtR(minContrib)}/mês no Tesouro Selic como reserva de emergência`);
+    nextSteps.push("Após 6 meses de reserva, diversifique com renda variável (ETFs)");
+  }
+
   return {
-    financialScore: 74,
-    profile: "moderado",
-    monthlyContribution: {
-      min: 450,
-      max: 850,
-      reason:
-        "Com base na diferença entre receitas e despesas, recomendamos alocar 20-38% do excedente em investimentos mensais.",
-    },
-    allocation: [
-      {
-        asset: "Tesouro Selic 2026",
-        category: "fixed_income",
-        allocation: 30,
-        risk: 12,
-        expectedReturn: "~13,25% a.a.",
-        timeframe: "Imediato",
-        rationale:
-          "Liquidez é prioridade. Tesouro Selic rende ~CDI com resgate D+1, ideal para reserva de emergência.",
-      },
-      {
-        asset: "BOVA11 — ETF Ibovespa",
-        category: "etf",
-        allocation: 25,
-        risk: 55,
-        expectedReturn: "12-18% a.a. (longo prazo)",
-        timeframe: "3+ anos",
-        rationale:
-          "Diversificação com custo mínimo (0,10% a.a.) e liquidez diária.",
-      },
-      {
-        asset: "Tesouro IPCA+ 2029",
-        category: "fixed_income",
-        allocation: 20,
-        risk: 18,
-        expectedReturn: "IPCA + 6,2% a.a.",
-        timeframe: "2-3 anos",
-        rationale:
-          "Proteção contra inflação com prazo adequado para metas de médio prazo.",
-      },
-      {
-        asset: "MXRF11 — FII de Papel",
-        category: "fii",
-        allocation: 15,
-        risk: 45,
-        expectedReturn: "~11% a.a. (dividendos)",
-        timeframe: "1-2 anos",
-        rationale:
-          "Dividendos mensais isentos de IR. Complementa a carteira com renda passiva.",
-      },
-      {
-        asset: "PETR4 — Petrobras PN",
-        category: "stock",
-        allocation: 10,
-        risk: 68,
-        expectedReturn: "Variável + dividendos",
-        timeframe: "1-2 anos",
-        rationale:
-          "Exposição ao setor de energia com bom histórico de dividendos.",
-      },
-    ],
-    insights: [
-      "💡 Mantenha sua reserva de emergência como prioridade antes de ampliar renda variável.",
-      "📈 Uma taxa de poupança consistente é o maior acelerador de patrimônio no longo prazo.",
-      "⚖️ Diversifique entre renda fixa e variável para equilibrar segurança e crescimento.",
-      "🎯 Revise suas metas a cada 3 meses para ajustar aportes conforme a evolução.",
-    ],
-    nextSteps: [
-      "Defina um aporte mensal fixo e automatize via débito programado",
-      "Avalie seu perfil de risco antes de aumentar exposição em renda variável",
-      "Priorize completar a reserva de emergência (6x despesas mensais)",
-    ],
-    confidence: 65,
+    financialScore,
+    profile,
+    monthlyContribution: { min: minContrib, max: maxContrib, reason: contribReason },
+    allocation: allocations,
+    insights,
+    nextSteps,
+    confidence: income > 0 ? 82 : 40,
     generatedAt: new Date().toISOString(),
     aiProvider: "mock",
   };
@@ -362,6 +393,6 @@ export async function POST(req: Request): Promise<Response> {
     }
   }
 
-  await new Promise((r) => setTimeout(r, 700 + Math.random() * 500));
-  return Response.json(getMock());
+  // Nenhum provedor de IA configurado → análise baseada em regras com dados reais
+  return Response.json(generateRuleBased(ctx));
 }

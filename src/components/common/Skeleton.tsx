@@ -3,8 +3,8 @@ import type { CSSProperties } from "react";
 export function Skeleton({ className, style }: { className?: string; style?: CSSProperties }) {
   return (
     <div
-      className={`animate-pulse rounded-lg ${className ?? ""}`}
-      style={{ background: "rgba(30,45,69,0.6)", ...style }}
+      className={`skeleton-shimmer rounded-lg ${className ?? ""}`}
+      style={style}
     />
   );
 }

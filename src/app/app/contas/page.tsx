@@ -4,6 +4,7 @@ import { getAccounts } from "@/lib/supabase/queries/accounts";
 import type { AccountWithBalance } from "@/types/app";
 import { FadeIn } from "@/components/common/FadeIn";
 import { NewAccountButton } from "./NewAccountButton";
+import { EditAccountButton } from "./EditAccountButton";
 
 export const metadata: Metadata = { title: "Contas" };
 
@@ -47,7 +48,7 @@ export default async function ContasPage() {
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-[#F1F5F9]">Contas</h1>
+        <h1 className="text-xl font-bold text-[var(--numi-text)]">Contas</h1>
         <NewAccountButton />
       </div>
 
@@ -57,7 +58,7 @@ export default async function ContasPage() {
           label="Patrimônio Líquido"
           value={formatCurrency(netWorth)}
           sub="Contas + Investimentos"
-          valueColor="#34D399"
+          valueColor="var(--numi-income)"
           className="col-span-2 lg:col-span-1"
         />
         <SummaryCard
@@ -69,25 +70,25 @@ export default async function ContasPage() {
           label="Fatura aberta"
           value={formatCurrency(totalBill)}
           sub="Cartões de crédito"
-          valueColor="#F87171"
+          valueColor="var(--numi-expense)"
         />
         <SummaryCard
           label="Investido"
           value={formatCurrency(invested)}
           sub="Corretoras"
-          valueColor="#38BDF8"
+          valueColor="var(--numi-info)"
         />
       </div>
 
       {/* Account list */}
-      <p className="text-xs font-semibold text-[#475569] uppercase tracking-wider mb-3">
+      <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
         Suas contas
       </p>
       {accounts.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-4xl mb-3">🏦</p>
-          <p className="text-[#94A3B8] font-medium">Nenhuma conta cadastrada</p>
-          <p className="text-sm text-[#475569] mt-1">Clique em "+ Nova Conta" para começar</p>
+          <p className="text-[var(--numi-text-2)] font-medium">Nenhuma conta cadastrada</p>
+          <p className="text-sm text-[var(--numi-text-3)] mt-1">Clique em "+ Nova Conta" para começar</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -111,11 +112,11 @@ function SummaryCard({
   return (
     <div
       className={`rounded-2xl p-4 ${className ?? ""}`}
-      style={{ background: "#131929", border: "1px solid #1E2D45" }}
+      style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
     >
-      <p className="text-xs text-[#94A3B8] mb-1">{label}</p>
-      <p className="text-xl font-bold" style={{ color: valueColor ?? "#F1F5F9" }}>{value}</p>
-      <p className="text-xs text-[#475569] mt-1">{sub}</p>
+      <p className="text-xs text-[var(--numi-text-2)] mb-1">{label}</p>
+      <p className="text-xl font-bold" style={{ color: valueColor ?? "var(--numi-text)" }}>{value}</p>
+      <p className="text-xs text-[var(--numi-text-3)] mt-1">{sub}</p>
     </div>
   );
 }
@@ -123,7 +124,7 @@ function SummaryCard({
 function AccountCard({ account }: { account: AccountWithBalance }) {
   const icon        = TYPE_ICON[account.type]  ?? "🏦";
   const label       = TYPE_LABEL[account.type] ?? account.type;
-  const color       = account.color ?? "#34D399";
+  const color       = account.color ?? "#10B981";
   const isCreditCard = account.type === "credit_card";
   const bill        = account.currentBillAmount ?? 0;
   const available   = isCreditCard && account.creditLimit
@@ -133,7 +134,7 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
   return (
     <div
       className="rounded-2xl p-5 flex flex-col gap-4"
-      style={{ background: "#131929", border: "1px solid #1E2D45" }}
+      style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
     >
       {/* Top row: icon + name + badge */}
       <div className="flex items-start justify-between gap-2">
@@ -149,37 +150,40 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
             {icon}
           </span>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-[#F1F5F9] truncate">{account.name}</p>
-            <p className="text-xs text-[#475569] truncate">{account.institution ?? "—"}</p>
+            <p className="text-sm font-semibold text-[var(--numi-text)] truncate">{account.name}</p>
+            <p className="text-xs text-[var(--numi-text-3)] truncate">{account.institution ?? "—"}</p>
           </div>
         </div>
-        <span
-          className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
-          style={{ background: `${color}22`, color }}
-        >
-          {label}
-        </span>
+        <div className="flex items-center gap-1 shrink-0">
+          <span
+            className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
+            style={{ background: `${color}22`, color }}
+          >
+            {label}
+          </span>
+          <EditAccountButton account={account} />
+        </div>
       </div>
 
       {/* Balance */}
       <div>
-        <p className="text-xs text-[#94A3B8] mb-1">
+        <p className="text-xs text-[var(--numi-text-2)] mb-1">
           {isCreditCard ? "Fatura atual" : "Saldo"}
         </p>
         <p
           className="text-2xl font-bold"
-          style={{ color: isCreditCard ? "#F87171" : "#F1F5F9" }}
+          style={{ color: isCreditCard ? "var(--numi-expense)" : "var(--numi-text)" }}
         >
           {formatCurrency(isCreditCard ? bill : account.currentBalance)}
         </p>
 
         {isCreditCard && available !== null && (
-          <p className="text-xs text-[#475569] mt-1">
+          <p className="text-xs text-[var(--numi-text-3)] mt-1">
             Disponível {formatCurrency(available)} de {formatCurrency(account.creditLimit!)}
           </p>
         )}
         {isCreditCard && account.dueDay && (
-          <p className="mt-1 text-xs font-medium" style={{ color: "#FBBF24" }}>
+          <p className="mt-1 text-xs font-medium" style={{ color: "var(--numi-warning)" }}>
             Vence dia {account.dueDay}
           </p>
         )}

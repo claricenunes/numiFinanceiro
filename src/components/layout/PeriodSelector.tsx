@@ -85,13 +85,13 @@ export function PeriodSelector() {
   return (
     <div className="relative" ref={ref}>
       <div
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-[#F1F5F9] transition-colors"
-        style={{ border: "1px solid #1E2D45" }}
+        className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium text-[var(--numi-text)] transition-colors"
+        style={{ border: "1px solid var(--numi-border)" }}
       >
         <button
           type="button"
           aria-label="Mês anterior"
-          className="w-5 h-5 flex items-center justify-center text-[#475569] hover:text-[#F1F5F9] transition-colors"
+          className="hidden lg:flex w-5 h-5 items-center justify-center text-[var(--numi-text-3)] hover:text-[var(--numi-text)] transition-colors"
           onClick={() => navigateMonth(-1)}
         >
           <ChevronLeftIcon />
@@ -102,7 +102,7 @@ export function PeriodSelector() {
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-haspopup="listbox"
-          className="min-w-[130px] text-center hover:text-[#34D399] transition-colors"
+          className="min-w-0 max-w-[38vw] lg:max-w-none lg:min-w-[130px] truncate text-center hover:text-[var(--numi-income)] transition-colors"
         >
           {period.label}
         </button>
@@ -110,7 +110,7 @@ export function PeriodSelector() {
         <button
           type="button"
           aria-label="Próximo mês"
-          className="w-5 h-5 flex items-center justify-center text-[#475569] hover:text-[#F1F5F9] transition-colors"
+          className="hidden lg:flex w-5 h-5 items-center justify-center text-[var(--numi-text-3)] hover:text-[var(--numi-text)] transition-colors"
           onClick={() => navigateMonth(1)}
         >
           <ChevronRightIcon />
@@ -119,7 +119,7 @@ export function PeriodSelector() {
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="text-[#475569] hover:text-[#F1F5F9] transition-colors"
+          className="shrink-0 text-[var(--numi-text-3)] hover:text-[var(--numi-text)] transition-colors"
         >
           <ChevronDownIcon />
         </button>
@@ -127,28 +127,28 @@ export function PeriodSelector() {
 
       {open && (
         <div
-          className="absolute top-full mt-2 w-56 rounded-xl z-50 py-1"
-          style={{ background: "#131929", border: "1px solid #1E2D45", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}
+          className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-56 max-w-[90vw] rounded-xl z-50 py-1"
+          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)", boxShadow: "0 8px 32px rgba(15,23,42,0.12)" }}
         >
-          <p className="px-3 py-1.5 text-xs font-medium text-[#475569]">Atalhos rápidos</p>
+          <p className="px-3 py-1.5 text-xs font-medium text-[var(--numi-text-3)]">Atalhos rápidos</p>
           {PRESETS.map((p) => (
             <button
               key={p.type}
               type="button"
               onClick={() => select(p.type)}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#F1F5F9] hover:bg-[#1A2235] transition-colors text-left"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] transition-colors text-left"
             >
-              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: period.type === p.type ? "#34D399" : "transparent" }} />
+              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: period.type === p.type ? "var(--numi-income)" : "transparent" }} />
               {p.label}
             </button>
           ))}
 
-          <div className="my-1 h-px bg-[#1E2D45]" />
+          <div className="my-1 h-px" style={{ background: "var(--numi-border)" }} />
 
           <button
             type="button"
             onClick={() => setShowCustom((s) => !s)}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#F1F5F9] hover:bg-[#1A2235] transition-colors text-left"
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] transition-colors text-left"
           >
             <span className="w-1.5 h-1.5" />
             Personalizado
@@ -161,14 +161,14 @@ export function PeriodSelector() {
                 value={customStart}
                 onChange={(e) => setCustomStart(e.target.value)}
                 className="input-base text-sm py-1.5"
-                style={{ colorScheme: "dark" }}
+                style={{ colorScheme: "light" }}
               />
               <input
                 type="date"
                 value={customEnd}
                 onChange={(e) => setCustomEnd(e.target.value)}
                 className="input-base text-sm py-1.5"
-                style={{ colorScheme: "dark" }}
+                style={{ colorScheme: "light" }}
               />
               <button
                 type="button"

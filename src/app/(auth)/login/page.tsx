@@ -66,8 +66,8 @@ export default function LoginPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-[#F1F5F9] mb-1">Bem-vinda de volta</h1>
-      <p className="text-sm text-[#94A3B8] mb-6">Entre na sua conta para continuar.</p>
+      <h1 className="text-2xl font-bold text-[var(--numi-text)] mb-1">Bem-vinda de volta</h1>
+      <p className="text-sm text-[var(--numi-text-2)] mb-6">Entre na sua conta para continuar.</p>
 
       {/* Google OAuth */}
       <button
@@ -81,15 +81,15 @@ export default function LoginPage() {
       </button>
 
       <div className="flex items-center gap-3 mb-4">
-        <div className="flex-1 h-px bg-[#1E2D45]" />
-        <span className="text-xs text-[#475569]">ou com e-mail</span>
-        <div className="flex-1 h-px bg-[#1E2D45]" />
+        <div className="flex-1 h-px bg-[var(--numi-border)]" />
+        <span className="text-xs text-[var(--numi-text-3)]">ou com e-mail</span>
+        <div className="flex-1 h-px bg-[var(--numi-border)]" />
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
         {/* E-mail */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-[#94A3B8]">
+          <label htmlFor="email" className="text-sm font-medium text-[var(--numi-text-2)]">
             E-mail
           </label>
           <input
@@ -102,17 +102,17 @@ export default function LoginPage() {
             {...register("email")}
           />
           {errors.email && (
-            <span className="text-xs text-[#F87171]">{errors.email.message}</span>
+            <span className="text-xs text-[var(--numi-expense)]">{errors.email.message}</span>
           )}
         </div>
 
         {/* Senha */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm font-medium text-[#94A3B8]">
+            <label htmlFor="password" className="text-sm font-medium text-[var(--numi-text-2)]">
               Senha
             </label>
-            <Link href="/forgot-password" className="text-xs text-[#34D399] hover:underline">
+            <Link href="/forgot-password" className="text-xs text-[var(--numi-income)] hover:underline">
               Esqueceu a senha?
             </Link>
           </div>
@@ -126,7 +126,7 @@ export default function LoginPage() {
             {...register("password")}
           />
           {errors.password && (
-            <span className="text-xs text-[#F87171]">{errors.password.message}</span>
+            <span className="text-xs text-[var(--numi-expense)]">{errors.password.message}</span>
           )}
         </div>
 
@@ -134,7 +134,7 @@ export default function LoginPage() {
         {serverError && (
           <div
             role="alert"
-            className="rounded-lg px-4 py-3 text-sm text-[#F87171]"
+            className="rounded-lg px-4 py-3 text-sm text-[var(--numi-expense)]"
             style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}
           >
             {serverError}
@@ -150,9 +150,9 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[#94A3B8]">
+      <p className="mt-6 text-center text-sm text-[var(--numi-text-2)]">
         Não tem conta?{" "}
-        <Link href="/register" className="text-[#34D399] font-medium hover:underline">
+        <Link href="/register" className="text-[var(--numi-income)] font-medium hover:underline">
           Criar conta grátis
         </Link>
       </p>

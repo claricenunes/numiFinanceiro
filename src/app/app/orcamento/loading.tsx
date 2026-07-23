@@ -12,7 +12,7 @@ export default function OrcamentoLoading() {
       </div>
 
       {/* Overall card */}
-      <div className="rounded-2xl p-5 mb-6" style={{ background: "#131929", border: "1px solid #1E2D45" }}>
+      <div className="rounded-2xl p-5 mb-6" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
         <div className="flex items-end justify-between mb-3">
           <div>
             <Skeleton className="h-3 w-20 mb-2" />
@@ -27,7 +27,7 @@ export default function OrcamentoLoading() {
       <Skeleton className="h-3 w-28 mb-3" />
       <div className="flex flex-col gap-2">
         {[0, 1, 2, 3, 4, 5, 6].map(i => (
-          <div key={i} className="rounded-2xl p-4" style={{ background: "#131929", border: "1px solid #1E2D45" }}>
+          <div key={i} className="rounded-2xl p-4" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
             <div className="flex items-center gap-3 mb-3">
               <Skeleton className="h-9 w-9 rounded-xl shrink-0" />
               <div className="flex-1">

@@ -49,7 +49,7 @@ export function ContributeButton({ goalId, goalName }: { goalId: string; goalNam
       <button
         onClick={() => setOpen(true)}
         className="text-sm font-semibold px-4 py-1.5 rounded-xl"
-        style={{ background: "#1E2D45", color: "#F1F5F9" }}
+        style={{ background: "var(--numi-border)", color: "var(--numi-text)" }}
       >
         + Registrar aporte
       </button>
@@ -60,43 +60,43 @@ export function ContributeButton({ goalId, goalName }: { goalId: string; goalNam
 
           <div
             className="relative w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "#0F1B2D", border: "1px solid #1E2D45" }}
+            style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)" }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold text-[#F1F5F9]">Registrar Aporte</h2>
-                <p className="text-xs text-[#475569] mt-0.5">{goalName}</p>
+                <h2 className="text-base font-semibold text-[var(--numi-text)]">Registrar Aporte</h2>
+                <p className="text-xs text-[var(--numi-text-3)] mt-0.5">{goalName}</p>
               </div>
               <button onClick={() => { setOpen(false); reset(); }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#64748B] hover:text-[#F1F5F9] hover:bg-[#1E2D45]">
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Valor (R$)</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Valor (R$)</label>
                 <input
                   value={amount} onChange={e => setAmount(e.target.value)}
                   type="text" inputMode="decimal" placeholder="0,00" required autoFocus
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Data</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Data</label>
                 <input value={date} onChange={e => setDate(e.target.value)} type="date" required
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#131929", colorScheme: "dark" }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)", colorScheme: "light" }} />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#64748B] mb-1.5 block">Observação (opcional)</label>
+                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Observação (opcional)</label>
                 <input value={notes} onChange={e => setNotes(e.target.value)} placeholder="Ex: Aporte de dezembro"
-                  className="w-full px-3 py-2.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-                  style={{ border: "1px solid #1E2D45", background: "#131929" }} />
+                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
               </div>
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-                style={{ background: "#34D399", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
+                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
                 {loading ? "Salvando..." : "Registrar"}
               </button>
             </form>

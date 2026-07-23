@@ -18,7 +18,7 @@ export function Header() {
         {/* Mobile: abre o drawer */}
         <button
           onClick={toggleMobileMenu}
-          className="flex lg:hidden w-8 h-8 items-center justify-center rounded-lg text-[#94A3B8] hover:bg-[#131929] hover:text-[#F1F5F9] transition-colors"
+          className="flex lg:hidden w-8 h-8 items-center justify-center rounded-lg text-[var(--numi-text-2)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] hover:text-[var(--numi-text)] transition-colors"
           aria-label="Abrir menu"
         >
           <MenuIcon className="w-4 h-4" />
@@ -27,7 +27,7 @@ export function Header() {
         {/* Desktop: colapsa/expande sidebar */}
         <button
           onClick={toggleSidebar}
-          className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg text-[#94A3B8] hover:bg-[#131929] hover:text-[#F1F5F9] transition-colors"
+          className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg text-[var(--numi-text-2)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] hover:text-[var(--numi-text)] transition-colors"
           aria-label="Toggle sidebar"
         >
           <MenuIcon className="w-4 h-4" />
@@ -39,9 +39,9 @@ export function Header() {
             className="w-7 h-7 rounded-lg flex items-center justify-center"
             style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.3)" }}
           >
-            <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] block" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[var(--numi-income)] block" />
           </span>
-          <span className="text-base font-semibold text-[#F1F5F9] tracking-tight">Numi</span>
+          <span className="text-base font-semibold text-[var(--numi-text)] tracking-tight">Numi</span>
         </div>
       </div>
 
@@ -52,7 +52,7 @@ export function Header() {
       <div className="flex items-center gap-2">
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer select-none"
-          style={{ background: "rgba(52,211,153,0.15)", color: "#34D399", border: "1px solid rgba(52,211,153,0.3)" }}
+          style={{ background: "rgba(52,211,153,0.15)", color: "var(--numi-income)", border: "1px solid rgba(52,211,153,0.3)" }}
           title={profile?.full_name ?? "Perfil"}
         >
           {profile?.full_name?.charAt(0).toUpperCase() ?? "?"}

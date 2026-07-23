@@ -56,23 +56,23 @@ export function BudgetCardActions({
       <form
         onSubmit={handleEdit}
         className="mt-3 pt-3 flex gap-2 items-center"
-        style={{ borderTop: "1px solid #1E2D45" }}
+        style={{ borderTop: "1px solid var(--numi-border)" }}
       >
-        <span className="text-xs text-[#64748B] shrink-0">Novo limite:</span>
+        <span className="text-xs text-[var(--numi-text-4)] shrink-0">Novo limite:</span>
         <input
           value={newAmount}
           onChange={e => setNewAmount(e.target.value)}
           type="text"
           inputMode="decimal"
           autoFocus
-          className="flex-1 px-2.5 py-1.5 rounded-lg text-[#F1F5F9] text-sm outline-none"
-          style={{ border: "1px solid #34D39966", background: "#131929" }}
+          className="flex-1 px-2.5 py-1.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
+          style={{ border: "1px solid rgba(16,185,129,0.4)", background: "var(--numi-input-bg)" }}
         />
         <button
           type="submit"
           disabled={loading}
           className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "#34D399", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
+          style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
         >
           {loading ? "..." : "Salvar"}
         </button>
@@ -80,7 +80,7 @@ export function BudgetCardActions({
           type="button"
           onClick={() => { setEditing(false); setNewAmount(budgeted.toFixed(2).replace(".", ",")); }}
           className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "#1E2D45", color: "#94A3B8" }}
+          style={{ background: "var(--numi-border)", color: "var(--numi-text-2)" }}
         >
           Cancelar
         </button>
@@ -92,23 +92,23 @@ export function BudgetCardActions({
     return (
       <div
         className="mt-3 pt-3 flex gap-2 items-center"
-        style={{ borderTop: "1px solid #1E2D45" }}
+        style={{ borderTop: "1px solid var(--numi-border)" }}
       >
-        <span className="text-xs flex-1" style={{ color: "#F87171" }}>
+        <span className="text-xs flex-1" style={{ color: "var(--numi-expense)" }}>
           Remover "{categoryName}"?
         </span>
         <button
           onClick={handleDelete}
           disabled={loading}
           className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "#F8717122", color: "#F87171", opacity: loading ? 0.6 : 1 }}
+          style={{ background: "rgba(239,68,68,0.14)", color: "var(--numi-expense)", opacity: loading ? 0.6 : 1 }}
         >
           {loading ? "..." : "Remover"}
         </button>
         <button
           onClick={() => setConfirmDel(false)}
           className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "#1E2D45", color: "#94A3B8" }}
+          style={{ background: "var(--numi-border)", color: "var(--numi-text-2)" }}
         >
           Cancelar
         </button>
@@ -117,18 +117,18 @@ export function BudgetCardActions({
   }
 
   return (
-    <div className="mt-3 pt-3 flex gap-2" style={{ borderTop: "1px solid #1E2D45" }}>
+    <div className="mt-3 pt-3 flex gap-2" style={{ borderTop: "1px solid var(--numi-border)" }}>
       <button
         onClick={() => setEditing(true)}
         className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-        style={{ background: "#1E2D45", color: "#94A3B8" }}
+        style={{ background: "var(--numi-border)", color: "var(--numi-text-2)" }}
       >
         ✏️ Editar limite
       </button>
       <button
         onClick={() => setConfirmDel(true)}
         className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-        style={{ background: "#F8717111", color: "#F87171" }}
+        style={{ background: "rgba(239,68,68,0.07)", color: "var(--numi-expense)" }}
       >
         🗑 Remover
       </button>
