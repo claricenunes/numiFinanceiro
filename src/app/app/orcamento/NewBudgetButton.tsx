@@ -6,6 +6,9 @@ import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
 
 interface Category { id: string; name: string; icon: string | null }
+interface SysCategory {
+  id: string; name: string; icon: string | null; color: string | null; type: string; sort_order: number;
+}
 
 export function NewBudgetButton() {
   const [open, setOpen]       = useState(false);
@@ -26,11 +29,12 @@ export function NewBudgetButton() {
     // já que budgets.category_id só aceita ids de user_categories.
     if (!data || data.length === 0) {
       const { data: { user } } = await supabase.auth.getUser();
-      const { data: sysCats } = await supabase
+      const { data: sysCatsRaw } = await supabase
         .from("system_categories")
         .select("id,name,icon,color,type,sort_order")
         .eq("type", "expense")
         .eq("is_active", true);
+      const sysCats = sysCatsRaw as SysCategory[] | null;
 
       if (user && sysCats && sysCats.length > 0) {
         // upsert (não insert) + ignoreDuplicates: se a categoria já existe

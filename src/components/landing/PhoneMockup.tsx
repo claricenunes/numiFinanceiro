@@ -1,26 +1,28 @@
 "use client";
 
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
-import { useRef, type MouseEvent } from "react";
+import { motion, useMotionValue, useSpring, type MotionValue } from "framer-motion";
+import { type MouseEvent } from "react";
 import { DashboardPreview } from "./DashboardPreview";
 
-const FRAME_WIDTH = 296;
-const FRAME_HEIGHT = 604;
-const SCREEN_INSET = 10;
+export const FRAME_WIDTH = 300;
+export const FRAME_HEIGHT = 620;
+export const SCREEN_INSET = 12;
+export const SCREEN_RADIUS = 52;
 const SCREEN_WIDTH = FRAME_WIDTH - SCREEN_INSET * 2;
-const CONTENT_WIDTH = 375; // largura mobile "real" do app — a prévia é renderizada nela e escalada pra caber na tela
+const CONTENT_WIDTH = 375; // largura mobile "real" do app
+// Escala fixa por largura — a tela funciona como um viewport de verdade:
+// mostra só o trecho de cima do dashboard na escala correta, e corta o
+// resto (overflow: hidden), exatamente como um app aberto num iPhone real.
+// Nada de "encolher a página inteira pra caber".
 const SCALE = SCREEN_WIDTH / CONTENT_WIDTH;
 
-const EASE = [0.25, 0.46, 0.45, 0.94] as const;
+interface PhoneMockupProps {
+  /** 0 = interface nítida, 1 = totalmente dissolvida em branco (usado durante o zoom cinematográfico). */
+  dissolve?: MotionValue<number>;
+}
 
-export function PhoneMockup() {
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  // Parallax de scroll: o celular se move mais devagar que o resto da página
-  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start end", "end start"] });
-  const parallaxY = useTransform(scrollYProgress, [0, 1], [36, -36]);
-
-  // Tilt sutil acompanhando o mouse (eixo Y principal, leve eixo X de apoio)
+export function PhoneMockup({ dissolve }: PhoneMockupProps) {
+  // Tilt sutil acompanhando o mouse — único movimento próprio do aparelho.
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
   const springRotateX = useSpring(rotateX, { stiffness: 140, damping: 18, mass: 0.4 });
@@ -30,8 +32,8 @@ export function PhoneMockup() {
     const rect = e.currentTarget.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width - 0.5;
     const py = (e.clientY - rect.top) / rect.height - 0.5;
-    rotateY.set(px * 6); // ~-3° a 3°
-    rotateX.set(-py * 4); // apoio sutil no eixo X
+    rotateY.set(px * 6);
+    rotateX.set(-py * 4);
   }
 
   function handleMouseLeave() {
@@ -39,113 +41,67 @@ export function PhoneMockup() {
     rotateX.set(0);
   }
 
+  // Hooks sempre chamados incondicionalmente: usa um MotionValue parado em 0
+  // quando nenhuma dissolução é passada (fora do contexto do zoom).
+  const fallbackDissolve = useMotionValue(0);
+  const effectiveDissolve = dissolve ?? fallbackDissolve;
+
   return (
-    <div ref={wrapRef} className="relative mx-auto lg:mx-0" style={{ width: FRAME_WIDTH, perspective: 1400 }}>
-      {/* Glow discreto atrás do aparelho */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(167,139,250,0.32) 0%, rgba(56,189,248,0.18) 45%, transparent 72%)",
-          transform: "scale(1.6)",
-        }}
-      />
-
-      {/* Sombra dinâmica e difusa, respira junto com o float */}
+    // Responsivo: encolhe em telas estreitas via transform (mantém tudo
+    // proporcional e centralizado, sem recalcular nenhuma medida interna).
+    <div
+      id="landing-phone-root"
+      className="shrink-0 scale-[0.62] sm:scale-75 lg:scale-100"
+      style={{ width: FRAME_WIDTH, height: FRAME_HEIGHT, perspective: 1400 }}
+    >
       <motion.div
-        aria-hidden="true"
-        className="absolute left-1/2 -translate-x-1/2 -z-10 rounded-full"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         style={{
-          bottom: -28,
-          width: FRAME_WIDTH * 0.75,
-          height: 28,
-          background: "radial-gradient(ellipse, rgba(15,23,42,0.30) 0%, transparent 72%)",
-          filter: "blur(14px)",
+          rotateX: springRotateX,
+          rotateY: springRotateY,
+          transformStyle: "preserve-3d",
+          width: FRAME_WIDTH,
+          height: FRAME_HEIGHT,
+          borderRadius: SCREEN_RADIUS,
+          background: "linear-gradient(155deg, #1e293b 0%, #0f172a 55%, #020617 100%)",
+          boxShadow:
+            "inset 0 0 0 2px rgba(255,255,255,0.06), 0 40px 70px -25px rgba(15,23,42,0.4), 0 12px 28px -12px rgba(15,23,42,0.28)",
+          willChange: "transform",
         }}
-        animate={{ scaleX: [1, 0.86, 1], opacity: [0.55, 0.32, 0.55] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-      />
+        className="relative"
+      >
+        {/* Botões laterais */}
+        <div className="absolute -left-[2px] top-[140px] w-[3px] h-9 rounded-r-sm" style={{ background: "#0f172a" }} />
+        <div className="absolute -left-[2px] top-[188px] w-[3px] h-14 rounded-r-sm" style={{ background: "#0f172a" }} />
+        <div className="absolute -left-[2px] top-[256px] w-[3px] h-14 rounded-r-sm" style={{ background: "#0f172a" }} />
+        <div className="absolute -right-[2px] top-[184px] w-[3px] h-20 rounded-l-sm" style={{ background: "#0f172a" }} />
 
-      {/* Camada 1: parallax de scroll */}
-      <motion.div style={{ y: parallaxY }}>
-        {/* Camada 2: floating contínuo (independente do scroll) */}
-        <motion.div
-          animate={{ y: [0, -9, 0] }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+        {/* Dynamic Island */}
+        <div
+          className="absolute top-[12px] left-1/2 -translate-x-1/2 rounded-full z-20"
+          style={{ width: 100, height: 30, background: "#000", transform: "translateZ(22px)" }}
+        />
+
+        {/* Tela — viewport real: overflow:hidden, conteúdo ancorado no topo
+            na escala correta. Mostra só o que caberia, corta o resto. */}
+        <div
+          className="absolute overflow-hidden"
+          style={{ inset: SCREEN_INSET, borderRadius: SCREEN_RADIUS - 10, background: "var(--numi-bg)" }}
         >
-          {/* Camada 3: entrada (fade+scale) + tilt 3D pelo mouse */}
           <motion.div
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            initial={{ opacity: 0, scale: 0.9, y: 32 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, ease: EASE }}
-            style={{
-              rotateX: springRotateX,
-              rotateY: springRotateY,
-              transformStyle: "preserve-3d",
-              width: FRAME_WIDTH,
-              height: FRAME_HEIGHT,
-            }}
-            className="relative rounded-[52px] p-2.5"
+            style={{ scale: SCALE, transformOrigin: "top left", width: CONTENT_WIDTH }}
           >
-            <div
-              className="relative w-full h-full rounded-[52px]"
-              style={{
-                background: "linear-gradient(155deg, #1e293b 0%, #0f172a 55%, #020617 100%)",
-                boxShadow:
-                  "inset 0 0 0 2px rgba(255,255,255,0.06), 0 40px 70px -25px rgba(15,23,42,0.4), 0 12px 28px -12px rgba(15,23,42,0.28)",
-              }}
-            >
-              {/* Botões laterais */}
-              <div className="absolute -left-[2px] top-[128px] w-[3px] h-9 rounded-r-sm" style={{ background: "#0f172a" }} />
-              <div className="absolute -left-[2px] top-[172px] w-[3px] h-14 rounded-r-sm" style={{ background: "#0f172a" }} />
-              <div className="absolute -left-[2px] top-[236px] w-[3px] h-14 rounded-r-sm" style={{ background: "#0f172a" }} />
-              <div className="absolute -right-[2px] top-[168px] w-[3px] h-20 rounded-l-sm" style={{ background: "#0f172a" }} />
-
-              {/* Tela */}
-              <div
-                className="absolute rounded-[42px] overflow-hidden"
-                style={{ inset: SCREEN_INSET, background: "var(--numi-bg)" }}
-              >
-                {/* Conteúdo real do dashboard, escalado pra caber, com auto-scroll sutil */}
-                <motion.div
-                  style={{ width: CONTENT_WIDTH, transform: `scale(${SCALE})`, transformOrigin: "top left" }}
-                  animate={{ y: [0, -190, -190, -380, -380, 0] }}
-                  transition={{
-                    duration: 16,
-                    times: [0, 0.28, 0.42, 0.7, 0.84, 1],
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                >
-                  <DashboardPreview />
-                </motion.div>
-
-                {/* Brilho/reflexo percorrendo a tela ocasionalmente */}
-                <motion.div
-                  aria-hidden="true"
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background:
-                      "linear-gradient(115deg, transparent 42%, rgba(255,255,255,0.28) 50%, transparent 58%)",
-                  }}
-                  initial={{ x: "-130%" }}
-                  animate={{ x: ["-130%", "130%"] }}
-                  transition={{ duration: 1.7, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
-                />
-              </div>
-
-              {/* Dynamic Island */}
-              <div
-                className="absolute top-[10px] left-1/2 -translate-x-1/2 rounded-full z-20"
-                style={{ width: 96, height: 28, background: "#000", transform: "translateZ(22px)" }}
-              />
-            </div>
+            <DashboardPreview />
           </motion.div>
-        </motion.div>
+
+          {/* Dissolução em branco: some com a interface antes do zoom máximo */}
+          <motion.div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: "#FFFFFF", opacity: effectiveDissolve }}
+          />
+        </div>
       </motion.div>
     </div>
   );

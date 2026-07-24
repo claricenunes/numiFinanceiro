@@ -6,16 +6,24 @@ import type { CategorySpending } from "@/types/app";
 
 interface Props {
   categories: CategorySpending[];
+  /**
+   * Força layout em coluna (donut acima da lista) mesmo em telas largas.
+   * Usado quando o card é renderizado dentro de um canvas de largura fixa
+   * e estreita (o preview do PhoneMockup na landing) — `lg:` reage à
+   * largura real do navegador, não à largura desse canvas, então sem essa
+   * flag o card tentava usar o layout em linha num espaço que não cabe.
+   */
+  compact?: boolean;
 }
 
-export function ExpenseChart({ categories }: Props) {
+export function ExpenseChart({ categories, compact = false }: Props) {
   const total = categories.reduce((s, c) => s + c.amount, 0);
 
   return (
     <div className="glass-card p-5">
       <p className="text-sm font-semibold text-[var(--numi-text)] mb-4">Gastos por categoria</p>
 
-      <div className="flex flex-col lg:flex-row items-center gap-4">
+      <div className={`flex flex-col ${compact ? "" : "lg:flex-row"} items-center gap-4`}>
         {/* Donut */}
         <div style={{ flexShrink: 0 }}>
           <PieChart width={180} height={180}>
@@ -50,16 +58,16 @@ export function ExpenseChart({ categories }: Props) {
         {/* Lista */}
         <ul className="flex-1 flex flex-col gap-2 w-full">
           {categories.map((cat) => (
-            <li key={cat.categoryId} className="flex items-center gap-2.5">
+            <li key={cat.categoryId} className="flex items-center gap-2">
               <span
                 className="w-2 h-2 rounded-full flex-shrink-0"
                 style={{ background: cat.color }}
               />
-              <span className="text-sm text-[var(--numi-text-2)] flex-1 truncate">{cat.categoryName}</span>
-              <span className="text-sm text-[var(--numi-text)] font-medium">
+              <span className="text-sm text-[var(--numi-text-2)] flex-1 min-w-0 truncate">{cat.categoryName}</span>
+              <span className="text-sm text-[var(--numi-text)] font-medium shrink-0">
                 {formatCurrency(cat.amount)}
               </span>
-              <span className="text-xs text-[var(--numi-text-3)] w-10 text-right">
+              <span className="text-xs text-[var(--numi-text-3)] w-8 shrink-0 text-right">
                 {cat.percentage.toFixed(0)}%
               </span>
             </li>

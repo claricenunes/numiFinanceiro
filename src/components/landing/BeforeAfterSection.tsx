@@ -37,7 +37,7 @@ export function BeforeAfterSection() {
         </StaggerGroup>
 
         <StaggerGroup className="glass-card p-6 lg:p-8 flex flex-col gap-4" style={{ border: "1px solid rgba(16,185,129,0.22)" }}>
-          <p className="text-sm font-semibold" style={{ color: "var(--numi-income)" }}>✨ Depois</p>
+          <p className="text-sm font-semibold" style={{ color: "var(--numi-income)" }}>Depois</p>
           {AFTER.map((item) => (
             <StaggerItem key={item} className="flex items-start gap-2.5">
               <span className="text-sm shrink-0" style={{ color: "var(--numi-income)" }}>✓</span>

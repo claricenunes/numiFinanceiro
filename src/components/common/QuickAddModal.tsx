@@ -11,6 +11,9 @@ type TxType = "income" | "expense" | "transfer";
 
 interface Category { id: string; name: string; icon: string | null }
 interface Account  { id: string; name: string; type: string }
+interface SysCategory {
+  id: string; name: string; icon: string | null; color: string | null; type: string; sort_order: number;
+}
 
 const TYPE_LABELS: Record<TxType, string> = {
   income:   "Receita",
@@ -80,10 +83,11 @@ export function QuickAddModal() {
       // já que transactions.category_id só aceita ids de user_categories.
       if (userCats.length === 0) {
         const { data: { user } } = await supabase.auth.getUser();
-        const { data: sysCats } = await supabase
+        const { data: sysCatsRaw } = await supabase
           .from("system_categories")
           .select("id,name,icon,color,type,sort_order")
           .eq("is_active", true);
+        const sysCats = sysCatsRaw as SysCategory[] | null;
 
         if (user && sysCats && sysCats.length > 0) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

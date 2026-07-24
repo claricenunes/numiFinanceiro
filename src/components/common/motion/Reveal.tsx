@@ -14,11 +14,14 @@ export function Reveal({
   className,
   delay = 0,
   direction = "up",
+  once = true,
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
   direction?: "up" | "left" | "right";
+  /** false = a revelação recomeça toda vez que o elemento volta a entrar na tela. */
+  once?: boolean;
 }) {
   const offset = DIRECTION_OFFSET[direction];
 
@@ -27,7 +30,7 @@ export function Reveal({
       className={className}
       initial={{ opacity: 0, ...offset }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once, margin: "-80px" }}
       transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94], delay }}
     >
       {children}
