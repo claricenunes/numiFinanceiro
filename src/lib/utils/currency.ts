@@ -1,17 +1,18 @@
 export function formatCurrency(
   value: number,
   currency = "BRL",
-  compact = false
+  compact = false,
+  locale = "pt-BR"
 ): string {
   if (compact && Math.abs(value) >= 1000) {
-    return new Intl.NumberFormat("pt-BR", {
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency,
       notation: "compact",
       maximumFractionDigits: 1,
     }).format(value);
   }
-  return new Intl.NumberFormat("pt-BR", {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     minimumFractionDigits: 2,

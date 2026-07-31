@@ -80,10 +80,18 @@ export function formatDate(iso: string, opts?: Intl.DateTimeFormatOptions): stri
   return new Date(iso + "T12:00:00").toLocaleDateString(LOCALE, opts ?? { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-export function formatDateRelative(iso: string): string {
+export function formatDateRelative(iso: string, locale: string = LOCALE): string {
   const date = new Date(iso + "T12:00:00");
   const today = new Date();
   const diff = Math.floor((today.getTime() - date.getTime()) / 86400000);
+
+  if (locale === "en-US") {
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Yesterday";
+    if (diff < 7) return `${diff} days ago`;
+    return new Date(iso + "T12:00:00").toLocaleDateString(locale, { day: "2-digit", month: "short" });
+  }
+
   if (diff === 0) return "Hoje";
   if (diff === 1) return "Ontem";
   if (diff < 7) return `${diff} dias atrás`;

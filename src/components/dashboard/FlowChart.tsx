@@ -19,19 +19,29 @@ interface WeekData {
 
 interface Props {
   data: WeekData[];
+  /** "en-US" is used only by the landing page's Dashboard Showcase — the
+   * real logged-in app never passes this and keeps its pt-BR/BRL default. */
+  locale?: "pt-BR" | "en-US";
 }
 
-export function FlowChart({ data }: Props) {
+export function FlowChart({ data, locale = "pt-BR" }: Props) {
+  const currency = locale === "en-US" ? "USD" : "BRL";
+  const format = (value: number) => formatCurrency(value, currency, false, locale);
+  const t =
+    locale === "en-US"
+      ? { title: "Cash flow", income: "Income", expense: "Expenses" }
+      : { title: "Fluxo do período", income: "Receita", expense: "Despesas" };
+
   return (
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-[var(--numi-text)]">Fluxo do período</p>
+        <p className="text-sm font-semibold text-[var(--numi-text)]">{t.title}</p>
         <div className="flex items-center gap-3 text-xs text-[var(--numi-text-2)]">
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-sm bg-[var(--numi-income)]" /> Receita
+            <span className="w-2 h-2 rounded-sm bg-[var(--numi-income)]" /> {t.income}
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-sm bg-[var(--numi-expense)]" /> Despesas
+            <span className="w-2 h-2 rounded-sm bg-[var(--numi-expense)]" /> {t.expense}
           </span>
         </div>
       </div>
@@ -58,8 +68,8 @@ export function FlowChart({ data }: Props) {
           />
           <Tooltip
             formatter={(value, name) => [
-              formatCurrency(Number(value ?? 0)),
-              name === "income" ? "Receita" : "Despesas",
+              format(Number(value ?? 0)),
+              name === "income" ? t.income : t.expense,
             ]}
             contentStyle={{
               background: "var(--numi-elevated)",

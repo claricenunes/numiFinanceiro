@@ -7,23 +7,33 @@ import type { TransactionRow } from "@/types/app";
 
 interface Props {
   transactions: TransactionRow[];
+  /** "en-US" is used only by the landing page's Dashboard Showcase — the
+   * real logged-in app never passes this and keeps its pt-BR/BRL default. */
+  locale?: "pt-BR" | "en-US";
 }
 
-export function RecentTransactions({ transactions }: Props) {
+export function RecentTransactions({ transactions, locale = "pt-BR" }: Props) {
+  const currency = locale === "en-US" ? "USD" : "BRL";
+  const format = (value: number) => formatCurrency(value, currency, false, locale);
+  const t =
+    locale === "en-US"
+      ? { title: "Recent transactions", viewAll: "View all", empty: "No transactions this period.", create: "+ Add first transaction" }
+      : { title: "Últimas transações", viewAll: "Ver todas", empty: "Nenhuma transação neste período.", create: "+ Adicionar primeira transação" };
+
   return (
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-[var(--numi-text)]">Últimas transações</p>
+        <p className="text-sm font-semibold text-[var(--numi-text)]">{t.title}</p>
         <Link href="/app/transactions" className="text-xs text-[var(--numi-income)] hover:underline">
-          Ver todas
+          {t.viewAll}
         </Link>
       </div>
 
       {transactions.length === 0 ? (
         <div className="text-center py-6">
-          <p className="text-sm text-[var(--numi-text-3)]">Nenhuma transação neste período.</p>
+          <p className="text-sm text-[var(--numi-text-3)]">{t.empty}</p>
           <button className="text-xs text-[var(--numi-income)] hover:underline mt-1">
-            + Adicionar primeira transação
+            {t.create}
           </button>
         </div>
       ) : (
@@ -47,7 +57,7 @@ export function RecentTransactions({ transactions }: Props) {
                   {tx.description ?? tx.categoryName}
                 </p>
                 <p className="text-xs text-[var(--numi-text-3)] truncate">
-                  {formatDateRelative(tx.date)} · {tx.accountName}
+                  {formatDateRelative(tx.date, locale)} · {tx.accountName}
                 </p>
               </div>
 
@@ -57,7 +67,7 @@ export function RecentTransactions({ transactions }: Props) {
                 style={{ color: tx.type === "income" ? "var(--numi-income)" : "var(--numi-text)" }}
               >
                 {tx.type === "income" ? "+" : "−"}
-                {formatCurrency(tx.amount)}
+                {format(tx.amount)}
               </span>
             </li>
           ))}
