@@ -43,6 +43,9 @@ export function ExpenseChart({ categories, compact = false, locale = "pt-BR" }: 
               outerRadius={72}
               paddingAngle={2}
               strokeWidth={0}
+              isAnimationActive
+              animationDuration={800}
+              animationEasing="ease-out"
             >
               {categories.map((cat) => (
                 <Cell key={cat.categoryId} fill={cat.color} />

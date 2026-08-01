@@ -1,46 +1,57 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { FadeIn } from "@/components/common/FadeIn";
+
+const NAV_LINKS = [
+  { href: "#features", label: "Features" },
+  { href: "#pricing", label: "Pricing" },
+];
 
 /**
- * Fixed landing header — the mascot sits centered (not a generic logo),
- * with sign-in/sign-up actions at the edges. Two equal `flex-1` side
- * columns keep the mascot truly centered regardless of each side's width.
+ * Floating pill navbar (dark-green, rounded-full) — mirrors the
+ * "capsule nav on pastel background" pattern, restyled with Numi's
+ * own wordmark and color system instead of a copied brand.
  */
 export function LandingHeader() {
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#F7F5EC]/90 backdrop-blur-sm border-b border-black/5">
-      <div className="max-w-6xl mx-auto px-4 h-16 lg:h-20 flex items-center justify-between lg:justify-center gap-3">
-        <div className="hidden lg:block lg:flex-1" />
-
-        <Link href="/" className="shrink-0 flex items-center gap-2">
-          <Image
-            src="/mascot/personagem2.png"
-            alt="Numi"
-            width={1113}
-            height={1414}
-            priority
-            className="h-9 lg:h-14 w-auto select-none"
-          />
-          <span className="text-base lg:text-xl font-bold text-[var(--numi-text)] tracking-tight">Numi</span>
-        </Link>
-
-        <div className="flex items-center gap-3 lg:gap-6 lg:flex-1 lg:justify-end">
-          <Link
-            href="/login"
-            className="text-sm lg:text-base font-medium text-[var(--numi-text)] underline decoration-transparent hover:decoration-current underline-offset-4 transition-[text-decoration-color] duration-200 whitespace-nowrap"
-          >
-            Sign in
+    <header className="sticky top-6 z-50 w-full px-4 lg:px-6">
+      <FadeIn className="max-w-[1500px] mx-auto">
+        <div className="numi-pill-nav h-[92px] lg:h-[104px] px-7 lg:px-10 flex items-center justify-between gap-6 shadow-lg shadow-black/10">
+          <Link href="/" className="shrink-0 flex items-center">
+            <span
+              className="text-5xl lg:text-6xl leading-none"
+              style={{ color: "var(--numi-landing-nav-muted)", fontFamily: "var(--font-logo)" }}
+            >
+              numi
+            </span>
           </Link>
-          <Link
-            href="/register"
-            className="text-sm lg:text-base font-semibold text-[#98BB8A] underline decoration-transparent hover:decoration-current underline-offset-4 transition-[text-decoration-color] duration-200 whitespace-nowrap"
-          >
-            Create account
-          </Link>
+
+          <nav className="hidden md:flex items-center gap-10">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-lg font-medium text-[var(--numi-landing-nav-text)] hover:opacity-80 transition-opacity"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-3 lg:gap-4">
+            <Link href="/register" className="numi-pill-btn numi-pill-btn-outline hidden sm:inline-flex text-lg px-6 py-3">
+              See pricing
+            </Link>
+            <Link href="/login" className="numi-pill-btn numi-pill-btn-outline text-lg px-6 py-3">
+              Log in
+            </Link>
+            <Link href="/register" className="numi-pill-btn numi-pill-btn-accent text-lg px-6 py-3">
+              Sign up
+            </Link>
+          </div>
         </div>
-      </div>
+      </FadeIn>
     </header>
   );
 }

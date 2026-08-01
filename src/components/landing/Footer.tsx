@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { StaggerGroup, StaggerItem } from "@/components/common/motion/Stagger";
 
 const COLUMNS: { title: string; links: string[] }[] = [
   { title: "Product", links: ["Features", "Pricing", "Dashboard"] },
@@ -11,8 +14,8 @@ export function Footer() {
   return (
     <footer className="px-4 pt-16 pb-8 border-t border-black/5">
       <div className="max-w-6xl mx-auto flex flex-col gap-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="col-span-2 lg:col-span-1 flex items-center gap-2">
+        <StaggerGroup className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <StaggerItem className="col-span-2 lg:col-span-1 flex items-center gap-2">
             <Image
               src="/mascot/personagem2.png"
               alt="Numi"
@@ -21,10 +24,10 @@ export function Footer() {
               className="h-9 w-auto select-none"
             />
             <span className="text-base font-bold text-[var(--numi-text)]">Numi</span>
-          </div>
+          </StaggerItem>
 
           {COLUMNS.map((column) => (
-            <div key={column.title} className="flex flex-col gap-3">
+            <StaggerItem key={column.title} className="flex flex-col gap-3">
               <p className="text-sm font-semibold text-[var(--numi-text)]">{column.title}</p>
               {column.links.map((link) => (
                 <Link
@@ -35,9 +38,9 @@ export function Footer() {
                   {link}
                 </Link>
               ))}
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
 
         <p className="text-xs text-[var(--numi-text-3)]">
           &copy; {new Date().getFullYear()} Numi. All rights reserved.

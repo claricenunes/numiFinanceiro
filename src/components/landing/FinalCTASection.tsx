@@ -1,20 +1,34 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Reveal } from "@/components/common/motion/Reveal";
+import { usePrefersReducedMotion } from "@/components/common/motion/usePrefersReducedMotion";
 
 export function FinalCTASection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reducedMotion = usePrefersReducedMotion();
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const mascotY = useTransform(scrollYProgress, [0, 1], [reducedMotion ? 0 : 25, reducedMotion ? 0 : -25]);
+
   return (
-    <section className="px-4 py-24 lg:py-32">
+    <section ref={sectionRef} className="px-4 py-24 lg:py-32">
       <Reveal className="max-w-3xl mx-auto glass-card p-10 lg:p-16 flex flex-col items-center text-center gap-6">
-        <Image
-          src="/mascot/personagem1.png"
-          alt="Numi mascot waving"
-          width={1113}
-          height={1414}
-          className="w-20 h-auto select-none"
-        />
+        <motion.div style={{ y: mascotY }}>
+          <Image
+            src="/mascot/personagem1.png"
+            alt="Numi mascot waving"
+            width={1113}
+            height={1414}
+            className="w-20 h-auto select-none"
+          />
+        </motion.div>
         <h2 className="text-3xl lg:text-4xl font-bold text-[var(--numi-text)] max-w-lg leading-tight">
           Ready to actually understand your money?
         </h2>

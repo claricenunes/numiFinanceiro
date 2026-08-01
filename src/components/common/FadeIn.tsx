@@ -2,22 +2,27 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { EASE_OUT_EXPO } from "./motion/Reveal";
 
 export function FadeIn({
   children,
   className,
   delay = 0,
+  duration = 0.5,
+  y = 16,
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
+  duration?: number;
+  y?: number;
 }) {
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94], delay }}
+      transition={{ duration, ease: EASE_OUT_EXPO, delay }}
     >
       {children}
     </motion.div>

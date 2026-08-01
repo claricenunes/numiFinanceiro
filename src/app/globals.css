@@ -73,6 +73,18 @@ html.light {
   --numi-gradient-warm: linear-gradient(135deg, #FBBF24, #FB923C);
   --numi-gradient-cool: linear-gradient(135deg, #34D399, #38BDF8);
   --numi-gradient-alert: linear-gradient(135deg, #F87171, #EC4899);
+
+  /* ── Landing (pill-nav / hero) — paleta própria da Numi ────── */
+  --numi-landing-nav-bg:      #16321F;
+  --numi-landing-nav-text:    #E9F3E4;
+  --numi-landing-nav-muted:   #B9D2B5;
+  --numi-landing-heading:     #16321F;
+  --numi-landing-tagline:     #4F7A5B;
+  --numi-landing-accent:      #E2896B;
+  --numi-landing-accent-text: #2A150D;
+  --numi-landing-wave:        rgba(22, 50, 31, 0.12);
+  --numi-landing-hero-bg:     #FAE4D3;
+  --numi-landing-hero-bg-2:   #F6D5BC;
 }
 
 /* ── Fundo ambiente (gradiente pastel de fundo, todas as telas) ── */
@@ -119,6 +131,13 @@ body {
 }
 
 /* ── Componentes base reutilizáveis ─────────────── */
+/* Layered as "components" (not left unlayered) so that Tailwind utility
+   classes combined in className strings — hidden, sm:inline-flex, px-8,
+   text-lg, etc. — can actually override these (display, padding,
+   font-size...). Unlayered CSS always beats @layer utilities regardless
+   of source order, which silently broke responsive hidden/flex toggles
+   on elements using these classes. */
+@layer components {
 .glass-card {
   background: var(--numi-surface);
   backdrop-filter: blur(20px) saturate(180%);
@@ -215,6 +234,85 @@ html:not(.light) .glass-card {
   transform: scale(0.97);
 }
 
+/* ── Landing: colored hero band (full-bleed, distinct from page bg) ── */
+.numi-hero-band {
+  background: linear-gradient(180deg, var(--numi-landing-hero-bg) 0%, var(--numi-landing-hero-bg-2) 100%);
+}
+
+/* ── Landing: pill navbar ────────────────────────── */
+.numi-pill-nav {
+  background: var(--numi-landing-nav-bg);
+  border-radius: 999px;
+}
+
+.numi-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.65rem 1.35rem;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, filter 0.15s ease, transform 0.1s ease;
+}
+
+.numi-pill-btn:active { transform: scale(0.97); }
+
+.numi-pill-btn-outline {
+  color: var(--numi-landing-nav-text);
+  border: 1px solid color-mix(in srgb, var(--numi-landing-nav-text) 35%, transparent);
+  background: transparent;
+}
+
+.numi-pill-btn-outline:hover {
+  border-color: var(--numi-landing-nav-text);
+  background: color-mix(in srgb, var(--numi-landing-nav-text) 8%, transparent);
+}
+
+.numi-pill-btn-accent {
+  color: var(--numi-landing-accent-text);
+  background: var(--numi-landing-accent);
+  border: 1px solid transparent;
+}
+
+.numi-pill-btn-accent:hover { filter: brightness(1.05); }
+
+.numi-pill-btn-dark {
+  color: var(--numi-landing-nav-text);
+  background: var(--numi-landing-nav-bg);
+  border: 1px solid transparent;
+}
+
+.numi-pill-btn-dark:hover { filter: brightness(1.15); }
+
+/* ── Landing: hero CTA — hover grow + shadow, snappy release ──── */
+.numi-cta-bounce {
+  box-shadow: 0 4px 14px rgba(22, 50, 31, 0.16);
+  transition: transform 200ms ease-out, background-color 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.numi-cta-bounce:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 28px rgba(22, 50, 31, 0.28);
+}
+
+.numi-cta-bounce:active {
+  transform: scale(0.97);
+  transition: transform 100ms ease-out;
+}
+
+/* ── Landing: hero wave backdrop ─────────────────── */
+.numi-hero-wave {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.numi-hero-wave svg { color: var(--numi-landing-wave); }
+
 /* ── Skeleton shimmer ────────────────────────────── */
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
@@ -231,3 +329,4 @@ html:not(.light) .glass-card {
   background-size: 200% 100%;
   animation: shimmer 1.6s ease-in-out infinite;
 }
+} /* end @layer components */

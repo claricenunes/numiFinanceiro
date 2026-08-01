@@ -4,10 +4,13 @@ import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
 const DIRECTION_OFFSET: Record<"up" | "left" | "right", { x?: number; y?: number }> = {
-  up: { y: 12 },
-  left: { x: -12 },
-  right: { x: 12 },
+  up: { y: 24 },
+  left: { x: -24 },
+  right: { x: 24 },
 };
+
+/** ease-out-expo — the "decelerating" curve used across all scroll-reveal motion. */
+export const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 export function Reveal({
   children,
@@ -30,8 +33,8 @@ export function Reveal({
       className={className}
       initial={{ opacity: 0, ...offset }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once, margin: "-80px" }}
-      transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94], delay }}
+      viewport={{ once, amount: 0.15 }}
+      transition={{ duration: 0.6, ease: EASE_OUT_EXPO, delay }}
     >
       {children}
     </motion.div>

@@ -1,3 +1,5 @@
+import { PageTransition } from "@/components/common/motion/PageTransition";
+
 export default function AuthLayout({
   children,
 }: {
@@ -16,7 +18,7 @@ export default function AuthLayout({
 
       {/* Card */}
       <div className="w-full max-w-[400px] glass-card p-8">
-        {children}
+        <PageTransition>{children}</PageTransition>
       </div>
 
       {/* Footer */}

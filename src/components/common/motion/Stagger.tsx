@@ -2,20 +2,21 @@
 
 import { motion, type Variants } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
+import { EASE_OUT_EXPO } from "./Reveal";
 
 const containerVariants: Variants = {
   hidden: {},
   show: {
-    transition: { staggerChildren: 0.06 },
+    transition: { staggerChildren: 0.08 },
   },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 12 },
+  hidden: { opacity: 0, y: 24 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.6, ease: EASE_OUT_EXPO },
   },
 };
 
@@ -35,7 +36,7 @@ export function StaggerGroup({
       variants={containerVariants}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, margin: "-60px" }}
+      viewport={{ once: true, amount: 0.15 }}
     >
       {children}
     </motion.div>

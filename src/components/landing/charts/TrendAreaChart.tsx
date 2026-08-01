@@ -64,7 +64,9 @@ export function TrendAreaChart({ data, color = "#8FAE7C", formatValue, height = 
           stroke={color}
           strokeWidth={2.5}
           fill={`url(#${gradientId})`}
-          animationDuration={900}
+          isAnimationActive
+          animationDuration={800}
+          animationEasing="ease-out"
           activeDot={{ r: 5, strokeWidth: 0 }}
         />
       </AreaChart>

@@ -46,9 +46,9 @@ export function FeaturesSection() {
         </h2>
       </Reveal>
 
-      <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <StaggerGroup className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-3">
         {FEATURES.map(({ icon: Icon, title, description, color }) => (
-          <StaggerItem key={title} className="glass-card p-6 flex flex-col gap-4">
+          <StaggerItem key={title} className="glass-card p-6 flex flex-col gap-4 snap-center shrink-0 w-[78%] sm:w-auto sm:shrink">
             <span
               className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: `${color}22` }}

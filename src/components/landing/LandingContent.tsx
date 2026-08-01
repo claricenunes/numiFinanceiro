@@ -2,9 +2,11 @@
 
 import { LandingHeader } from "./LandingHeader";
 import { Hero } from "./Hero";
+import { TrustBadges } from "./TrustBadges";
+import { AnimatedHeroBackground } from "./AnimatedHeroBackground";
 import { FeaturesSection } from "./FeaturesSection";
 import { DashboardShowcaseSection } from "./DashboardShowcaseSection";
-import { AnalyticsSection } from "./AnalyticsSection";
+import { AnalyticsScrollSection } from "./AnalyticsScrollSection";
 import { BeforeAfterSection } from "./BeforeAfterSection";
 import { ProductivitySection } from "./ProductivitySection";
 import { TestimonialsSection } from "./TestimonialsSection";
@@ -16,11 +18,15 @@ import { Footer } from "./Footer";
 export function LandingContent() {
   return (
     <div className="numi-ambient-bg">
-      <LandingHeader />
-      <Hero />
-      <FeaturesSection />
+      <div className="numi-hero-band relative">
+        <AnimatedHeroBackground />
+        <LandingHeader />
+        <Hero />
+        <TrustBadges />
+      </div>
       <DashboardShowcaseSection />
-      <AnalyticsSection />
+      <FeaturesSection />
+      <AnalyticsScrollSection />
       <BeforeAfterSection />
       <ProductivitySection />
       <TestimonialsSection />

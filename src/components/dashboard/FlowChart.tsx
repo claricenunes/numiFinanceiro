@@ -80,8 +80,8 @@ export function FlowChart({ data, locale = "pt-BR" }: Props) {
             }}
             cursor={{ fill: "color-mix(in srgb, var(--numi-text) 4%, transparent)" }}
           />
-          <Bar dataKey="income"  fill="var(--numi-income)" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="expense" fill="var(--numi-expense)" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="income"  fill="var(--numi-income)" radius={[4, 4, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" />
+          <Bar dataKey="expense" fill="var(--numi-expense)" radius={[4, 4, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" />
         </BarChart>
       </ResponsiveContainer>
     </div>
