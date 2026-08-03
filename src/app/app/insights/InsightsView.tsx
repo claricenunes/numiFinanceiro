@@ -7,18 +7,18 @@ import type { Insight } from "@/lib/supabase/queries/insights";
 type TabValue = "all" | "alert" | "trend" | "win" | "forecast";
 
 const TABS: { value: TabValue; label: string }[] = [
-  { value: "all",      label: "Tudo" },
-  { value: "alert",    label: "Alertas" },
-  { value: "trend",    label: "Tendências" },
-  { value: "win",      label: "Conquistas" },
-  { value: "forecast", label: "Previsões" },
+  { value: "all",      label: "All" },
+  { value: "alert",    label: "Alerts" },
+  { value: "trend",    label: "Trends" },
+  { value: "win",      label: "Wins" },
+  { value: "forecast", label: "Forecasts" },
 ];
 
 const CAT_STYLE: Record<string, { badge: string; color: string; label: string }> = {
-  alert:    { badge: "rgba(239,68,68,0.15)",  color: "var(--numi-expense)", label: "Alerta" },
-  trend:    { badge: "rgba(59,130,246,0.15)", color: "var(--numi-info)",    label: "Tendência" },
-  win:      { badge: "rgba(16,185,129,0.15)", color: "var(--numi-income)",  label: "Conquista" },
-  forecast: { badge: "rgba(245,158,11,0.15)", color: "var(--numi-warning)", label: "Previsão" },
+  alert:    { badge: "rgba(239,68,68,0.15)",  color: "var(--numi-expense)", label: "Alert" },
+  trend:    { badge: "rgba(59,130,246,0.15)", color: "var(--numi-info)",    label: "Trend" },
+  win:      { badge: "rgba(16,185,129,0.15)", color: "var(--numi-income)",  label: "Win" },
+  forecast: { badge: "rgba(245,158,11,0.15)", color: "var(--numi-warning)", label: "Forecast" },
 };
 
 interface Props {
@@ -42,37 +42,37 @@ export function InsightsView({ insights, periodLabel }: Props) {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-[var(--numi-text)]">Insights</h1>
+        <h1 className="text-xl font-bold" style={{ color: "var(--numi-landing-heading)" }}>Insights</h1>
         <p className="text-sm text-[var(--numi-text-3)] mt-0.5">
-          {periodLabel} · {insights.length} análise{insights.length !== 1 ? "s" : ""}
+          {periodLabel} · {insights.length} insight{insights.length !== 1 ? "s" : ""}
         </p>
       </div>
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <StatCard count={counts.alert}    label="Alertas"    color="var(--numi-expense)" emoji="⛔" />
-        <StatCard count={counts.trend}    label="Tendências" color="var(--numi-info)" emoji="📊" />
-        <StatCard count={counts.win}      label="Conquistas" color="var(--numi-income)" emoji="🏆" />
-        <StatCard count={counts.forecast} label="Previsões"  color="var(--numi-warning)" emoji="🔮" />
+        <StatCard count={counts.alert}    label="Alerts"    color="var(--numi-expense)" emoji="⛔" />
+        <StatCard count={counts.trend}    label="Trends"    color="var(--numi-info)" emoji="📊" />
+        <StatCard count={counts.win}      label="Wins"      color="var(--numi-income)" emoji="🏆" />
+        <StatCard count={counts.forecast} label="Forecasts" color="var(--numi-warning)" emoji="🔮" />
       </div>
 
       {/* Tab bar */}
       <div
         className="flex gap-1 p-1 rounded-xl mb-6 overflow-x-auto"
-        style={{ background: "var(--numi-elevated)" }}
+        style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
       >
         {TABS.map((t) => (
           <button
             key={t.value}
             onClick={() => setTab(t.value)}
             className="relative px-3 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-colors flex-shrink-0"
-            style={{ color: tab === t.value ? "var(--numi-text)" : "var(--numi-text-3)" }}
+            style={{ color: tab === t.value ? "var(--numi-landing-heading)" : "var(--numi-text-3)" }}
           >
             {tab === t.value && (
               <motion.span
                 layoutId="insight-tab-bg"
                 className="absolute inset-0 rounded-lg"
-                style={{ background: "var(--numi-border)" }}
+                style={{ background: "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" }}
               />
             )}
             <span className="relative">{t.label}</span>
@@ -84,9 +84,9 @@ export function InsightsView({ insights, periodLabel }: Props) {
       {filtered.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-4xl mb-3">✨</p>
-          <p className="text-[var(--numi-text-2)] font-medium">Nenhum insight nesta categoria</p>
+          <p className="text-[var(--numi-text-2)] font-medium">No insights in this category</p>
           <p className="text-xs text-[var(--numi-text-3)] mt-1">
-            Continue registrando suas finanças para gerar mais análises
+            Keep tracking your finances to generate more insights
           </p>
         </div>
       ) : (
@@ -119,7 +119,7 @@ function StatCard({
   return (
     <div
       className="rounded-xl p-3 flex items-center gap-3"
-      style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
     >
       <span
         className="flex items-center justify-center text-base w-9 h-9 rounded-lg shrink-0"
@@ -128,7 +128,7 @@ function StatCard({
         {emoji}
       </span>
       <div>
-        <p className="text-xl font-bold text-[var(--numi-text)]">{count}</p>
+        <p className="text-xl font-bold" style={{ color: "var(--numi-landing-heading)" }}>{count}</p>
         <p className="text-xs text-[var(--numi-text-3)]">{label}</p>
       </div>
     </div>
@@ -140,12 +140,12 @@ function InsightCard({ insight }: { insight: Insight }) {
   const borderColor =
     insight.severity === "alert"   ? "rgba(239,68,68,0.22)" :
     insight.severity === "warning" ? "rgba(245,158,11,0.18)"  :
-    "var(--numi-border)";
+    "rgba(22, 50, 31, 0.08)";
 
   return (
     <div
       className="rounded-2xl p-4 flex gap-4 h-full"
-      style={{ background: "var(--numi-elevated)", border: `1px solid ${borderColor}` }}
+      style={{ background: "#FFFFFF", border: `1px solid ${borderColor}`, boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
     >
       <span
         className="flex items-center justify-center text-xl w-10 h-10 rounded-xl shrink-0"
@@ -155,7 +155,7 @@ function InsightCard({ insight }: { insight: Insight }) {
       </span>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-1.5">
-          <p className="text-sm font-semibold text-[var(--numi-text)] leading-snug">{insight.title}</p>
+          <p className="text-sm font-semibold leading-snug" style={{ color: "var(--numi-landing-heading)" }}>{insight.title}</p>
           <span
             className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
             style={{ background: style.badge, color: style.color }}

@@ -24,9 +24,9 @@ export function NewBudgetButton() {
     const supabase = createClient();
     let { data } = await supabase.from("user_categories").select("id,name,icon").eq("type", "expense").order("name");
 
-    // Usuário sem categorias próprias ainda (ex.: conta criada antes do seed
-    // automático) — copia as categorias padrão do sistema para o usuário,
-    // já que budgets.category_id só aceita ids de user_categories.
+    // User has no categories of their own yet (e.g. account created before
+    // the automatic seed) — copy the system's default categories over,
+    // since budgets.category_id only accepts user_categories ids.
     if (!data || data.length === 0) {
       const { data: { user } } = await supabase.auth.getUser();
       const { data: sysCatsRaw } = await supabase
@@ -37,8 +37,8 @@ export function NewBudgetButton() {
       const sysCats = sysCatsRaw as SysCategory[] | null;
 
       if (user && sysCats && sysCats.length > 0) {
-        // upsert (não insert) + ignoreDuplicates: se a categoria já existe
-        // para esse usuário (mesmo system_category_id), não duplica.
+        // upsert (not insert) + ignoreDuplicates: if the category already
+        // exists for this user (same system_category_id), don't duplicate.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (supabase.from("user_categories") as any).upsert(
           sysCats.map((c) => ({
@@ -63,20 +63,21 @@ export function NewBudgetButton() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = parseFloat(amount.replace(",", "."));
-    if (!categoryId || !parsed) { show("Preencha categoria e valor", "error"); return; }
+    if (!categoryId || !parsed) { show("Fill in category and amount", "error"); return; }
 
     setLoading(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { show("Sessão expirada", "error"); setLoading(false); return; }
+    if (!user) { show("Session expired", "error"); setLoading(false); return; }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase.from("budgets") as any).insert({
       user_id: user.id, category_id: categoryId, amount: parsed, currency_code: "BRL",
     });
     setLoading(false);
-    if (error) { show("Erro: " + error.message, "error"); return; }
+    if (error) { show("Error: " + error.message, "error"); return; }
 
-    show("Orçamento criado!", "success");
+    show("Budget created!", "success");
     setOpen(false);
     setAmount(""); setCategoryId("");
     router.refresh();
@@ -86,10 +87,9 @@ export function NewBudgetButton() {
     return (
       <button
         onClick={openModal}
-        className="text-sm font-semibold px-4 py-2 rounded-xl"
-        style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)", color: "var(--numi-text)" }}
+        className="numi-pill-btn numi-pill-btn-outline-dark text-sm px-4 py-2"
       >
-        + Categoria
+        + Category
       </button>
     );
   }
@@ -98,32 +98,29 @@ export function NewBudgetButton() {
     <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={() => setOpen(false)} />
       <div className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-           style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)" }}>
+           style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)" }}>
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-[var(--numi-text)]">Novo Orçamento</h2>
-          <button onClick={() => setOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">✕</button>
+          <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>New Budget</h2>
+          <button onClick={() => setOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">✕</button>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
-            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Categoria</label>
+            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Category</label>
             <select value={categoryId} onChange={e => setCategoryId(e.target.value)} required
-              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}>
-              <option value="">Selecionar categoria</option>
+              className="numi-landing-input">
+              <option value="">Select category</option>
               {cats.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Limite mensal (R$)</label>
+            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Monthly limit ($)</label>
             <input type="text" inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)}
-              placeholder="0,00" required
-              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+              placeholder="0.00" required
+              className="numi-landing-input" />
           </div>
           <button type="submit" disabled={loading}
-            className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-            style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
-            {loading ? "Salvando..." : "Criar orçamento"}
+            className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base mt-1 disabled:opacity-60 disabled:pointer-events-none">
+            {loading ? "Saving..." : "Create budget"}
           </button>
         </form>
       </div>

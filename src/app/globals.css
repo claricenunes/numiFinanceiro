@@ -253,6 +253,14 @@ html:not(.light) .glass-card {
 
 .numi-pill-btn:active { transform: scale(0.97); }
 
+/* Same unlayered-vs-layered issue as .numi-landing-input above — the
+   generic green focus ring would otherwise clash with every pill
+   button's own coral/dark-green palette when tabbed to. */
+.numi-pill-btn:focus-visible {
+  outline: 2px solid var(--numi-landing-accent) !important;
+  outline-offset: 2px;
+}
+
 .numi-pill-btn-outline {
   color: var(--numi-landing-nav-text);
   border: 1px solid color-mix(in srgb, var(--numi-landing-nav-text) 35%, transparent);
@@ -293,6 +301,55 @@ html:not(.light) .glass-card {
 }
 
 .numi-pill-btn-dark:hover { filter: brightness(1.15); }
+
+/* ── Landing: auth card + input — same warm/cream language as the hero,
+   used by (auth)/* so login/register/etc. read as a continuation of the
+   landing rather than the generic app's cool-gray dashboard theme ──── */
+.numi-landing-auth-card {
+  background: #FFFDF9;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 30px 60px -20px rgba(22, 50, 31, 0.18), 0 10px 24px -10px rgba(22, 50, 31, 0.1);
+}
+
+.numi-landing-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1.5px solid rgba(22, 50, 31, 0.12);
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  color: var(--numi-landing-heading);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.numi-landing-input::placeholder {
+  color: color-mix(in srgb, var(--numi-landing-heading) 38%, transparent);
+}
+
+.numi-landing-input:hover {
+  border-color: color-mix(in srgb, var(--numi-landing-heading) 25%, transparent);
+}
+
+.numi-landing-input:focus,
+.numi-landing-input:focus-visible {
+  /* !important: the global :focus-visible rule above is deliberately
+     unlayered so it wins over ordinary @layer components/utilities
+     styles everywhere else in the app — but that means it also beats
+     this rule on specificity alone, since @layer content always loses
+     to unlayered content regardless of selector weight. Only
+     !important (unlayered or not) can out-rank an unlayered normal
+     declaration, which is why the coral ring needs it here. */
+  outline: none !important;
+  border-color: var(--numi-landing-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--numi-landing-accent) 16%, transparent);
+}
+
+.numi-landing-input[aria-invalid="true"] {
+  border-color: #D9534F;
+  box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.12);
+}
 
 /* ── Landing: hero CTA — hover grow + shadow, snappy release ──── */
 .numi-cta-bounce {

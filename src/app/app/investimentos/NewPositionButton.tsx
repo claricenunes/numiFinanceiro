@@ -8,12 +8,12 @@ import { createClient } from "@/lib/supabase/client";
 type AssetType = "stock" | "etf" | "fii" | "fixed_income" | "crypto" | "cash";
 
 const TYPE_OPTIONS: { value: AssetType; label: string; icon: string }[] = [
-  { value: "stock",        label: "Ação",       icon: "📈" },
-  { value: "etf",          label: "ETF",        icon: "📊" },
-  { value: "fii",          label: "FII",        icon: "🏢" },
-  { value: "fixed_income", label: "Renda Fixa", icon: "🏛️" },
-  { value: "crypto",       label: "Cripto",     icon: "₿"  },
-  { value: "cash",         label: "Caixa",      icon: "💵" },
+  { value: "stock",        label: "Stock",        icon: "📈" },
+  { value: "etf",          label: "ETF",          icon: "📊" },
+  { value: "fii",          label: "REIT",         icon: "🏢" },
+  { value: "fixed_income", label: "Fixed Income", icon: "🏛️" },
+  { value: "crypto",       label: "Crypto",       icon: "₿"  },
+  { value: "cash",         label: "Cash",         icon: "💵" },
 ];
 
 type Account = { id: string; name: string };
@@ -58,14 +58,14 @@ export function NewPositionButton() {
     const qty = parseFloat(quantity.replace(",", "."));
     const avg = parseFloat(avgPrice.replace(",", "."));
     if (!name.trim() || !qty || !avg) {
-      show("Nome, quantidade e preço médio são obrigatórios", "error");
+      show("Name, quantity and average price are required", "error");
       return;
     }
 
     setLoading(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { show("Sessão expirada", "error"); setLoading(false); return; }
+    if (!user) { show("Session expired", "error"); setLoading(false); return; }
 
     const row: Record<string, unknown> = {
       user_id:       user.id,
@@ -73,7 +73,7 @@ export function NewPositionButton() {
       type,
       quantity:      qty,
       average_price: avg,
-      currency_code: "BRL",
+      currency_code: "USD",
     };
     if (accountId) row.account_id = accountId;
     const cur = parseFloat(currentPrice.replace(",", "."));
@@ -82,9 +82,9 @@ export function NewPositionButton() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase.from("user_positions") as any).insert(row);
     setLoading(false);
-    if (error) { show("Erro: " + error.message, "error"); return; }
+    if (error) { show("Error: " + error.message, "error"); return; }
 
-    show("Posição adicionada!", "success");
+    show("Position added!", "success");
     setOpen(false);
     reset();
     router.refresh();
@@ -94,10 +94,9 @@ export function NewPositionButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-sm font-semibold px-4 py-2 rounded-xl"
-        style={{ background: "var(--numi-income)", color: "#0B1020" }}
+        className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce text-sm px-4 py-2"
       >
-        + Nova Posição
+        + New Position
       </button>
 
       {open && (
@@ -106,28 +105,28 @@ export function NewPositionButton() {
 
           <div
             className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)", maxHeight: "92dvh", overflowY: "auto" }}
+            style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)", maxHeight: "92dvh", overflowY: "auto" }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[var(--numi-text)]">Nova Posição</h2>
+              <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>New Position</h2>
               <button onClick={() => { setOpen(false); reset(); }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              {/* Tipo */}
+              {/* Type */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Tipo</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Type</label>
                 <div className="grid grid-cols-3 gap-2">
                   {TYPE_OPTIONS.map(opt => (
                     <button key={opt.value} type="button" onClick={() => setType(opt.value)}
-                      className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-xs font-medium"
+                      className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-xs font-medium transition-colors"
                       style={{
-                        background: type === opt.value ? "rgba(52,211,153,0.15)" : "var(--numi-input-bg)",
-                        border: `1px solid ${type === opt.value ? "var(--numi-income)" : "var(--numi-border)"}`,
-                        color: type === opt.value ? "var(--numi-income)" : "var(--numi-text-2)",
+                        background: type === opt.value ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
+                        border: `1px solid ${type === opt.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                        color: type === opt.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
                       }}>
                       <span className="text-lg">{opt.icon}</span>
                       <span>{opt.label}</span>
@@ -136,51 +135,45 @@ export function NewPositionButton() {
                 </div>
               </div>
 
-              {/* Nome */}
-              <Field label="Nome / Ticker">
+              {/* Name */}
+              <Field label="Name / Ticker">
                 <input value={name} onChange={e => setName(e.target.value)}
-                  placeholder="Ex: PETR4, BOVA11, Tesouro Selic..." required autoFocus
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                  placeholder="e.g. AAPL, VTI, Treasury Bond..." required autoFocus
+                  className="numi-landing-input" />
               </Field>
 
-              {/* Conta */}
+              {/* Account */}
               {accounts.length > 0 && (
-                <Field label="Conta de investimento">
+                <Field label="Investment account">
                   <select value={accountId} onChange={e => setAccountId(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                    style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}>
+                    className="numi-landing-input">
                     {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                   </select>
                 </Field>
               )}
 
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Quantidade">
+                <Field label="Quantity">
                   <input value={quantity} onChange={e => setQuantity(e.target.value)}
                     type="text" inputMode="decimal" placeholder="0" required
-                    className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                    style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                    className="numi-landing-input" />
                 </Field>
-                <Field label="Preço médio (R$)">
+                <Field label="Average price ($)">
                   <input value={avgPrice} onChange={e => setAvgPrice(e.target.value)}
-                    type="text" inputMode="decimal" placeholder="0,00" required
-                    className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                    style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                    type="text" inputMode="decimal" placeholder="0.00" required
+                    className="numi-landing-input" />
                 </Field>
               </div>
 
-              <Field label="Cotação atual (R$) — opcional">
+              <Field label="Current price ($) — optional">
                 <input value={currentPrice} onChange={e => setCurrentPrice(e.target.value)}
-                  type="text" inputMode="decimal" placeholder="0,00"
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                  type="text" inputMode="decimal" placeholder="0.00"
+                  className="numi-landing-input" />
               </Field>
 
               <button type="submit" disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
-                {loading ? "Salvando..." : "Adicionar posição"}
+                className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base mt-1 disabled:opacity-60 disabled:pointer-events-none">
+                {loading ? "Saving..." : "Add position"}
               </button>
             </form>
           </div>
@@ -193,7 +186,7 @@ export function NewPositionButton() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">{label}</label>
+      <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>{label}</label>
       {children}
     </div>
   );

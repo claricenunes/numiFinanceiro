@@ -7,15 +7,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useUIStore } from "@/stores/useUIStore";
 
 const NAV = [
-  { label: "Dashboard",      href: "/app/dashboard",     icon: DashboardIcon },
-  { label: "Contas",         href: "/app/contas",         icon: AccountsIcon },
-  { label: "Transações",     href: "/app/transacoes",     icon: TransactionsIcon },
-  { label: "Orçamento",      href: "/app/orcamento",      icon: BudgetIcon },
-  { label: "Metas",          href: "/app/metas",          icon: GoalsIcon },
-  { label: "Investimentos",  href: "/app/investimentos",  icon: InvestmentsIcon },
-  { label: "Insights",       href: "/app/insights",       icon: InsightsIcon },
-  { label: "IA Financeira",  href: "/app/fia",            icon: FIAIcon },
-  { label: "Configurações",  href: "/app/settings",       icon: SettingsIcon },
+  { label: "Dashboard",     href: "/app/dashboard",     icon: DashboardIcon },
+  { label: "Accounts",      href: "/app/contas",        icon: AccountsIcon },
+  { label: "Transactions",  href: "/app/transacoes",    icon: TransactionsIcon },
+  { label: "Budget",        href: "/app/orcamento",     icon: BudgetIcon },
+  { label: "Goals",         href: "/app/metas",         icon: GoalsIcon },
+  { label: "Investments",   href: "/app/investimentos", icon: InvestmentsIcon },
+  { label: "Insights",      href: "/app/insights",      icon: InsightsIcon },
+  { label: "Financial AI",  href: "/app/fia",           icon: FIAIcon },
+  { label: "Settings",      href: "/app/settings",      icon: SettingsIcon },
 ];
 
 export function MobileDrawer() {
@@ -45,35 +45,27 @@ export function MobileDrawer() {
           {/* Drawer */}
           <motion.aside
             className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-64 flex flex-col"
-            style={{ background: "var(--numi-elevated)", borderRight: "1px solid var(--numi-border)" }}
+            style={{ background: "#FFFFFF", borderRight: "1px solid rgba(22, 50, 31, 0.08)" }}
             initial={{ x: -264 }}
             animate={{ x: 0 }}
             exit={{ x: -264 }}
             transition={{ type: "spring", stiffness: 320, damping: 30 }}
           >
-            {/* Header do drawer */}
+            {/* Drawer header */}
             <div
               className="flex items-center justify-between px-4 py-4"
-              style={{ borderBottom: "1px solid var(--numi-border)", minHeight: "64px" }}
+              style={{ borderBottom: "1px solid rgba(22, 50, 31, 0.08)", minHeight: "64px" }}
             >
-              <div className="flex items-center gap-3">
-                <span
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{
-                    background: "rgba(52,211,153,0.15)",
-                    border: "1px solid rgba(52,211,153,0.3)",
-                  }}
-                >
-                  <span className="w-3 h-3 rounded-full bg-[var(--numi-income)] block" />
-                </span>
-                <span className="text-base font-semibold text-[var(--numi-text)] tracking-tight">
-                  Numi
-                </span>
-              </div>
+              <span
+                className="text-2xl leading-none"
+                style={{ color: "var(--numi-landing-heading)", fontFamily: "var(--font-logo)" }}
+              >
+                numi
+              </span>
               <button
                 onClick={closeMobileMenu}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-3)] hover:text-[var(--numi-text)] hover:bg-[var(--numi-border)] transition-colors text-xl leading-none"
-                aria-label="Fechar menu"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-3)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)] transition-colors text-xl leading-none"
+                aria-label="Close menu"
               >
                 ×
               </button>
@@ -90,14 +82,14 @@ export function MobileDrawer() {
                     href={href}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
                     style={{
-                      background: active ? "rgba(52,211,153,0.1)" : "transparent",
-                      color: active ? "var(--numi-income)" : "var(--numi-text-2)",
+                      background: active ? "color-mix(in srgb, var(--numi-landing-heading) 8%, transparent)" : "transparent",
+                      color: active ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
                     }}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     <span className="text-sm font-medium">{label}</span>
                     {active && (
-                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--numi-income)]" />
+                      <span className="ml-auto w-1.5 h-1.5 rounded-full" style={{ background: "var(--numi-landing-accent)" }} />
                     )}
                   </Link>
                 );

@@ -6,7 +6,7 @@ export default function InvestimentosLoading() {
       <Skeleton className="h-7 w-36 mb-5" />
 
       {/* Portfolio summary */}
-      <div className="rounded-2xl p-5 mb-6" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
+      <div className="rounded-2xl p-5 mb-6" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="col-span-2 lg:col-span-1">
             <Skeleton className="h-3 w-24 mb-2" />
@@ -27,7 +27,7 @@ export default function InvestimentosLoading() {
       </div>
 
       {/* Allocation */}
-      <div className="rounded-2xl p-5 mb-6" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
+      <div className="rounded-2xl p-5 mb-6" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}>
         <Skeleton className="h-4 w-20 mb-4" />
         <div className="flex flex-col lg:flex-row gap-6 items-center">
           <Skeleton className="h-48 w-48 rounded-full shrink-0" />
@@ -48,7 +48,7 @@ export default function InvestimentosLoading() {
       <Skeleton className="h-3 w-16 mb-3" />
       <div className="flex flex-col gap-2">
         {[0, 1, 2, 3, 4, 5].map(i => (
-          <div key={i} className="rounded-2xl p-4" style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}>
+          <div key={i} className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}>
             <div className="flex items-start gap-3">
               <Skeleton className="h-10 w-10 rounded-xl shrink-0" />
               <div className="flex-1">

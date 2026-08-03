@@ -119,7 +119,7 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
 
   function handleFile(file: File) {
     if (!file.name.toLowerCase().endsWith(".csv")) {
-      show("Selecione um arquivo .csv", "error");
+      show("Please select a .csv file", "error");
       return;
     }
     setFileName(file.name);
@@ -129,19 +129,19 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
       const parsed = parseCSV(text);
       setRows(parsed);
       if (parsed.length === 0) {
-        show("Nenhuma transação encontrada. Verifique o formato.", "warning");
+        show("No transactions found. Check the file format.", "warning");
       }
     };
     reader.readAsText(file, "UTF-8");
   }
 
   async function handleImport() {
-    if (!accountId) { show("Selecione uma conta de destino", "error"); return; }
+    if (!accountId) { show("Select a destination account", "error"); return; }
 
     setImporting(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { show("Sessão expirada", "error"); setImporting(false); return; }
+    if (!user) { show("Session expired", "error"); setImporting(false); return; }
 
     let success = 0;
     let errors  = 0;
@@ -181,11 +181,11 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
     setImporting(false);
 
     if (success > 0) {
-      show(`${success} transaç${success === 1 ? "ão importada" : "ões importadas"}${errors > 0 ? ` (${errors} ignoradas)` : ""}!`, "success");
+      show(`${success} transaction${success === 1 ? "" : "s"} imported${errors > 0 ? ` (${errors} skipped)` : ""}!`, "success");
       router.refresh();
       onClose();
     } else {
-      show(`Nenhuma transação importada. ${errors} linhas com formato inválido.`, "error");
+      show(`No transactions imported. ${errors} rows had an invalid format.`, "error");
     }
   }
 
@@ -196,7 +196,7 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
-      aria-label="Importar CSV"
+      aria-label="Import CSV"
       style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)" }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
@@ -206,17 +206,17 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
         exit={{ opacity: 0, y: 32 }}
         transition={{ type: "spring", stiffness: 320, damping: 28 }}
         className="w-full max-w-lg rounded-2xl overflow-hidden"
-        style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)", maxHeight: "90dvh", overflowY: "auto" }}
+        style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)", maxHeight: "90dvh", overflowY: "auto" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 sticky top-0"
-          style={{ background: "var(--numi-elevated)", borderBottom: "1px solid var(--numi-border)" }}>
+          style={{ background: "#FFFDF9", borderBottom: "1px solid rgba(22, 50, 31, 0.08)" }}>
           <div>
-            <h2 className="text-base font-bold text-[var(--numi-text)]">Importar CSV</h2>
-            <p className="text-xs text-[var(--numi-text-3)] mt-0.5">Formato: Data · Descrição · Tipo · Valor · Categoria · Conta</p>
+            <h2 className="text-base font-bold" style={{ color: "var(--numi-landing-heading)" }}>Import CSV</h2>
+            <p className="text-xs text-[var(--numi-text-3)] mt-0.5">Format: Date · Description · Type · Amount · Category · Account</p>
           </div>
-          <button onClick={onClose} aria-label="Fechar"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-3)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] transition-colors text-lg leading-none">
+          <button onClick={onClose} aria-label="Close"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-3)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)] transition-colors text-lg leading-none">
             ×
           </button>
         </div>
@@ -225,7 +225,7 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
           {/* Drop zone */}
           <div
             className="rounded-xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center py-10 px-4 text-center"
-            style={{ borderColor: dragging ? "var(--numi-income)" : "var(--numi-border)", background: dragging ? "rgba(16,185,129,0.05)" : "var(--numi-input-bg)" }}
+            style={{ borderColor: dragging ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.15)", background: dragging ? "color-mix(in srgb, var(--numi-landing-accent) 6%, transparent)" : "#FFFFFF" }}
             onDragOver={e => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
             onDrop={e => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
@@ -234,15 +234,15 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
             <span className="text-3xl mb-2">📂</span>
             {fileName ? (
               <>
-                <p className="text-sm font-semibold text-[var(--numi-text)]">{fileName}</p>
+                <p className="text-sm font-semibold" style={{ color: "var(--numi-landing-heading)" }}>{fileName}</p>
                 <p className="text-xs mt-1" style={{ color: "var(--numi-income)" }}>
-                  {rows.length} linha{rows.length !== 1 ? "s" : ""} encontrada{rows.length !== 1 ? "s" : ""}
+                  {rows.length} row{rows.length !== 1 ? "s" : ""} found
                 </p>
               </>
             ) : (
               <>
-                <p className="text-sm font-medium text-[var(--numi-text-2)]">Arraste um arquivo CSV ou clique para selecionar</p>
-                <p className="text-xs text-[var(--numi-text-3)] mt-1">Apenas .csv · máx 5 MB</p>
+                <p className="text-sm font-medium text-[var(--numi-text-2)]">Drag a CSV file here or click to select</p>
+                <p className="text-xs text-[var(--numi-text-3)] mt-1">.csv only · max 5 MB</p>
               </>
             )}
           </div>
@@ -253,10 +253,9 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
           {/* Account selector */}
           {accounts.length > 0 && (
             <div>
-              <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Conta de destino</label>
+              <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Destination account</label>
               <select value={accountId} onChange={e => setAccountId(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}>
+                className="numi-landing-input">
                 {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </div>
@@ -265,32 +264,32 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
           {/* Preview table */}
           {rows.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-2">
-                Pré-visualização{rows.length > 8 ? ` (8 de ${rows.length})` : ""}
+              <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--numi-landing-tagline)" }}>
+                Preview{rows.length > 8 ? ` (8 of ${rows.length})` : ""}
               </p>
-              <div className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--numi-border)" }}>
+              <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(22, 50, 31, 0.08)" }}>
                 <table className="w-full text-xs">
                   <thead>
-                    <tr style={{ background: "var(--numi-input-bg)" }}>
-                      <th className="px-3 py-2 text-left text-[var(--numi-text-3)] font-medium">Data</th>
-                      <th className="px-3 py-2 text-left text-[var(--numi-text-3)] font-medium">Descrição</th>
-                      <th className="px-3 py-2 text-left text-[var(--numi-text-3)] font-medium">Tipo</th>
-                      <th className="px-3 py-2 text-right text-[var(--numi-text-3)] font-medium">Valor</th>
+                    <tr style={{ background: "#FFFFFF" }}>
+                      <th className="px-3 py-2 text-left text-[var(--numi-text-3)] font-medium">Date</th>
+                      <th className="px-3 py-2 text-left text-[var(--numi-text-3)] font-medium">Description</th>
+                      <th className="px-3 py-2 text-left text-[var(--numi-text-3)] font-medium">Type</th>
+                      <th className="px-3 py-2 text-right text-[var(--numi-text-3)] font-medium">Amount</th>
                     </tr>
                   </thead>
                   <tbody>
                     {preview.map((row, i) => {
                       const type = parseType(row.tipo);
                       return (
-                        <tr key={i} style={{ borderTop: "1px solid var(--numi-border)" }}>
+                        <tr key={i} style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}>
                           <td className="px-3 py-2 text-[var(--numi-text-2)] whitespace-nowrap">{row.data}</td>
-                          <td className="px-3 py-2 text-[var(--numi-text)] max-w-[120px] truncate">{row.descricao}</td>
+                          <td className="px-3 py-2 max-w-[120px] truncate" style={{ color: "var(--numi-landing-heading)" }}>{row.descricao}</td>
                           <td className="px-3 py-2 whitespace-nowrap text-xs font-medium"
                             style={{ color: type === "income" ? "var(--numi-income)" : "var(--numi-expense)" }}>
-                            {type === "income" ? "Receita" : "Despesa"}
+                            {type === "income" ? "Income" : "Expense"}
                           </td>
-                          <td className="px-3 py-2 text-right text-[var(--numi-text)] font-medium whitespace-nowrap">
-                            R$ {row.valor}
+                          <td className="px-3 py-2 text-right font-medium whitespace-nowrap" style={{ color: "var(--numi-landing-heading)" }}>
+                            ${row.valor}
                           </td>
                         </tr>
                       );
@@ -305,13 +304,12 @@ export function CSVImport({ onClose }: { onClose: () => void }) {
           <div className="flex gap-3">
             <button onClick={onClose}
               className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
-              style={{ background: "var(--numi-border)", color: "var(--numi-text-2)" }}>
-              Cancelar
+              style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}>
+              Cancel
             </button>
             <button onClick={handleImport} disabled={rows.length === 0 || importing}
-              className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
-              style={{ background: "var(--numi-income)", color: "#0B1020" }}>
-              {importing ? "Importando..." : rows.length > 0 ? `Importar (${rows.length})` : "Importar"}
+              className="numi-pill-btn numi-pill-btn-accent flex-1 py-2.5 text-sm disabled:opacity-40 disabled:pointer-events-none">
+              {importing ? "Importing..." : rows.length > 0 ? `Import (${rows.length})` : "Import"}
             </button>
           </div>
         </div>

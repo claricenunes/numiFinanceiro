@@ -33,24 +33,24 @@ async function exportTransactionsCSV(): Promise<number | null> {
   };
 
   const rows = [
-    ["Data", "Descrição", "Tipo", "Valor", "Categoria", "Conta", "Status"],
+    ["Date", "Description", "Type", "Amount", "Category", "Account", "Status"],
     ...(data as unknown as Row[]).map((t) => [
       t.date,
       `"${(t.description ?? "").replace(/"/g, '""')}"`,
-      t.type === "income" ? "Receita" : t.type === "expense" ? "Despesa" : "Transferência",
-      (+t.amount).toFixed(2).replace(".", ","),
+      t.type === "income" ? "Income" : t.type === "expense" ? "Expense" : "Transfer",
+      (+t.amount).toFixed(2),
       t.user_categories?.name ?? "",
       t.accounts?.name ?? "",
-      t.status === "confirmed" ? "Confirmado" : "Pendente",
+      t.status === "confirmed" ? "Confirmed" : "Pending",
     ]),
   ];
 
-  const csv = rows.map((r) => r.join(";")).join("\n");
+  const csv = rows.map((r) => r.join(",")).join("\n");
   const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `numi-transacoes-${new Date().toISOString().slice(0, 7)}.csv`;
+  a.download = `numi-transactions-${new Date().toISOString().slice(0, 7)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
   return data.length;
@@ -96,32 +96,32 @@ async function exportFullReport(): Promise<number | null> {
   ]);
 
   const lines: string[] = [];
-  lines.push(`RELATÓRIO NUMI — ${startDate} até ${endDate}`);
+  lines.push(`NUMI REPORT — ${startDate} to ${endDate}`);
   lines.push("");
-  lines.push("=== CONTAS ===");
-  lines.push("Nome;Tipo;Saldo inicial");
+  lines.push("=== ACCOUNTS ===");
+  lines.push("Name,Type,Initial balance");
   for (const a of (accRes.data ?? []) as AccRow[]) {
-    lines.push(`"${a.name}";${a.type};${a.initial_balance.toFixed(2).replace(".", ",")}`);
+    lines.push(`"${a.name}",${a.type},${a.initial_balance.toFixed(2)}`);
   }
   lines.push("");
-  lines.push("=== METAS ===");
-  lines.push("Nome;Meta (R$);Status;Prazo");
+  lines.push("=== GOALS ===");
+  lines.push("Name,Target ($),Status,Deadline");
   for (const g of (goalsRes.data ?? []) as GoalRow[]) {
-    lines.push(`"${g.name}";${g.target_amount.toFixed(2).replace(".", ",")};${g.status};${g.deadline ?? ""}`);
+    lines.push(`"${g.name}",${g.target_amount.toFixed(2)},${g.status},${g.deadline ?? ""}`);
   }
   lines.push("");
-  lines.push("=== TRANSAÇÕES DO MÊS ===");
-  lines.push("Data;Descrição;Tipo;Valor;Categoria;Conta;Status");
+  lines.push("=== TRANSACTIONS THIS MONTH ===");
+  lines.push("Date,Description,Type,Amount,Category,Account,Status");
   for (const t of (txRes.data ?? []) as unknown as TxRow[]) {
     lines.push([
       t.date,
       `"${(t.description ?? "").replace(/"/g, '""')}"`,
-      t.type === "income" ? "Receita" : t.type === "expense" ? "Despesa" : "Transferência",
-      t.amount.toFixed(2).replace(".", ","),
+      t.type === "income" ? "Income" : t.type === "expense" ? "Expense" : "Transfer",
+      t.amount.toFixed(2),
       t.user_categories?.name ?? "",
       t.accounts?.name ?? "",
-      t.status === "confirmed" ? "Confirmado" : "Pendente",
-    ].join(";"));
+      t.status === "confirmed" ? "Confirmed" : "Pending",
+    ].join(","));
   }
 
   const csv = lines.join("\n");
@@ -129,7 +129,7 @@ async function exportFullReport(): Promise<number | null> {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `numi-relatorio-completo-${now.toISOString().slice(0, 7)}.csv`;
+  a.download = `numi-full-report-${now.toISOString().slice(0, 7)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
   return (txRes.data?.length ?? 0) + (accRes.data?.length ?? 0) + (goalsRes.data?.length ?? 0);
@@ -142,7 +142,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const { profile, setProfile } = useUserStore();
 
-  const displayName = profile?.full_name || "Usuário";
+  const displayName = profile?.full_name || "User";
   const initial = displayName.charAt(0).toUpperCase();
 
   /* ── Logout ─────────────────────────── */
@@ -155,19 +155,19 @@ export default function SettingsPage() {
 
   /* ── Export ─────────────────────────── */
   async function handleExport() {
-    show("Exportando...", "info");
+    show("Exporting...", "info");
     const count = await exportTransactionsCSV();
-    if (count === null) { show("Faça login para exportar.", "error"); return; }
-    if (count === 0)    { show("Nenhuma transação para exportar.", "warning"); return; }
-    show(`${count} transações exportadas!`, "success");
+    if (count === null) { show("Please log in to export.", "error"); return; }
+    if (count === 0)    { show("No transactions to export.", "warning"); return; }
+    show(`${count} transactions exported!`, "success");
   }
 
   async function handleFullReport() {
-    show("Gerando relatório completo...", "info");
+    show("Generating full report...", "info");
     const count = await exportFullReport();
-    if (count === null) { show("Faça login para exportar.", "error"); return; }
-    if (count === 0)    { show("Nenhum dado encontrado.", "warning"); return; }
-    show("Relatório completo exportado!", "success");
+    if (count === null) { show("Please log in to export.", "error"); return; }
+    if (count === 0)    { show("No data found.", "warning"); return; }
+    show("Full report exported!", "success");
   }
 
   /* ── Theme ──────────────────────────── */
@@ -178,35 +178,35 @@ export default function SettingsPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase.from("user_profiles") as any).update({ theme }).eq("id", user.id);
     setProfile({ ...profile, theme });
-    show(theme === "light" ? "Modo claro ativado" : theme === "dark" ? "Modo escuro ativado" : "Seguindo sistema", "success");
+    show(theme === "light" ? "Light mode enabled" : theme === "dark" ? "Dark mode enabled" : "Following system", "success");
   }
 
   const currentTheme = profile?.theme ?? "light";
 
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-2xl mx-auto">
-      <h1 className="text-xl font-bold text-[var(--numi-text)] mb-8">Configurações</h1>
+      <h1 className="text-xl font-bold mb-8" style={{ color: "var(--numi-landing-heading)" }}>Settings</h1>
 
-      {/* ── Perfil ─────────────────────────── */}
-      <Section title="Perfil">
-        <div className="flex items-center gap-4 mb-5 pb-5" style={{ borderBottom: "1px solid var(--numi-border)" }}>
+      {/* ── Profile ─────────────────────────── */}
+      <Section title="Profile">
+        <div className="flex items-center gap-4 mb-5 pb-5" style={{ borderBottom: "1px solid rgba(22, 50, 31, 0.08)" }}>
           <div
-            className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-[#0B1020] shrink-0"
-            style={{ background: "var(--numi-income)" }}
+            className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-white shrink-0"
+            style={{ background: "var(--numi-landing-nav-bg)" }}
           >
             {initial}
           </div>
           <div>
-            <p className="text-base font-semibold text-[var(--numi-text)]">{displayName}</p>
-            <p className="text-sm text-[var(--numi-text-3)]">{profile ? "Conta ativa" : "Carregando…"}</p>
+            <p className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>{displayName}</p>
+            <p className="text-sm text-[var(--numi-text-3)]">{profile ? "Active account" : "Loading…"}</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <EditRow
-            label="Nome"
+            label="Name"
             currentValue={profile?.full_name ?? ""}
-            placeholder="Seu nome completo"
+            placeholder="Your full name"
             onSave={async (val) => {
               if (!val.trim() || !profile) return;
               const supabase = createClient();
@@ -218,49 +218,49 @@ export default function SettingsPage() {
                 .eq("id", user.id);
               if (error) throw error;
               setProfile({ ...profile, full_name: val.trim() });
-              show("Nome atualizado!", "success");
+              show("Name updated!", "success");
             }}
           />
           <EditRow
             label="Email"
             currentValue={profile ? "••••@••••.com" : ""}
-            placeholder="novo@email.com"
+            placeholder="new@email.com"
             type="email"
-            hint="Um link de confirmação será enviado para o novo email"
+            hint="A confirmation link will be sent to the new email"
             onSave={async (val) => {
               if (!val.trim()) return;
               const supabase = createClient();
               const { error } = await supabase.auth.updateUser({ email: val.trim() });
               if (error) throw error;
-              show("Confirme o novo email para concluir a alteração", "info");
+              show("Confirm the new email to complete the change", "info");
             }}
           />
           <EditRow
-            label="Senha"
+            label="Password"
             currentValue="••••••••"
-            placeholder="Nova senha (mín. 8 caracteres)"
+            placeholder="New password (min. 8 characters)"
             type="password"
-            hint="Mínimo de 8 caracteres"
+            hint="Minimum 8 characters"
             onSave={async (val) => {
-              if (val.length < 8) throw new Error("Senha precisa ter pelo menos 8 caracteres");
+              if (val.length < 8) throw new Error("Password must be at least 8 characters");
               const supabase = createClient();
               const { error } = await supabase.auth.updateUser({ password: val });
               if (error) throw error;
-              show("Senha alterada com sucesso!", "success");
+              show("Password changed successfully!", "success");
             }}
           />
         </div>
       </Section>
 
-      {/* ── Aparência ──────────────────────── */}
-      <Section title="Aparência">
-        <p className="text-xs text-[var(--numi-text-4)] mb-3">Tema</p>
+      {/* ── Appearance ──────────────────────── */}
+      <Section title="Appearance">
+        <p className="text-xs text-[var(--numi-text-4)] mb-3">Theme</p>
         <div className="grid grid-cols-3 gap-2">
           {(["dark", "light", "system"] as const).map((t) => {
             const meta = {
-              dark:   { label: "Escuro", icon: "🌙" },
-              light:  { label: "Claro",  icon: "☀️" },
-              system: { label: "Sistema", icon: "💻" },
+              dark:   { label: "Dark",   icon: "🌙" },
+              light:  { label: "Light",  icon: "☀️" },
+              system: { label: "System", icon: "💻" },
             }[t];
             const active = currentTheme === t;
             return (
@@ -269,9 +269,9 @@ export default function SettingsPage() {
                 onClick={() => handleTheme(t)}
                 className="py-3 px-2 rounded-xl text-sm font-medium flex flex-col items-center gap-2 transition-colors"
                 style={{
-                  background: active ? "rgba(52,211,153,0.1)" : "var(--numi-elevated)",
-                  border: `1px solid ${active ? "rgba(16,185,129,0.4)" : "var(--numi-border)"}`,
-                  color: active ? "var(--numi-income)" : "var(--numi-text-2)",
+                  background: active ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
+                  border: `1px solid ${active ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                  color: active ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
                 }}
               >
                 <span className="text-xl">{meta.icon}</span>
@@ -282,31 +282,31 @@ export default function SettingsPage() {
         </div>
       </Section>
 
-      {/* ── Preferências ───────────────────── */}
-      <Section title="Preferências">
+      {/* ── Preferences ───────────────────── */}
+      <Section title="Preferences">
         <div className="space-y-4">
-          <Row label="Moeda">
-            <span className="text-sm text-[var(--numi-text-2)]">{profile?.currency_code ?? "BRL"}</span>
+          <Row label="Currency">
+            <span className="text-sm text-[var(--numi-text-2)]">{profile?.currency_code ?? "USD"}</span>
           </Row>
-          <Row label="Idioma">
-            <span className="text-sm text-[var(--numi-text-2)]">Português (Brasil)</span>
+          <Row label="Language">
+            <span className="text-sm text-[var(--numi-text-2)]">English (US)</span>
           </Row>
         </div>
       </Section>
 
-      {/* ── Dados ──────────────────────────── */}
-      <Section title="Dados">
+      {/* ── Data ──────────────────────────── */}
+      <Section title="Data">
         <div className="space-y-3">
           <ActionRow
-            label="Exportar transações"
-            sub="CSV com todas as transações"
+            label="Export transactions"
+            sub="CSV with all transactions"
             right="↓ CSV"
             rightColor="var(--numi-income)"
             onClick={handleExport}
           />
           <ActionRow
-            label="Relatório completo"
-            sub="Contas + Metas + Transações do mês"
+            label="Full report"
+            sub="Accounts + Goals + Transactions this month"
             right="↓ CSV"
             rightColor="var(--numi-info)"
             onClick={handleFullReport}
@@ -314,25 +314,25 @@ export default function SettingsPage() {
         </div>
       </Section>
 
-      {/* ── Sobre ──────────────────────────── */}
-      <Section title="Sobre">
+      {/* ── About ──────────────────────────── */}
+      <Section title="About">
         <div className="space-y-3">
-          <Row label="Versão">
+          <Row label="Version">
             <span className="text-sm text-[var(--numi-text-2)]">1.0.0-beta</span>
           </Row>
-          <Row label="Banco de dados">
+          <Row label="Database">
             <span
               className="text-xs font-medium px-2.5 py-1 rounded-full"
               style={{ background: "rgba(16,185,129,0.15)", color: "var(--numi-income)" }}
             >
-              Supabase conectado
+              Supabase connected
             </span>
           </Row>
         </div>
       </Section>
 
-      {/* ── Conta ──────────────────────────── */}
-      <Section title="Conta">
+      {/* ── Account ──────────────────────────── */}
+      <Section title="Account">
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left"
@@ -349,20 +349,20 @@ export default function SettingsPage() {
           }
         >
           <LogoutIcon />
-          <span className="text-sm font-semibold">Sair da conta</span>
+          <span className="text-sm font-semibold">Log out</span>
         </button>
       </Section>
     </FadeIn>
   );
 }
 
-/* ── Sub-componentes ────────────────────────────── */
+/* ── Sub-components ────────────────────────────── */
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-8">
       <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">{title}</p>
-      <div className="rounded-2xl p-4" style={{ background: "var(--numi-surface)", border: "1px solid var(--numi-border)" }}>
+      <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}>
         {children}
       </div>
     </div>
@@ -404,7 +404,7 @@ function EditRow({
     try {
       await onSave(draft);
     } catch (e) {
-      show((e as Error).message || "Erro ao salvar", "error");
+      show((e as Error).message || "Error saving", "error");
     } finally {
       setLoading(false);
       setEditing(false);
@@ -424,26 +424,20 @@ function EditRow({
               onKeyDown={(e) => { if (e.key === "Enter") save(); if (e.key === "Escape") setEditing(false); }}
               placeholder={placeholder}
               autoFocus
-              className="px-3 py-1.5 rounded-lg text-sm outline-none max-w-[180px]"
-              style={{
-                background: "var(--numi-input-bg)",
-                border: "1px solid var(--numi-border)",
-                color: "var(--numi-text)",
-              }}
+              className="numi-landing-input px-3 py-1.5 max-w-[180px]"
             />
             <button
               onClick={save}
               disabled={loading}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-opacity"
-              style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
+              className="numi-pill-btn numi-pill-btn-accent text-xs px-3 py-1.5 disabled:opacity-60"
             >
-              {loading ? "…" : "Salvar"}
+              {loading ? "…" : "Save"}
             </button>
             <button
               onClick={() => setEditing(false)}
               className="text-xs text-[var(--numi-text-3)] hover:text-[var(--numi-text-2)] transition-colors"
             >
-              Cancelar
+              Cancel
             </button>
           </div>
         ) : (
@@ -451,9 +445,10 @@ function EditRow({
             <span className="text-sm text-[var(--numi-text-2)] truncate max-w-[160px]">{currentValue}</span>
             <button
               onClick={startEdit}
-              className="text-xs font-medium text-[var(--numi-income)] hover:opacity-80 transition-colors shrink-0"
+              className="text-xs font-medium hover:opacity-80 transition-colors shrink-0"
+              style={{ color: "var(--numi-landing-heading)" }}
             >
-              Editar
+              Edit
             </button>
           </div>
         )}
@@ -476,12 +471,12 @@ function ActionRow({
       onClick={onClick}
       disabled={disabled}
       className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed"
-      style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
-      onMouseEnter={(e) => { if (!disabled) (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)"; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--numi-border)"; }}
+      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
+      onMouseEnter={(e) => { if (!disabled) (e.currentTarget as HTMLElement).style.borderColor = "var(--numi-landing-accent)"; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(22, 50, 31, 0.08)"; }}
     >
       <div>
-        <p className="text-sm font-semibold text-[var(--numi-text)]">{label}</p>
+        <p className="text-sm font-semibold" style={{ color: "var(--numi-landing-heading)" }}>{label}</p>
         <p className="text-xs text-[var(--numi-text-3)] mt-0.5">{sub}</p>
       </div>
       <span className="text-sm font-medium shrink-0 ml-3" style={{ color: rightColor }}>{right}</span>

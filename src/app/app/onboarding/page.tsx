@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { OnboardingWizard } from "./OnboardingWizard";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Bem-vindo ao Numi" };
+export const metadata: Metadata = { title: "Welcome to Numi" };
 
 export default async function OnboardingPage() {
   const supabase = await createClient();

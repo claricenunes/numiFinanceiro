@@ -24,7 +24,7 @@ interface Props {
   locale?: "pt-BR" | "en-US";
 }
 
-export function FlowChart({ data, locale = "pt-BR" }: Props) {
+export function FlowChart({ data, locale = "en-US" }: Props) {
   const currency = locale === "en-US" ? "USD" : "BRL";
   const format = (value: number) => formatCurrency(value, currency, false, locale);
   const t =

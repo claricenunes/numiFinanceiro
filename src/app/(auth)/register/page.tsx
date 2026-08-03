@@ -9,17 +9,17 @@ import { createClient } from "@/lib/supabase/client";
 
 const schema = z
   .object({
-    fullName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-    email: z.string().email("E-mail inválido"),
+    fullName: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Invalid email"),
     password: z
       .string()
-      .min(8, "Mínimo 8 caracteres")
-      .regex(/[A-Z]/, "Deve conter letra maiúscula")
-      .regex(/[0-9]/, "Deve conter número"),
+      .min(8, "At least 8 characters")
+      .regex(/[A-Z]/, "Must contain an uppercase letter")
+      .regex(/[0-9]/, "Must contain a number"),
     confirmPassword: z.string(),
   })
   .refine((d) => d.password === d.confirmPassword, {
-    message: "As senhas não coincidem",
+    message: "Passwords don't match",
     path: ["confirmPassword"],
   });
 
@@ -52,8 +52,8 @@ export default function RegisterPage() {
     if (error) {
       setServerError(
         error.message.includes("already registered")
-          ? "Este e-mail já está cadastrado."
-          : "Erro ao criar conta. Tente novamente."
+          ? "This email is already registered."
+          : "Error creating account. Please try again."
       );
       return;
     }
@@ -73,16 +73,18 @@ export default function RegisterPage() {
   if (emailSent) {
     return (
       <div className="text-center">
-        <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center"
-             style={{ background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.3)" }}>
+        <div
+          className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
+          style={{ background: "color-mix(in srgb, var(--numi-landing-accent) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--numi-landing-accent) 35%, transparent)" }}
+        >
           <span className="text-2xl">✉️</span>
         </div>
-        <h2 className="text-xl font-bold text-[var(--numi-text)] mb-2">Confirme seu e-mail</h2>
+        <h2 className="text-xl font-bold mb-2" style={{ color: "var(--numi-landing-heading)" }}>Confirm your email</h2>
         <p className="text-sm text-[var(--numi-text-2)] mb-6">
-          Enviamos um link de confirmação para o seu e-mail. Clique nele para ativar sua conta.
+          We&apos;ve sent a confirmation link to your email. Click it to activate your account.
         </p>
-        <Link href="/login" className="text-sm text-[var(--numi-income)] hover:underline">
-          Voltar para o login
+        <Link href="/login" className="text-sm font-semibold hover:underline" style={{ color: "var(--numi-landing-tagline)" }}>
+          Back to login
         </Link>
       </div>
     );
@@ -90,70 +92,72 @@ export default function RegisterPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-[var(--numi-text)] mb-1">Criar conta</h1>
-      <p className="text-sm text-[var(--numi-text-2)] mb-6">Comece a organizar suas finanças hoje.</p>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1.5" style={{ color: "var(--numi-landing-heading)" }}>
+        Create account
+      </h1>
+      <p className="text-sm text-[var(--numi-text-2)] mb-7">Start organizing your finances today.</p>
 
       <button
         type="button"
         onClick={handleGoogleSignup}
         disabled={isGoogleLoading || isSubmitting}
-        className="btn-outline mb-4"
+        className="numi-pill-btn numi-pill-btn-outline-dark w-full mb-5 gap-2 py-3"
       >
         <GoogleIcon />
-        {isGoogleLoading ? "Redirecionando…" : "Continuar com Google"}
+        {isGoogleLoading ? "Redirecting…" : "Continue with Google"}
       </button>
 
-      <div className="flex items-center gap-3 mb-4">
-        <div className="flex-1 h-px bg-[var(--numi-border)]" />
-        <span className="text-xs text-[var(--numi-text-3)]">ou com e-mail</span>
-        <div className="flex-1 h-px bg-[var(--numi-border)]" />
+      <div className="flex items-center gap-3 mb-5">
+        <div className="flex-1 h-px" style={{ background: "rgba(22, 50, 31, 0.12)" }} />
+        <span className="text-xs text-[var(--numi-text-3)]">or with email</span>
+        <div className="flex-1 h-px" style={{ background: "rgba(22, 50, 31, 0.12)" }} />
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
-        <Field label="Nome completo" error={errors.fullName?.message}>
+        <Field label="Full name" error={errors.fullName?.message}>
           <input
             id="fullName"
             type="text"
             autoComplete="name"
-            placeholder="Seu nome"
-            className="input-base"
+            placeholder="Your name"
+            className="numi-landing-input"
             aria-invalid={!!errors.fullName}
             {...register("fullName")}
           />
         </Field>
 
-        <Field label="E-mail" error={errors.email?.message}>
+        <Field label="Email" error={errors.email?.message}>
           <input
             id="email"
             type="email"
             autoComplete="email"
-            placeholder="voce@email.com"
-            className="input-base"
+            placeholder="you@email.com"
+            className="numi-landing-input"
             aria-invalid={!!errors.email}
             {...register("email")}
           />
         </Field>
 
-        <Field label="Senha" error={errors.password?.message}
-               hint="Mínimo 8 caracteres, 1 maiúscula e 1 número">
+        <Field label="Password" error={errors.password?.message}
+               hint="At least 8 characters, 1 uppercase letter and 1 number">
           <input
             id="password"
             type="password"
             autoComplete="new-password"
             placeholder="••••••••"
-            className="input-base"
+            className="numi-landing-input"
             aria-invalid={!!errors.password}
             {...register("password")}
           />
         </Field>
 
-        <Field label="Confirmar senha" error={errors.confirmPassword?.message}>
+        <Field label="Confirm password" error={errors.confirmPassword?.message}>
           <input
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
             placeholder="••••••••"
-            className="input-base"
+            className="numi-landing-input"
             aria-invalid={!!errors.confirmPassword}
             {...register("confirmPassword")}
           />
@@ -162,8 +166,8 @@ export default function RegisterPage() {
         {serverError && (
           <div
             role="alert"
-            className="rounded-lg px-4 py-3 text-sm text-[var(--numi-expense)]"
-            style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}
+            className="rounded-2xl px-4 py-3 text-sm text-[var(--numi-expense)]"
+            style={{ background: "rgba(217, 83, 79, 0.08)", border: "1px solid rgba(217, 83, 79, 0.2)" }}
           >
             {serverError}
           </div>
@@ -172,16 +176,16 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={isSubmitting || isGoogleLoading}
-          className="btn-primary mt-1"
+          className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full mt-1 py-3 text-base disabled:opacity-60 disabled:pointer-events-none"
         >
-          {isSubmitting ? "Criando conta…" : "Criar conta"}
+          {isSubmitting ? "Creating account…" : "Create account"}
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-[var(--numi-text-2)]">
-        Já tem conta?{" "}
-        <Link href="/login" className="text-[var(--numi-income)] font-medium hover:underline">
-          Entrar
+        Already have an account?{" "}
+        <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--numi-landing-tagline)" }}>
+          Sign in
         </Link>
       </p>
     </>
@@ -201,7 +205,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-[var(--numi-text-2)]">{label}</label>
+      <label className="text-sm font-medium" style={{ color: "var(--numi-landing-heading)" }}>{label}</label>
       {children}
       {hint && !error && <span className="text-xs text-[var(--numi-text-3)]">{hint}</span>}
       {error && <span className="text-xs text-[var(--numi-expense)]">{error}</span>}

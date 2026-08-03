@@ -15,7 +15,7 @@ export function BudgetCardActions({
   categoryName: string;
 }) {
   const [editing,    setEditing]    = useState(false);
-  const [newAmount,  setNewAmount]  = useState(budgeted.toFixed(2).replace(".", ","));
+  const [newAmount,  setNewAmount]  = useState(budgeted.toFixed(2));
   const [loading,    setLoading]    = useState(false);
   const [confirmDel, setConfirmDel] = useState(false);
   const router  = useRouter();
@@ -24,7 +24,7 @@ export function BudgetCardActions({
   async function handleEdit(e: React.FormEvent) {
     e.preventDefault();
     const amount = parseFloat(newAmount.replace(",", "."));
-    if (!amount || amount <= 0) { show("Valor inválido", "error"); return; }
+    if (!amount || amount <= 0) { show("Invalid amount", "error"); return; }
     setLoading(true);
     const supabase = createClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,8 +32,8 @@ export function BudgetCardActions({
       .update({ amount, updated_at: new Date().toISOString() })
       .eq("id", budgetId);
     setLoading(false);
-    if (error) { show("Erro: " + error.message, "error"); return; }
-    show("Limite atualizado!", "success");
+    if (error) { show("Error: " + error.message, "error"); return; }
+    show("Limit updated!", "success");
     setEditing(false);
     router.refresh();
   }
@@ -46,8 +46,8 @@ export function BudgetCardActions({
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", budgetId);
     setLoading(false);
-    if (error) { show("Erro: " + error.message, "error"); return; }
-    show("Orçamento removido", "success");
+    if (error) { show("Error: " + error.message, "error"); return; }
+    show("Budget removed", "success");
     router.refresh();
   }
 
@@ -56,33 +56,31 @@ export function BudgetCardActions({
       <form
         onSubmit={handleEdit}
         className="mt-3 pt-3 flex gap-2 items-center"
-        style={{ borderTop: "1px solid var(--numi-border)" }}
+        style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}
       >
-        <span className="text-xs text-[var(--numi-text-4)] shrink-0">Novo limite:</span>
+        <span className="text-xs text-[var(--numi-text-3)] shrink-0">New limit:</span>
         <input
           value={newAmount}
           onChange={e => setNewAmount(e.target.value)}
           type="text"
           inputMode="decimal"
           autoFocus
-          className="flex-1 px-2.5 py-1.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-          style={{ border: "1px solid rgba(16,185,129,0.4)", background: "var(--numi-input-bg)" }}
+          className="flex-1 numi-landing-input py-1.5"
         />
         <button
           type="submit"
           disabled={loading}
-          className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}
+          className="numi-pill-btn numi-pill-btn-accent text-xs px-3 py-1.5 disabled:opacity-60 disabled:pointer-events-none"
         >
-          {loading ? "..." : "Salvar"}
+          {loading ? "..." : "Save"}
         </button>
         <button
           type="button"
-          onClick={() => { setEditing(false); setNewAmount(budgeted.toFixed(2).replace(".", ",")); }}
+          onClick={() => { setEditing(false); setNewAmount(budgeted.toFixed(2)); }}
           className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "var(--numi-border)", color: "var(--numi-text-2)" }}
+          style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}
         >
-          Cancelar
+          Cancel
         </button>
       </form>
     );
@@ -92,10 +90,10 @@ export function BudgetCardActions({
     return (
       <div
         className="mt-3 pt-3 flex gap-2 items-center"
-        style={{ borderTop: "1px solid var(--numi-border)" }}
+        style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}
       >
         <span className="text-xs flex-1" style={{ color: "var(--numi-expense)" }}>
-          Remover "{categoryName}"?
+          Remove &quot;{categoryName}&quot;?
         </span>
         <button
           onClick={handleDelete}
@@ -103,34 +101,34 @@ export function BudgetCardActions({
           className="text-xs font-semibold px-3 py-1.5 rounded-lg"
           style={{ background: "rgba(239,68,68,0.14)", color: "var(--numi-expense)", opacity: loading ? 0.6 : 1 }}
         >
-          {loading ? "..." : "Remover"}
+          {loading ? "..." : "Remove"}
         </button>
         <button
           onClick={() => setConfirmDel(false)}
           className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "var(--numi-border)", color: "var(--numi-text-2)" }}
+          style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}
         >
-          Cancelar
+          Cancel
         </button>
       </div>
     );
   }
 
   return (
-    <div className="mt-3 pt-3 flex gap-2" style={{ borderTop: "1px solid var(--numi-border)" }}>
+    <div className="mt-3 pt-3 flex gap-2" style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}>
       <button
         onClick={() => setEditing(true)}
         className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-        style={{ background: "var(--numi-border)", color: "var(--numi-text-2)" }}
+        style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}
       >
-        ✏️ Editar limite
+        ✏️ Edit limit
       </button>
       <button
         onClick={() => setConfirmDel(true)}
         className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
         style={{ background: "rgba(239,68,68,0.07)", color: "var(--numi-expense)" }}
       >
-        🗑 Remover
+        🗑 Remove
       </button>
     </div>
   );

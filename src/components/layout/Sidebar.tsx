@@ -8,14 +8,14 @@ import { useRouter } from "next/navigation";
 
 const NAV = [
   { label: "Dashboard",     href: "/app/dashboard",     icon: DashboardIcon },
-  { label: "Contas",        href: "/app/contas",        icon: AccountsIcon },
-  { label: "Transações",    href: "/app/transacoes",    icon: TransactionsIcon },
-  { label: "Orçamento",     href: "/app/orcamento",     icon: BudgetIcon },
-  { label: "Metas",         href: "/app/metas",         icon: GoalsIcon },
-  { label: "Investimentos", href: "/app/investimentos", icon: InvestmentsIcon },
+  { label: "Accounts",      href: "/app/contas",        icon: AccountsIcon },
+  { label: "Transactions",  href: "/app/transacoes",    icon: TransactionsIcon },
+  { label: "Budget",        href: "/app/orcamento",     icon: BudgetIcon },
+  { label: "Goals",         href: "/app/metas",         icon: GoalsIcon },
+  { label: "Investments",   href: "/app/investimentos", icon: InvestmentsIcon },
   { label: "Insights",      href: "/app/insights",      icon: InsightsIcon },
-  { label: "IA Financeira", href: "/app/fia",           icon: FIAIcon },
-  { label: "Notificações",  href: "/app/notificacoes",  icon: BellIcon, badge: true },
+  { label: "Financial AI",  href: "/app/fia",           icon: FIAIcon },
+  { label: "Notifications", href: "/app/notificacoes",  icon: BellIcon, badge: true },
 ];
 
 interface Props {
@@ -41,24 +41,30 @@ export function Sidebar({ userName, userAvatar, notifCount = 0 }: Props) {
       className="hidden lg:flex flex-col h-full transition-all duration-300"
       style={{
         width: sidebarOpen ? "240px" : "64px",
-        background: "var(--numi-elevated)",
-        borderRight: "1px solid var(--numi-border)",
+        background: "#FFFFFF",
+        borderRight: "1px solid rgba(22, 50, 31, 0.08)",
         flexShrink: 0,
       }}
     >
       {/* Logo */}
       <div
         className="flex items-center gap-3 px-4 py-5"
-        style={{ borderBottom: "1px solid var(--numi-border)", minHeight: "64px" }}
+        style={{ borderBottom: "1px solid rgba(22, 50, 31, 0.08)", minHeight: "64px" }}
       >
-        <span
-          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.3)" }}
-        >
-          <span className="w-3 h-3 rounded-full bg-[var(--numi-income)] block" />
-        </span>
-        {sidebarOpen && (
-          <span className="text-base font-semibold text-[var(--numi-text)] tracking-tight">Numi</span>
+        {sidebarOpen ? (
+          <span
+            className="text-3xl leading-none"
+            style={{ color: "var(--numi-landing-heading)", fontFamily: "var(--font-logo)" }}
+          >
+            numi
+          </span>
+        ) : (
+          <span
+            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+            style={{ background: "var(--numi-landing-nav-bg)" }}
+          >
+            N
+          </span>
         )}
       </div>
 
@@ -74,12 +80,12 @@ export function Sidebar({ userName, userAvatar, notifCount = 0 }: Props) {
               title={!sidebarOpen ? label : undefined}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150"
               style={{
-                background: active ? "rgba(52,211,153,0.1)" : "transparent",
-                color: active ? "var(--numi-income)" : "var(--numi-text-2)",
+                background: active ? "color-mix(in srgb, var(--numi-landing-heading) 8%, transparent)" : "transparent",
+                color: active ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
               }}
               onMouseEnter={(e) => {
-                if (!active) (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-text) 6%, transparent)";
-                if (!active) (e.currentTarget as HTMLElement).style.color = "var(--numi-text)";
+                if (!active) (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-landing-heading) 5%, transparent)";
+                if (!active) (e.currentTarget as HTMLElement).style.color = "var(--numi-landing-heading)";
               }}
               onMouseLeave={(e) => {
                 if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
@@ -103,7 +109,7 @@ export function Sidebar({ userName, userAvatar, notifCount = 0 }: Props) {
                 <span className="text-sm font-medium truncate flex-1">{label}</span>
               )}
               {active && sidebarOpen && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--numi-income)] flex-shrink-0" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "var(--numi-landing-accent)" }} />
               )}
             </Link>
           );
@@ -111,30 +117,30 @@ export function Sidebar({ userName, userAvatar, notifCount = 0 }: Props) {
       </nav>
 
       {/* Footer */}
-      <div className="px-2 py-4" style={{ borderTop: "1px solid var(--numi-border)" }}>
+      <div className="px-2 py-4" style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}>
         <Link
           href="/app/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--numi-text-2)] hover:text-[var(--numi-text)] transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--numi-text-2)] transition-colors"
           style={{ background: "transparent" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-text) 6%, transparent)"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-landing-heading) 5%, transparent)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-landing-heading)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text-2)"; }}
         >
           <SettingsIcon className="w-5 h-5 flex-shrink-0" />
-          {sidebarOpen && <span className="text-sm font-medium">Configurações</span>}
+          {sidebarOpen && <span className="text-sm font-medium">Settings</span>}
         </Link>
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--numi-text-2)] hover:bg-[var(--numi-expense)]/10 hover:text-[var(--numi-expense)] transition-colors"
         >
           <LogoutIcon className="w-5 h-5 flex-shrink-0" />
-          {sidebarOpen && <span className="text-sm font-medium">Sair</span>}
+          {sidebarOpen && <span className="text-sm font-medium">Log out</span>}
         </button>
       </div>
     </aside>
   );
 }
 
-// ── Ícones inline (Lucide-style) ──────────────────────────────
+// ── Inline icons (Lucide-style) ──────────────────────────────
 function DashboardIcon({ className }: { className?: string }) {
   return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>;
 }

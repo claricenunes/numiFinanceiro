@@ -64,8 +64,8 @@ export function Modal({
   }, [onClose]);
 
   const merged: React.CSSProperties = {
-    background:  "var(--numi-modal)",
-    border:      "1px solid var(--numi-border)",
+    background:  "#FFFDF9",
+    border:      "1px solid rgba(22, 50, 31, 0.08)",
     maxHeight:   "92dvh",
     overflowY:   "auto",
     ...panelStyle,
@@ -93,13 +93,13 @@ export function Modal({
       >
         {/* Header row */}
         <div className="flex items-center justify-between">
-          <h2 id={titleId} className="text-base font-semibold text-[var(--numi-text)]">
+          <h2 id={titleId} className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>
             {title}
           </h2>
           <button
             onClick={onClose}
-            aria-label="Fechar"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] transition-colors"
+            aria-label="Close"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)] transition-colors"
           >
             ✕
           </button>

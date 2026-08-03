@@ -16,9 +16,9 @@ interface SysCategory {
 }
 
 const TYPE_LABELS: Record<TxType, string> = {
-  income:   "Receita",
-  expense:  "Despesa",
-  transfer: "Transferência",
+  income:   "Income",
+  expense:  "Expense",
+  transfer: "Transfer",
 };
 
 export function QuickAddModal() {
@@ -79,8 +79,8 @@ export function QuickAddModal() {
       ]);
       let userCats = (userCatRes.data ?? []) as Category[];
 
-      // Sem categorias próprias ainda — copia as do sistema para o usuário,
-      // já que transactions.category_id só aceita ids de user_categories.
+      // No categories of their own yet — copy the system ones over for the
+      // user, since transactions.category_id only accepts user_categories ids.
       if (userCats.length === 0) {
         const { data: { user } } = await supabase.auth.getUser();
         const { data: sysCatsRaw } = await supabase
@@ -146,11 +146,11 @@ export function QuickAddModal() {
 
     const parsed = parseFloat(amount.replace(",", "."));
     if (!parsed || parsed <= 0) {
-      show("Informe um valor válido", "error");
+      show("Enter a valid amount", "error");
       return;
     }
     if (!accountId) {
-      show("Selecione uma conta", "error");
+      show("Select an account", "error");
       return;
     }
 
@@ -159,16 +159,16 @@ export function QuickAddModal() {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      show("Sessão expirada. Faça login novamente.", "error");
+      show("Session expired. Please log in again.", "error");
       setLoading(false);
       return;
     }
 
-    // Parcelado: cria N transações com o mesmo installment_group_id
+    // Installments: creates N transactions sharing the same installment_group_id
     if (installment && type === "expense") {
       const n = Math.max(2, Math.min(48, parseInt(numParcelas, 10) || 2));
       const groupId = crypto.randomUUID();
-      const baseDesc = description.trim() || "Compra parcelada";
+      const baseDesc = description.trim() || "Installment purchase";
       const parcel = Math.floor((parsed / n) * 100) / 100;
       const lastParcel = Math.round((parsed - parcel * (n - 1)) * 100) / 100;
 
@@ -191,8 +191,8 @@ export function QuickAddModal() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.from("transactions") as any).insert(rows);
       setLoading(false);
-      if (error) { show("Erro ao salvar parcelas: " + error.message, "error"); return; }
-      show(`${n} parcelas de ${formatCurrency(parcel)} adicionadas!`, "success");
+      if (error) { show("Error saving installments: " + error.message, "error"); return; }
+      show(`${n} installments of ${formatCurrency(parcel)} added!`, "success");
       handleClose();
       router.refresh();
       return;
@@ -215,11 +215,11 @@ export function QuickAddModal() {
     setLoading(false);
 
     if (error) {
-      show("Erro ao salvar transação: " + error.message, "error");
+      show("Error saving transaction: " + error.message, "error");
       return;
     }
 
-    show("Transação adicionada!", "success");
+    show("Transaction added!", "success");
     handleClose();
     router.refresh();
   }
@@ -246,22 +246,22 @@ export function QuickAddModal() {
       <div
         ref={panelRef}
         className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-        style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)", maxHeight: "92dvh", overflowY: "auto" }}
+        style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)", maxHeight: "92dvh", overflowY: "auto" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 id="quick-add-title" className="text-base font-semibold text-[var(--numi-text)]">Nova transação</h2>
+          <h2 id="quick-add-title" className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>New transaction</h2>
           <button
             onClick={handleClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] transition-colors"
-            aria-label="Fechar"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)] transition-colors"
+            aria-label="Close"
           >
             <XIcon />
           </button>
         </div>
 
         {/* Type toggle */}
-        <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid var(--numi-border)" }}>
+        <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(22, 50, 31, 0.12)" }}>
           {types.map((t) => (
             <button
               key={t}
@@ -285,45 +285,43 @@ export function QuickAddModal() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           {/* Amount */}
           <div>
-            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Valor (R$)</label>
+            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Amount ($)</label>
             <input
               ref={amountRef}
               type="text"
               inputMode="decimal"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="0,00"
+              placeholder="0.00"
               required
-              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm bg-transparent outline-none"
-              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
+              className="numi-landing-input"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Descrição</label>
+            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Description</label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Ex: Mercado, Salário..."
-              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
+              placeholder="e.g. Groceries, Paycheck..."
+              className="numi-landing-input"
             />
           </div>
 
           {/* Date */}
           <div>
-            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">
-              {installment ? "Data da 1ª parcela" : "Data"}
+            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>
+              {installment ? "Date of 1st installment" : "Date"}
             </label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
-              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)", colorScheme: "light" }}
+              className="numi-landing-input"
+              style={{ colorScheme: "light" }}
             />
           </div>
 
@@ -331,7 +329,7 @@ export function QuickAddModal() {
           {type === "expense" && (
             <div
               className="rounded-xl p-3 flex flex-col gap-3"
-              style={{ background: installment ? "rgba(99,102,241,0.08)" : "var(--numi-input-bg)", border: `1px solid ${installment ? "#6366F144" : "var(--numi-border)"}`, transition: "all 0.15s" }}
+              style={{ background: installment ? "rgba(99,102,241,0.08)" : "#FFFFFF", border: `1px solid ${installment ? "#6366F144" : "rgba(22, 50, 31, 0.12)"}`, transition: "all 0.15s" }}
             >
               <button
                 type="button"
@@ -340,12 +338,12 @@ export function QuickAddModal() {
               >
                 <div className="flex items-center gap-2">
                   <span className="text-base">💳</span>
-                  <span className="text-sm font-medium text-[var(--numi-text)]">Parcelado</span>
+                  <span className="text-sm font-medium" style={{ color: "var(--numi-landing-heading)" }}>Installments</span>
                 </div>
                 {/* Toggle pill */}
                 <span
                   className="relative inline-flex items-center w-9 h-5 rounded-full transition-colors shrink-0"
-                  style={{ background: installment ? "#6366F1" : "var(--numi-border)" }}
+                  style={{ background: installment ? "#6366F1" : "rgba(22, 50, 31, 0.15)" }}
                 >
                   <span
                     className="absolute w-3.5 h-3.5 rounded-full bg-white transition-transform"
@@ -357,13 +355,13 @@ export function QuickAddModal() {
               {installment && (
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
-                    <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Número de parcelas</label>
+                    <label className="text-xs font-medium text-[var(--numi-text-3)] mb-1.5 block">Number of installments</label>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => setNumParcelas((v) => String(Math.max(2, parseInt(v, 10) - 1)))}
-                        className="w-8 h-8 rounded-lg text-[var(--numi-text)] font-bold flex items-center justify-center shrink-0"
-                        style={{ background: "var(--numi-border)" }}
+                        className="w-8 h-8 rounded-lg font-bold flex items-center justify-center shrink-0"
+                        style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}
                       >
                         −
                       </button>
@@ -373,14 +371,14 @@ export function QuickAddModal() {
                         max={48}
                         value={numParcelas}
                         onChange={(e) => setNumParcelas(e.target.value)}
-                        className="flex-1 px-3 py-2 rounded-lg text-[var(--numi-text)] text-sm text-center outline-none"
-                        style={{ border: "1px solid #6366F144", background: "var(--numi-input-bg)" }}
+                        className="flex-1 px-3 py-2 rounded-lg text-sm text-center outline-none"
+                        style={{ border: "1px solid #6366F144", background: "#FFFFFF", color: "var(--numi-landing-heading)" }}
                       />
                       <button
                         type="button"
                         onClick={() => setNumParcelas((v) => String(Math.min(48, parseInt(v, 10) + 1)))}
-                        className="w-8 h-8 rounded-lg text-[var(--numi-text)] font-bold flex items-center justify-center shrink-0"
-                        style={{ background: "var(--numi-border)" }}
+                        className="w-8 h-8 rounded-lg font-bold flex items-center justify-center shrink-0"
+                        style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}
                       >
                         +
                       </button>
@@ -388,7 +386,7 @@ export function QuickAddModal() {
                   </div>
                   {amount && parseFloat(amount.replace(",", ".")) > 0 && (
                     <div className="text-right shrink-0">
-                      <p className="text-xs text-[var(--numi-text-4)]">por parcela</p>
+                      <p className="text-xs text-[var(--numi-text-3)]">per installment</p>
                       <p className="text-sm font-bold" style={{ color: "#818CF8" }}>
                         {formatCurrency(parseFloat(amount.replace(",", ".")) / (parseInt(numParcelas, 10) || 2))}
                       </p>
@@ -401,17 +399,16 @@ export function QuickAddModal() {
 
           {/* Account */}
           <div>
-            <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">
-              {type === "transfer" ? "Conta de origem" : "Conta"}
+            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>
+              {type === "transfer" ? "From account" : "Account"}
             </label>
             <select
               value={accountId}
               onChange={(e) => setAccountId(e.target.value)}
               required
-              className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-              style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
+              className="numi-landing-input"
             >
-              <option value="">Selecionar conta</option>
+              <option value="">Select account</option>
               {accounts.map((a) => (
                 <option key={a.id} value={a.id}>{a.name}</option>
               ))}
@@ -421,14 +418,13 @@ export function QuickAddModal() {
           {/* Destination account (transfer only) */}
           {type === "transfer" && (
             <div>
-              <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Conta de destino</label>
+              <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>To account</label>
               <select
                 value={toAccountId}
                 onChange={(e) => setToAccountId(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
+                className="numi-landing-input"
               >
-                <option value="">Selecionar conta</option>
+                <option value="">Select account</option>
                 {accounts.filter((a) => a.id !== accountId).map((a) => (
                   <option key={a.id} value={a.id}>{a.name}</option>
                 ))}
@@ -439,14 +435,13 @@ export function QuickAddModal() {
           {/* Category (not for transfers) */}
           {type !== "transfer" && (
             <div>
-              <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Categoria</label>
+              <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Category</label>
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }}
+                className="numi-landing-input"
               >
-                <option value="">Sem categoria</option>
+                <option value="">No category</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.icon ? c.icon + " " : ""}{c.name}
@@ -467,10 +462,10 @@ export function QuickAddModal() {
             }}
           >
             {loading
-              ? "Salvando..."
+              ? "Saving..."
               : installment
-                ? `Parcelar em ${numParcelas}x`
-                : "Adicionar"}
+                ? `Split into ${numParcelas}x`
+                : "Add"}
           </button>
         </form>
       </div>

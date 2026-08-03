@@ -21,13 +21,13 @@ const SEVERITY_COLOR: Record<string, string> = {
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60_000);
-  if (mins < 1)  return "agora";
-  if (mins < 60) return `${mins}m atrás`;
+  if (mins < 1)  return "now";
+  if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24)  return `${hrs}h atrás`;
+  if (hrs < 24)  return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days}d atrás`;
-  return new Date(dateStr).toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
+  if (days < 30) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString("en-US", { day: "numeric", month: "short" });
 }
 
 interface Props { notifications: Notification[] }
@@ -48,7 +48,7 @@ export function NotificationsView({ notifications: initial }: Props) {
     await (supabase.from("financial_events") as any).update({ is_read: true }).eq("is_read", false);
     setItems((prev) => prev.map((n) => ({ ...n, is_read: true })));
     setLoading(false);
-    show("Todas marcadas como lidas", "success");
+    show("All marked as read", "success");
     router.refresh();
   }
 
@@ -64,9 +64,9 @@ export function NotificationsView({ notifications: initial }: Props) {
     return (
       <div className="text-center py-24">
         <p className="text-4xl mb-3">🔔</p>
-        <p className="text-[var(--numi-text-2)] font-medium">Nenhuma notificação</p>
+        <p className="text-[var(--numi-text-2)] font-medium">No notifications</p>
         <p className="text-sm text-[var(--numi-text-3)] mt-1">
-          Você receberá alertas sobre orçamentos, metas e movimentações importantes
+          You&apos;ll get alerts about budgets, goals and important transactions
         </p>
       </div>
     );
@@ -77,29 +77,31 @@ export function NotificationsView({ notifications: initial }: Props) {
       {unreadCount > 0 && (
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-[var(--numi-text-4)]">
-            {unreadCount} não lida{unreadCount !== 1 ? "s" : ""}
+            {unreadCount} unread
           </p>
           <button
             onClick={markAllRead}
             disabled={loading}
-            className="text-xs font-medium text-[var(--numi-income)] hover:opacity-80 transition-colors disabled:opacity-50"
+            className="text-xs font-medium hover:opacity-80 transition-colors disabled:opacity-50"
+            style={{ color: "var(--numi-landing-heading)" }}
           >
-            Marcar tudo como lido
+            Mark all as read
           </button>
         </div>
       )}
 
       <div className="flex flex-col gap-2">
         {items.map((n) => {
-          const color = SEVERITY_COLOR[n.severity] ?? "var(--numi-income)";
+          const color = SEVERITY_COLOR[n.severity] ?? "var(--numi-info)";
           return (
             <div
               key={n.id}
               onClick={() => !n.is_read && markOneRead(n.id)}
               className="rounded-2xl p-4 transition-colors"
               style={{
-                background: n.is_read ? "var(--numi-elevated)" : "color-mix(in srgb, var(--numi-info) 6%, var(--numi-elevated))",
-                border:     `1px solid ${n.is_read ? "var(--numi-border)" : "rgba(59,130,246,0.3)"}`,
+                background: n.is_read ? "#FFFFFF" : "color-mix(in srgb, var(--numi-info) 6%, #FFFFFF)",
+                border:     `1px solid ${n.is_read ? "rgba(22, 50, 31, 0.08)" : "rgba(59,130,246,0.3)"}`,
+                boxShadow:  "0 8px 20px -12px rgba(22, 50, 31, 0.15)",
                 cursor:     n.is_read ? "default" : "pointer",
               }}
             >
@@ -109,7 +111,7 @@ export function NotificationsView({ notifications: initial }: Props) {
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-[var(--numi-text)] leading-tight">{n.title}</p>
+                    <p className="text-sm font-semibold leading-tight" style={{ color: "var(--numi-landing-heading)" }}>{n.title}</p>
                     {!n.is_read && (
                       <span
                         className="w-2 h-2 rounded-full flex-shrink-0"

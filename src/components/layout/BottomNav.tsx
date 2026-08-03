@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import { useUIStore } from "@/stores/useUIStore";
 
 const NAV = [
-  { label: "Início",   href: "/app/dashboard",    icon: HomeIcon },
-  { label: "Contas",   href: "/app/contas",       icon: CardIcon },
-  { label: "Orçamento",href: "/app/orcamento",    icon: ChartIcon },
-  { label: "Metas",    href: "/app/metas",        icon: TargetIcon },
-  { label: "Investir", href: "/app/investimentos",icon: TrendIcon },
+  { label: "Home",     href: "/app/dashboard",     icon: HomeIcon },
+  { label: "Accounts", href: "/app/contas",        icon: CardIcon },
+  { label: "Budget",   href: "/app/orcamento",     icon: ChartIcon },
+  { label: "Goals",    href: "/app/metas",         icon: TargetIcon },
+  { label: "Invest",   href: "/app/investimentos", icon: TrendIcon },
 ];
 
 export function BottomNav() {
@@ -20,24 +20,24 @@ export function BottomNav() {
     <nav
       className="lg:hidden fixed bottom-0 inset-x-0 z-50 flex items-center justify-around px-2 pb-safe"
       style={{
-        background: "color-mix(in srgb, var(--numi-bg) 92%, transparent)",
+        background: "color-mix(in srgb, #FFFFFF 92%, transparent)",
         backdropFilter: "blur(12px)",
-        borderTop: "1px solid var(--numi-border)",
+        borderTop: "1px solid rgba(22, 50, 31, 0.08)",
         height: "64px",
       }}
     >
       {NAV.map(({ label, href, icon: Icon }, i) => {
         const active = pathname === href || pathname.startsWith(href + "/");
 
-        // FAB no centro
+        // Center FAB
         if (i === 2) {
           return (
             <div key="fab" className="flex flex-col items-center gap-1">
               <button
                 onClick={() => openQuickAdd("expense")}
-                className="w-12 h-12 rounded-full flex items-center justify-center text-[#0B1020] font-bold text-xl shadow-lg transition-transform active:scale-95"
-                style={{ background: "var(--numi-income)", boxShadow: "0 4px 20px rgba(52,211,153,0.4)" }}
-                aria-label="Nova transação"
+                className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl shadow-lg transition-transform active:scale-95"
+                style={{ background: "var(--numi-landing-accent)", color: "var(--numi-landing-accent-text)", boxShadow: "0 4px 20px rgba(226, 137, 107, 0.45)" }}
+                aria-label="New transaction"
               >
                 +
               </button>
@@ -50,7 +50,7 @@ export function BottomNav() {
             key={href}
             href={href}
             className="flex flex-col items-center gap-1 min-w-[48px] transition-colors"
-            style={{ color: active ? "var(--numi-income)" : "var(--numi-text-3)" }}
+            style={{ color: active ? "var(--numi-landing-heading)" : "var(--numi-text-3)" }}
           >
             <Icon className="w-5 h-5" />
             <span className="text-[10px] font-medium">{label}</span>

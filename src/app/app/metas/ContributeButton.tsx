@@ -19,12 +19,12 @@ export function ContributeButton({ goalId, goalName }: { goalId: string; goalNam
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = parseFloat(amount.replace(",", "."));
-    if (!parsed || parsed <= 0) { show("Informe um valor válido", "error"); return; }
+    if (!parsed || parsed <= 0) { show("Enter a valid amount", "error"); return; }
 
     setLoading(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { show("Sessão expirada", "error"); setLoading(false); return; }
+    if (!user) { show("Session expired", "error"); setLoading(false); return; }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase.from("goal_contributions") as any).insert({
@@ -36,9 +36,9 @@ export function ContributeButton({ goalId, goalName }: { goalId: string; goalNam
       notes:         notes.trim() || null,
     });
     setLoading(false);
-    if (error) { show("Erro: " + error.message, "error"); return; }
+    if (error) { show("Error: " + error.message, "error"); return; }
 
-    show("Aporte registrado!", "success");
+    show("Contribution recorded!", "success");
     setOpen(false);
     reset();
     router.refresh();
@@ -49,9 +49,9 @@ export function ContributeButton({ goalId, goalName }: { goalId: string; goalNam
       <button
         onClick={() => setOpen(true)}
         className="text-sm font-semibold px-4 py-1.5 rounded-xl"
-        style={{ background: "var(--numi-border)", color: "var(--numi-text)" }}
+        style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}
       >
-        + Registrar aporte
+        + Add contribution
       </button>
 
       {open && (
@@ -60,44 +60,41 @@ export function ContributeButton({ goalId, goalName }: { goalId: string; goalNam
 
           <div
             className="relative w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)" }}
+            style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)" }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold text-[var(--numi-text)]">Registrar Aporte</h2>
+                <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>Add Contribution</h2>
                 <p className="text-xs text-[var(--numi-text-3)] mt-0.5">{goalName}</p>
               </div>
               <button onClick={() => { setOpen(false); reset(); }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Valor (R$)</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Amount ($)</label>
                 <input
                   value={amount} onChange={e => setAmount(e.target.value)}
-                  type="text" inputMode="decimal" placeholder="0,00" required autoFocus
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                  type="text" inputMode="decimal" placeholder="0.00" required autoFocus
+                  className="numi-landing-input" />
               </div>
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Data</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Date</label>
                 <input value={date} onChange={e => setDate(e.target.value)} type="date" required
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)", colorScheme: "light" }} />
+                  className="numi-landing-input"
+                  style={{ colorScheme: "light" }} />
               </div>
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Observação (opcional)</label>
-                <input value={notes} onChange={e => setNotes(e.target.value)} placeholder="Ex: Aporte de dezembro"
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Note (optional)</label>
+                <input value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. December contribution"
+                  className="numi-landing-input" />
               </div>
               <button type="submit" disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
-                {loading ? "Salvando..." : "Registrar"}
+                className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base mt-1 disabled:opacity-60 disabled:pointer-events-none">
+                {loading ? "Saving..." : "Add"}
               </button>
             </form>
           </div>

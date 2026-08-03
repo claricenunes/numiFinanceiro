@@ -6,7 +6,7 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import { formatCurrency } from "@/lib/utils/currency";
 import type { FIAAnalysis, AllocationItem } from "@/types/fia";
 
-/* ── Paleta ──────────────────────────────────────────── */
+/* ── Palette ──────────────────────────────────────────── */
 const ASSET_COLOR: Record<string, string> = {
   stock:        "#34D399",
   etf:          "#38BDF8",
@@ -20,9 +20,9 @@ const ASSET_ICON: Record<string, string> = {
 };
 
 function riskLabel(n: number): string {
-  if (n <= 30) return "baixo";
-  if (n <= 60) return "médio";
-  return "alto";
+  if (n <= 30) return "low";
+  if (n <= 60) return "medium";
+  return "high";
 }
 
 function riskColor(n: number): string {
@@ -31,7 +31,7 @@ function riskColor(n: number): string {
   return "var(--numi-expense)";
 }
 
-/* ── Componentes auxiliares ──────────────────────────── */
+/* ── Helper components ──────────────────────────── */
 
 function ScoreRing({ score }: { score: number }) {
   const r = 44;
@@ -41,7 +41,7 @@ function ScoreRing({ score }: { score: number }) {
 
   return (
     <svg width={108} height={108} viewBox="0 0 108 108">
-      <circle cx={54} cy={54} r={r} fill="none" stroke="var(--numi-border)" strokeWidth={8} />
+      <circle cx={54} cy={54} r={r} fill="none" stroke="rgba(22, 50, 31, 0.08)" strokeWidth={8} />
       <motion.circle
         cx={54} cy={54} r={r}
         fill="none"
@@ -55,7 +55,7 @@ function ScoreRing({ score }: { score: number }) {
         transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
       />
       <text x={54} y={50} textAnchor="middle" dominantBaseline="central"
-        fill="var(--numi-text)" fontSize={22} fontWeight={700} fontFamily="inherit">
+        fill="var(--numi-landing-heading)" fontSize={22} fontWeight={700} fontFamily="inherit">
         {score}
       </text>
       <text x={54} y={68} textAnchor="middle" dominantBaseline="central"
@@ -74,7 +74,7 @@ function AllocationCard({ rec, amount }: { rec: AllocationItem; amount: number }
   return (
     <div
       className="rounded-2xl p-4"
-      style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
     >
       <div className="flex items-start gap-3 mb-3">
         <span
@@ -85,9 +85,9 @@ function AllocationCard({ rec, amount }: { rec: AllocationItem; amount: number }
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className="text-sm font-semibold text-[var(--numi-text)] leading-snug">{rec.asset}</p>
+            <p className="text-sm font-semibold leading-snug" style={{ color: "var(--numi-landing-heading)" }}>{rec.asset}</p>
             <div className="text-right shrink-0">
-              <p className="text-base font-bold text-[var(--numi-text)]">{rec.allocation}%</p>
+              <p className="text-base font-bold" style={{ color: "var(--numi-landing-heading)" }}>{rec.allocation}%</p>
               <p className="text-xs text-[var(--numi-text-3)]">{formatCurrency(amount)}</p>
             </div>
           </div>
@@ -97,7 +97,7 @@ function AllocationCard({ rec, amount }: { rec: AllocationItem; amount: number }
       <p className="text-xs text-[var(--numi-text-2)] leading-relaxed mb-3">{rec.rationale}</p>
 
       <div className="flex flex-wrap gap-2">
-        <Tag label={`Risco: ${rLabel}`} color={rCol} />
+        <Tag label={`Risk: ${rLabel}`} color={rCol} />
         <Tag label={rec.expectedReturn} color={color} />
         <Tag label={rec.timeframe} color="var(--numi-text-3)" />
       </div>
@@ -124,28 +124,28 @@ function LoadingState() {
   return (
     <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-8 h-8 rounded-full border-2 border-[var(--numi-income)] border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "var(--numi-landing-accent)" }} />
         <div>
-          <p className="text-base font-semibold text-[var(--numi-text)]">Analisando seu perfil financeiro…</p>
-          <p className="text-sm text-[var(--numi-text-3)]">O FIA está processando seus dados</p>
+          <p className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>Analyzing your financial profile…</p>
+          <p className="text-sm text-[var(--numi-text-3)]">FIA is processing your data</p>
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-32 rounded-2xl bg-[var(--numi-elevated)] animate-pulse" />
+          <div key={i} className="h-32 rounded-2xl animate-pulse" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }} />
         ))}
       </div>
-      <div className="h-64 rounded-2xl bg-[var(--numi-elevated)] animate-pulse mb-4" />
+      <div className="h-64 rounded-2xl animate-pulse mb-4" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-36 rounded-2xl bg-[var(--numi-elevated)] animate-pulse" />
+          <div key={i} className="h-36 rounded-2xl animate-pulse" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }} />
         ))}
       </div>
     </div>
   );
 }
 
-/* ── Página principal ────────────────────────────────── */
+/* ── Main page ────────────────────────────────── */
 
 export default function FIAPage() {
   const [analysis, setAnalysis] = useState<FIAAnalysis | null>(null);
@@ -160,7 +160,7 @@ export default function FIAPage() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setAnalysis(await res.json() as FIAAnalysis);
     } catch (e) {
-      setError("Não foi possível gerar a análise. Tente novamente.");
+      setError("Could not generate the analysis. Please try again.");
       console.error("[FIA]", e);
     } finally {
       setLoading(false);
@@ -175,13 +175,12 @@ export default function FIAPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <p className="text-4xl">⚠️</p>
-        <p className="text-[var(--numi-text-2)] font-medium">{error ?? "Erro desconhecido"}</p>
+        <p className="text-[var(--numi-text-2)] font-medium">{error ?? "Unknown error"}</p>
         <button
           onClick={fetchAnalysis}
-          className="px-4 py-2 rounded-xl text-sm font-semibold"
-          style={{ background: "var(--numi-income)", color: "#0B1020" }}
+          className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce px-4 py-2 text-sm"
         >
-          Tentar novamente
+          Try again
         </button>
       </div>
     );
@@ -189,18 +188,18 @@ export default function FIAPage() {
 
   const { profile: prof } = analysis;
   const profileColor =
-    prof === "conservador" ? "var(--numi-info)" :
-    prof === "arrojado"    ? "var(--numi-expense)" :
+    prof === "conservative" ? "var(--numi-info)" :
+    prof === "aggressive"   ? "var(--numi-expense)" :
     "var(--numi-income)";
 
   const isAI = analysis.aiProvider !== "mock";
   const badgeText =
     analysis.aiProvider === "gemini"   ? "⚡ Gemini" :
     analysis.aiProvider === "deepseek" ? "⚡ DeepSeek" :
-    "📊 Baseado nos seus dados";
+    "📊 Based on your data";
   const badgeColor = isAI ? "var(--numi-income)" : "var(--numi-info)";
 
-  // Aporte de referência para cálculo de valores por ativo
+  // Reference contribution used to calculate per-asset values
   const aportBase = analysis.monthlyContribution.max;
   const recommended = Math.round(
     (analysis.monthlyContribution.min + analysis.monthlyContribution.max) / 2
@@ -212,7 +211,7 @@ export default function FIAPage() {
     color: ASSET_COLOR[a.category] ?? "#94A3B8",
   }));
 
-  const generatedDate = new Date(analysis.generatedAt).toLocaleString("pt-BR", {
+  const generatedDate = new Date(analysis.generatedAt).toLocaleString("en-US", {
     day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
   });
 
@@ -227,7 +226,7 @@ export default function FIAPage() {
       <div className="flex items-start justify-between mb-6 gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl font-bold text-[var(--numi-text)]">Investimento Inteligente</h1>
+            <h1 className="text-xl font-bold" style={{ color: "var(--numi-landing-heading)" }}>Smart Investing</h1>
             <span
               className="text-xs font-semibold px-2 py-0.5 rounded-full"
               style={{
@@ -239,27 +238,27 @@ export default function FIAPage() {
             </span>
           </div>
           <p className="text-sm text-[var(--numi-text-3)]">
-            Análise gerada em {generatedDate} · Confiança {analysis.confidence}%
+            Analysis generated on {generatedDate} · {analysis.confidence}% confidence
           </p>
         </div>
         <button
           onClick={fetchAnalysis}
           className="text-sm font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shrink-0 transition-colors"
-          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)", color: "var(--numi-text-2)" }}
+          style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", color: "var(--numi-text-2)" }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)";
-            (e.currentTarget as HTMLElement).style.color = "var(--numi-text)";
+            (e.currentTarget as HTMLElement).style.borderColor = "var(--numi-landing-accent)";
+            (e.currentTarget as HTMLElement).style.color = "var(--numi-landing-heading)";
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.borderColor = "var(--numi-border)";
+            (e.currentTarget as HTMLElement).style.borderColor = "rgba(22, 50, 31, 0.08)";
             (e.currentTarget as HTMLElement).style.color = "var(--numi-text-2)";
           }}
         >
-          ↻ Reanalisar
+          ↻ Re-analyze
         </button>
       </div>
 
-      {/* ── Notice: análise baseada em regras ─────── */}
+      {/* ── Notice: rule-based analysis ─────── */}
       {!isAI && (
         <div
           className="flex items-start gap-3 rounded-xl px-4 py-3 mb-5 text-sm"
@@ -267,39 +266,39 @@ export default function FIAPage() {
         >
           <span className="text-base shrink-0 mt-0.5">💡</span>
           <p>
-            Esta análise foi calculada a partir dos seus dados reais (renda, despesas, metas e orçamento).
-            Para recomendações com IA generativa, configure uma chave em{" "}
+            This analysis was calculated from your real data (income, expenses, goals and budget).
+            For generative AI recommendations, set a key in{" "}
             <code className="text-[var(--numi-info)] text-xs bg-[color-mix(in_srgb,var(--numi-text)_8%,transparent)] px-1 rounded">GOOGLE_GENERATIVE_AI_API_KEY</code>{" "}
-            ou{" "}
+            or{" "}
             <code className="text-[var(--numi-info)] text-xs bg-[color-mix(in_srgb,var(--numi-text)_8%,transparent)] px-1 rounded">DEEPSEEK_API_KEY</code>.
           </p>
         </div>
       )}
 
-      {/* ── Score + Perfil + Capacidade ────────────── */}
+      {/* ── Score + Profile + Capacity ────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {/* Score */}
         <div
           className="rounded-2xl p-5 flex flex-col items-center gap-2"
-          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+          style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
         >
           <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider">
-            Score Financeiro
+            Financial Score
           </p>
           <ScoreRing score={analysis.financialScore} />
           <p className="text-xs text-[var(--numi-text-3)] text-center">
-            {analysis.financialScore >= 70 ? "Boa saúde financeira" :
-             analysis.financialScore >= 50 ? "Situação moderada" : "Atenção necessária"}
+            {analysis.financialScore >= 70 ? "Good financial health" :
+             analysis.financialScore >= 50 ? "Moderate situation" : "Needs attention"}
           </p>
         </div>
 
-        {/* Perfil */}
+        {/* Profile */}
         <div
           className="rounded-2xl p-5 flex flex-col items-center justify-center gap-3"
-          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+          style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
         >
           <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider">
-            Perfil Detectado
+            Detected Profile
           </p>
           <span
             className="text-2xl font-bold capitalize px-5 py-2 rounded-xl"
@@ -308,29 +307,29 @@ export default function FIAPage() {
             {analysis.profile}
           </span>
           <div className="flex gap-1">
-            {["conservador", "moderado", "arrojado"].map((p) => (
+            {["conservative", "moderate", "aggressive"].map((p) => (
               <span
                 key={p}
                 className="w-2 h-2 rounded-full transition-colors"
-                style={{ background: p === analysis.profile ? profileColor : "var(--numi-border)" }}
+                style={{ background: p === analysis.profile ? profileColor : "rgba(22, 50, 31, 0.12)" }}
               />
             ))}
           </div>
         </div>
 
-        {/* Capacidade */}
+        {/* Capacity */}
         <div
           className="rounded-2xl p-5"
-          style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+          style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
         >
           <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
-            Capacidade Mensal
+            Monthly Capacity
           </p>
-          <p className="text-3xl font-bold text-[var(--numi-income)] mb-1">
+          <p className="text-3xl font-bold mb-1" style={{ color: "var(--numi-income)" }}>
             {formatCurrency(recommended)}
           </p>
           <p className="text-xs text-[var(--numi-text-3)] mb-3">
-            Faixa: {formatCurrency(analysis.monthlyContribution.min)} — {formatCurrency(analysis.monthlyContribution.max)}
+            Range: {formatCurrency(analysis.monthlyContribution.min)} — {formatCurrency(analysis.monthlyContribution.max)}
           </p>
           <p className="text-xs text-[var(--numi-text-2)] leading-relaxed">
             {analysis.monthlyContribution.reason}
@@ -338,13 +337,13 @@ export default function FIAPage() {
         </div>
       </div>
 
-      {/* ── Distribuição recomendada ────────────────── */}
+      {/* ── Recommended distribution ────────────────── */}
       <div
         className="rounded-2xl p-5 mb-6"
-        style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+        style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
       >
-        <p className="text-sm font-semibold text-[var(--numi-text)] mb-5">
-          Distribuição Recomendada — {formatCurrency(aportBase)}/mês
+        <p className="text-sm font-semibold mb-5" style={{ color: "var(--numi-landing-heading)" }}>
+          Recommended Distribution — {formatCurrency(aportBase)}/month
         </p>
         <div className="flex flex-col lg:flex-row gap-6 items-center">
           {/* Donut chart */}
@@ -367,17 +366,17 @@ export default function FIAPage() {
               <Tooltip
                 formatter={(v) => [`${v}%`, ""]}
                 contentStyle={{
-                  background: "var(--numi-elevated)",
-                  border: "1px solid var(--numi-border)",
+                  background: "#FFFFFF",
+                  border: "1px solid rgba(22, 50, 31, 0.08)",
                   borderRadius: "10px",
                   fontSize: "12px",
-                  color: "var(--numi-text)",
+                  color: "var(--numi-landing-heading)",
                 }}
               />
             </PieChart>
           </div>
 
-          {/* Lista */}
+          {/* List */}
           <div className="flex-1 w-full flex flex-col gap-2">
             {analysis.allocation.map((a, i) => {
               const color  = ASSET_COLOR[a.category] ?? "#94A3B8";
@@ -391,8 +390,8 @@ export default function FIAPage() {
                   transition={{ delay: i * 0.06 }}
                 >
                   <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
-                  <p className="text-sm text-[var(--numi-text)] flex-1 truncate">{a.asset}</p>
-                  <p className="text-sm font-bold text-[var(--numi-text)] shrink-0">{a.allocation}%</p>
+                  <p className="text-sm flex-1 truncate" style={{ color: "var(--numi-landing-heading)" }}>{a.asset}</p>
+                  <p className="text-sm font-bold shrink-0" style={{ color: "var(--numi-landing-heading)" }}>{a.allocation}%</p>
                   <p className="text-xs text-[var(--numi-text-3)] w-16 text-right shrink-0">
                     {formatCurrency(amount)}
                   </p>
@@ -403,9 +402,9 @@ export default function FIAPage() {
         </div>
       </div>
 
-      {/* ── Carteira detalhada ─────────────────────── */}
+      {/* ── Detailed portfolio ─────────────────────── */}
       <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
-        Carteira detalhada
+        Detailed Portfolio
       </p>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
         {analysis.allocation.map((rec, i) => (
@@ -425,14 +424,14 @@ export default function FIAPage() {
 
       {/* ── Insights ──────────────────────────────── */}
       <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
-        Insights do FIA
+        FIA Insights
       </p>
       <div className="flex flex-col gap-2 mb-6">
         {analysis.insights.map((insight, i) => (
           <motion.div
             key={i}
             className="rounded-xl px-4 py-3 text-sm text-[var(--numi-text-2)] leading-relaxed"
-            style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+            style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 + i * 0.06 }}
@@ -442,19 +441,20 @@ export default function FIAPage() {
         ))}
       </div>
 
-      {/* ── Próximos passos ────────────────────────── */}
+      {/* ── Next steps ────────────────────────── */}
       <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
-        Próximos Passos
+        Next Steps
       </p>
       <div
         className="rounded-2xl p-4 mb-8"
-        style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+        style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
       >
         <ol className="flex flex-col gap-3">
           {analysis.nextSteps.map((step, i) => (
             <motion.li
               key={i}
-              className="flex items-start gap-3 text-sm text-[var(--numi-text)]"
+              className="flex items-start gap-3 text-sm"
+              style={{ color: "var(--numi-landing-heading)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 + i * 0.08 }}
@@ -471,11 +471,11 @@ export default function FIAPage() {
         </ol>
       </div>
 
-      {/* ── Rodapé ────────────────────────────────── */}
+      {/* ── Footer ────────────────────────────────── */}
       <p className="text-xs text-center text-[var(--numi-text-3)]">
         {isAI
-          ? `Análise gerada por ${analysis.aiProvider === "gemini" ? "Google Gemini" : "DeepSeek"} · Não constitui recomendação de investimento`
-          : "Modo demo — configure GOOGLE_GENERATIVE_AI_API_KEY ou DEEPSEEK_API_KEY no .env.local para ativar a IA"}
+          ? `Analysis generated by ${analysis.aiProvider === "gemini" ? "Google Gemini" : "DeepSeek"} · Not investment advice`
+          : "Demo mode — set GOOGLE_GENERATIVE_AI_API_KEY or DEEPSEEK_API_KEY in .env.local to enable AI"}
       </p>
     </motion.div>
   );

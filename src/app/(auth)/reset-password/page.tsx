@@ -11,13 +11,13 @@ const schema = z
   .object({
     password: z
       .string()
-      .min(8, "Mínimo 8 caracteres")
-      .regex(/[A-Z]/, "Deve conter letra maiúscula")
-      .regex(/[0-9]/, "Deve conter número"),
+      .min(8, "At least 8 characters")
+      .regex(/[A-Z]/, "Must contain an uppercase letter")
+      .regex(/[0-9]/, "Must contain a number"),
     confirmPassword: z.string(),
   })
   .refine((d) => d.password === d.confirmPassword, {
-    message: "As senhas não coincidem",
+    message: "Passwords don't match",
     path: ["confirmPassword"],
   });
 
@@ -42,7 +42,7 @@ export default function ResetPasswordPage() {
     });
 
     if (error) {
-      setServerError("Erro ao redefinir senha. O link pode ter expirado.");
+      setServerError("Error resetting password. The link may have expired.");
       return;
     }
 
@@ -52,41 +52,43 @@ export default function ResetPasswordPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-[var(--numi-text)] mb-1">Nova senha</h1>
-      <p className="text-sm text-[var(--numi-text-2)] mb-6">
-        Crie uma senha segura para sua conta.
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1.5" style={{ color: "var(--numi-landing-heading)" }}>
+        New password
+      </h1>
+      <p className="text-sm text-[var(--numi-text-2)] mb-7">
+        Create a secure password for your account.
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-sm font-medium text-[var(--numi-text-2)]">
-            Nova senha
+          <label htmlFor="password" className="text-sm font-medium" style={{ color: "var(--numi-landing-heading)" }}>
+            New password
           </label>
           <input
             id="password"
             type="password"
             autoComplete="new-password"
             placeholder="••••••••"
-            className="input-base"
+            className="numi-landing-input"
             aria-invalid={!!errors.password}
             {...register("password")}
           />
           {errors.password
             ? <span className="text-xs text-[var(--numi-expense)]">{errors.password.message}</span>
-            : <span className="text-xs text-[var(--numi-text-3)]">Mínimo 8 caracteres, 1 maiúscula e 1 número</span>
+            : <span className="text-xs text-[var(--numi-text-3)]">At least 8 characters, 1 uppercase letter and 1 number</span>
           }
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="confirmPassword" className="text-sm font-medium text-[var(--numi-text-2)]">
-            Confirmar nova senha
+          <label htmlFor="confirmPassword" className="text-sm font-medium" style={{ color: "var(--numi-landing-heading)" }}>
+            Confirm new password
           </label>
           <input
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
             placeholder="••••••••"
-            className="input-base"
+            className="numi-landing-input"
             aria-invalid={!!errors.confirmPassword}
             {...register("confirmPassword")}
           />
@@ -98,15 +100,19 @@ export default function ResetPasswordPage() {
         {serverError && (
           <div
             role="alert"
-            className="rounded-lg px-4 py-3 text-sm text-[var(--numi-expense)]"
-            style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}
+            className="rounded-2xl px-4 py-3 text-sm text-[var(--numi-expense)]"
+            style={{ background: "rgba(217, 83, 79, 0.08)", border: "1px solid rgba(217, 83, 79, 0.2)" }}
           >
             {serverError}
           </div>
         )}
 
-        <button type="submit" disabled={isSubmitting} className="btn-primary">
-          {isSubmitting ? "Salvando…" : "Salvar nova senha"}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base disabled:opacity-60 disabled:pointer-events-none"
+        >
+          {isSubmitting ? "Saving…" : "Save new password"}
         </button>
       </form>
     </>

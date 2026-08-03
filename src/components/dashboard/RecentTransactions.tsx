@@ -12,7 +12,7 @@ interface Props {
   locale?: "pt-BR" | "en-US";
 }
 
-export function RecentTransactions({ transactions, locale = "pt-BR" }: Props) {
+export function RecentTransactions({ transactions, locale = "en-US" }: Props) {
   const currency = locale === "en-US" ? "USD" : "BRL";
   const format = (value: number) => formatCurrency(value, currency, false, locale);
   const t =
@@ -24,7 +24,7 @@ export function RecentTransactions({ transactions, locale = "pt-BR" }: Props) {
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm font-semibold text-[var(--numi-text)]">{t.title}</p>
-        <Link href="/app/transactions" className="text-xs text-[var(--numi-income)] hover:underline">
+        <Link href="/app/transacoes" className="text-xs text-[var(--numi-income)] hover:underline">
           {t.viewAll}
         </Link>
       </div>

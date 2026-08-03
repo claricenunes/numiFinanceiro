@@ -10,6 +10,7 @@ import { UserProfileSync } from "./UserProfileSync";
 import { QuickAddModal } from "@/components/common/QuickAddModal";
 import { ThemeProvider } from "@/components/common/ThemeProvider";
 import { PageTransition } from "@/components/common/motion/PageTransition";
+import { AnimatedHeroBackground } from "@/components/landing/AnimatedHeroBackground";
 import type { UserProfile } from "@/types/database";
 
 const isSupabaseConfigured =
@@ -57,11 +58,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect("/app/onboarding");
   }
 
-  // Full-screen layout for onboarding (no sidebar/header)
+  // Full-screen layout for onboarding (no sidebar/header) — same cream
+  // hero-band gradient + drifting blobs as the landing/auth pages, so
+  // the very first thing a new user sees keeps that same identity.
   if (isOnboarding) {
     return (
-      <div className="min-h-dvh numi-ambient-bg">
-        <PageTransition>{children}</PageTransition>
+      <div className="numi-hero-band relative min-h-dvh overflow-hidden">
+        <AnimatedHeroBackground />
+        <div className="relative z-10">
+          <PageTransition>{children}</PageTransition>
+        </div>
         {profile && <UserProfileSync profile={profile} />}
         <ToastContainer />
       </div>

@@ -11,7 +11,7 @@ interface Props {
   locale?: "pt-BR" | "en-US";
 }
 
-export function GoalsPreview({ goals, locale = "pt-BR" }: Props) {
+export function GoalsPreview({ goals, locale = "en-US" }: Props) {
   const active = goals.filter((g) => g.status === "active").slice(0, 3);
   const currency = locale === "en-US" ? "USD" : "BRL";
   const format = (value: number) => formatCurrency(value, currency, false, locale);
@@ -38,7 +38,7 @@ export function GoalsPreview({ goals, locale = "pt-BR" }: Props) {
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm font-semibold text-[var(--numi-text)]">{t.title}</p>
-        <Link href="/app/goals" className="text-xs text-[var(--numi-income)] hover:underline">
+        <Link href="/app/metas" className="text-xs text-[var(--numi-income)] hover:underline">
           {t.viewAll}
         </Link>
       </div>
@@ -46,7 +46,7 @@ export function GoalsPreview({ goals, locale = "pt-BR" }: Props) {
       {active.length === 0 ? (
         <div className="text-center py-6">
           <p className="text-sm text-[var(--numi-text-3)]">{t.empty}</p>
-          <Link href="/app/goals" className="text-xs text-[var(--numi-income)] hover:underline mt-1 inline-block">
+          <Link href="/app/metas" className="text-xs text-[var(--numi-income)] hover:underline mt-1 inline-block">
             {t.create}
           </Link>
         </div>

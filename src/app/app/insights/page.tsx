@@ -11,7 +11,7 @@ export default async function InsightsPage() {
   const now = new Date();
   const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
   const endDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
-  const label     = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(now);
+  const label     = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(now);
 
   const period = { type: "current_month" as const, startDate, endDate, label };
 
@@ -22,7 +22,7 @@ export default async function InsightsPage() {
 
   const insights = generateInsights(dashData, budgets);
 
-  const periodLabel = new Intl.DateTimeFormat("pt-BR", {
+  const periodLabel = new Intl.DateTimeFormat("en-US", {
     month: "long", year: "numeric",
   }).format(now);
 

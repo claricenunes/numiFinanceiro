@@ -3,7 +3,7 @@ import { getTransactions } from "@/lib/supabase/queries/transactions";
 import { parsePeriodFromParams } from "@/lib/utils/date";
 import { TransactionView } from "./TransactionView";
 
-export const metadata: Metadata = { title: "Transações" };
+export const metadata: Metadata = { title: "Transactions" };
 
 export default async function TransacoesPage({
   searchParams,

@@ -7,12 +7,13 @@ import type { DashboardSummary } from "@/types/app";
 
 interface Props {
   summary: DashboardSummary;
-  /** "en-US" is used only by the landing page's Dashboard Showcase — the
-   * real logged-in app never passes this and keeps its pt-BR/BRL default. */
+  /** "pt-BR" is kept only for the pt-BR/BRL labels below, still used by
+   * a couple of older mockups — the real logged-in app defaults to
+   * en-US/USD. */
   locale?: "pt-BR" | "en-US";
 }
 
-export function SummaryCards({ summary, locale = "pt-BR" }: Props) {
+export function SummaryCards({ summary, locale = "en-US" }: Props) {
   const currency = locale === "en-US" ? "USD" : "BRL";
   const format = (value: number) => formatCurrency(value, currency, false, locale);
 

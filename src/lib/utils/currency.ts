@@ -1,8 +1,8 @@
 export function formatCurrency(
   value: number,
-  currency = "BRL",
+  currency = "USD",
   compact = false,
-  locale = "pt-BR"
+  locale = "en-US"
 ): string {
   if (compact && Math.abs(value) >= 1000) {
     return new Intl.NumberFormat(locale, {

@@ -1,6 +1,6 @@
 import type { Period, PeriodType } from "@/types/app";
 
-const LOCALE = "pt-BR";
+const LOCALE = "en-US";
 
 export function getCurrentPeriod(): Period {
   const now = new Date();
@@ -23,14 +23,14 @@ export function getPeriod(type: PeriodType, custom?: { start: string; end: strin
     const end = now;
     const start = new Date(now);
     start.setDate(start.getDate() - 29);
-    return { type, startDate: toISO(start), endDate: toISO(end), label: "Últimos 30 dias" };
+    return { type, startDate: toISO(start), endDate: toISO(end), label: "Last 30 days" };
   }
 
   if (type === "last_90_days") {
     const end = now;
     const start = new Date(now);
     start.setDate(start.getDate() - 89);
-    return { type, startDate: toISO(start), endDate: toISO(end), label: "Últimos 90 dias" };
+    return { type, startDate: toISO(start), endDate: toISO(end), label: "Last 90 days" };
   }
 
   if (type === "this_year") {
@@ -73,7 +73,7 @@ export function parsePeriodFromParams(
 }
 
 function formatDateShort(iso: string): string {
-  return new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+  return new Date(iso + "T12:00:00").toLocaleDateString(LOCALE, { day: "2-digit", month: "short" });
 }
 
 export function formatDate(iso: string, opts?: Intl.DateTimeFormatOptions): string {

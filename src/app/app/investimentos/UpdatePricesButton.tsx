@@ -62,13 +62,13 @@ export function UpdatePricesButton({ positions }: Props) {
       const count = updates.length;
       show(
         count > 0
-          ? `${count} cotação${count !== 1 ? "ões" : ""} atualizada${count !== 1 ? "s" : ""}!`
-          : "Nenhuma cotação encontrada para os tickers cadastrados",
+          ? `${count} price${count !== 1 ? "s" : ""} updated!`
+          : "No prices found for the registered tickers",
         count > 0 ? "success" : "warning"
       );
       router.refresh();
     } catch {
-      show("Erro ao buscar cotações. Verifique os tickers.", "error");
+      show("Error fetching prices. Check the tickers.", "error");
     } finally {
       setLoading(false);
     }
@@ -80,14 +80,14 @@ export function UpdatePricesButton({ positions }: Props) {
       disabled={loading}
       className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all"
       style={{
-        background: "rgba(52,211,153,0.08)",
-        border: "1px solid rgba(52,211,153,0.25)",
-        color: loading ? "var(--numi-text-3)" : "var(--numi-income)",
+        background: "rgba(22, 50, 31, 0.08)",
+        border: "1px solid rgba(22, 50, 31, 0.12)",
+        color: loading ? "var(--numi-text-3)" : "var(--numi-landing-heading)",
         opacity: loading ? 0.7 : 1,
       }}
     >
       <RefreshIcon spinning={loading} />
-      {loading ? "Atualizando..." : "Atualizar cotações"}
+      {loading ? "Updating..." : "Update prices"}
     </button>
   );
 }

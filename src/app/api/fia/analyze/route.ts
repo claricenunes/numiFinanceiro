@@ -5,8 +5,8 @@ import { getBudgetItems }   from "@/lib/supabase/queries/budgets";
 
 /* ── Rate limiting ────────────────────────────────────── */
 // In-memory store: resets on cold start (acceptable for serverless MVP)
-const RL_WINDOW_MS = 60 * 60 * 1000; // 1 hora
-const RL_LIMIT     = 5;               // max 5 req/user/hora
+const RL_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RL_LIMIT     = 5;               // max 5 req/user/hour
 const rlStore      = new Map<string, { count: number; resetAt: number }>();
 
 function checkRateLimit(userId: string): { allowed: boolean; remaining: number; resetAt: number } {
@@ -46,14 +46,14 @@ type UserCtx = {
   allocation:     Array<{ label: string; pct: number }>;
 };
 
-function fmt(n: number) { return `R$ ${n.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`; }
+function fmt(n: number) { return `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`; }
 
 async function fetchUserContext(): Promise<UserCtx | null> {
   try {
     const now       = new Date();
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
     const endDate   = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
-    const periodLabel = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(now);
+    const periodLabel = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(now);
 
     const [dash, inv, budgets] = await Promise.all([
       getDashboardData({ type: "current_month", startDate, endDate, label: periodLabel }),
@@ -91,52 +91,52 @@ async function fetchUserContext(): Promise<UserCtx | null> {
 /* ── Prompt ───────────────────────────────────────────── */
 function buildPrompt(ctx: UserCtx | null): string {
   const data = ctx
-    ? `DADOS DO USUÁRIO (${ctx.periodLabel}):
-- Renda mensal: ${fmt(ctx.income)}
-- Despesas mensais: ${fmt(ctx.expense)}
-- Saldo disponível: ${fmt(ctx.availableCash)}
-- Patrimônio total: ${fmt(ctx.netWorth)} | Investimentos: ${fmt(ctx.invested)}
-- Taxa de poupança: ${ctx.savingsRate.toFixed(0)}%
-${ctx.allocation.length > 0 ? `- Carteira: ${ctx.allocation.map(a => `${a.label} ${a.pct}%`).join(" | ")}` : ""}
+    ? `USER DATA (${ctx.periodLabel}):
+- Monthly income: ${fmt(ctx.income)}
+- Monthly expenses: ${fmt(ctx.expense)}
+- Available cash: ${fmt(ctx.availableCash)}
+- Net worth: ${fmt(ctx.netWorth)} | Investments: ${fmt(ctx.invested)}
+- Savings rate: ${ctx.savingsRate.toFixed(0)}%
+${ctx.allocation.length > 0 ? `- Portfolio: ${ctx.allocation.map(a => `${a.label} ${a.pct}%`).join(" | ")}` : ""}
 
-METAS:
+GOALS:
 ${ctx.goals.length > 0
-      ? ctx.goals.map(g => `- ${g.name}: ${g.pct}% ${g.onTrack ? "(no ritmo)" : g.monthlyNeeded ? `(fora do ritmo, precisaria ${fmt(g.monthlyNeeded)}/mês)` : "(sem prazo)"}${g.deadline ? ` — prazo: ${g.deadline}` : ""}`).join("\n")
-      : "- Nenhuma meta cadastrada"}
+      ? ctx.goals.map(g => `- ${g.name}: ${g.pct}% ${g.onTrack ? "(on track)" : g.monthlyNeeded ? `(off track, would need ${fmt(g.monthlyNeeded)}/month)` : "(no deadline)"}${g.deadline ? ` — deadline: ${g.deadline}` : ""}`).join("\n")
+      : "- No goals set"}
 
-ORÇAMENTO: ${ctx.budgetOverages.length > 0
-      ? ctx.budgetOverages.map(b => `${b.name} +${b.overPct}% acima do limite`).join(", ")
-      : "dentro do orçamento"}`
-    : `DADOS DO USUÁRIO: Dados não disponíveis. Forneça análise genérica de qualidade para investidor brasileiro.`;
+BUDGET: ${ctx.budgetOverages.length > 0
+      ? ctx.budgetOverages.map(b => `${b.name} +${b.overPct}% over limit`).join(", ")
+      : "within budget"}`
+    : `USER DATA: Not available. Provide a good-quality generic analysis for a US investor.`;
 
-  return `Você é um analista financeiro especialista no Brasil.
+  return `You are an expert financial analyst.
 
-Analise os dados do usuário e retorne APENAS JSON válido, sem markdown, sem texto extra.
+Analyze the user data and return ONLY valid JSON, no markdown, no extra text.
 
 ${data}
 
-Formato obrigatório (apenas este JSON, exatamente 5 ativos no allocation, percentuais somando 100):
+Required format (only this JSON, exactly 5 assets in allocation, percentages summing to 100):
 {
-  "financialScore": <número 0-100>,
-  "profile": <"conservador"|"moderado"|"arrojado">,
+  "financialScore": <number 0-100>,
+  "profile": <"conservative"|"moderate"|"aggressive">,
   "monthlyContribution": {
-    "min": <valor mínimo em R$>,
-    "max": <valor máximo em R$>,
-    "reason": <string pt-BR, máx 200 chars>
+    "min": <minimum amount in USD>,
+    "max": <maximum amount in USD>,
+    "reason": <string in English, max 200 chars>
   },
   "allocation": [
     {
-      "asset": <nome completo do ativo>,
+      "asset": <full asset name>,
       "category": <"stock"|"etf"|"fii"|"fixed_income"|"crypto">,
-      "allocation": <percentual 0-100>,
-      "risk": <número 0-100: renda fixa ~15, FII ~45, ação ~65, cripto ~85>,
-      "expectedReturn": <string com retorno esperado>,
-      "timeframe": <string com prazo ideal>,
-      "rationale": <string pt-BR máx 180 chars>
+      "allocation": <percentage 0-100>,
+      "risk": <number 0-100: fixed income ~15, REIT ~45, stock ~65, crypto ~85>,
+      "expectedReturn": <string with expected return>,
+      "timeframe": <string with ideal timeframe>,
+      "rationale": <string in English, max 180 chars>
     }
   ],
-  "insights": [<3-4 strings pt-BR específicas para este usuário>],
-  "nextSteps": [<3 ações concretas em pt-BR para esta semana>],
+  "insights": [<3-4 strings in English specific to this user>],
+  "nextSteps": [<3 concrete actions in English for this week>],
   "confidence": <0-100>
 }`;
 }
@@ -218,7 +218,7 @@ async function tryDeepSeek(prompt: string): Promise<FIAAnalysis | null> {
           {
             role: "system",
             content:
-              "Você é um analista financeiro especialista no Brasil. Responda APENAS com JSON válido.",
+              "You are an expert financial analyst. Respond ONLY with valid JSON.",
           },
           { role: "user", content: prompt },
         ],
@@ -238,9 +238,9 @@ async function tryDeepSeek(prompt: string): Promise<FIAAnalysis | null> {
   return stamp(parseJSON(text), "deepseek");
 }
 
-/* ── Rule-based fallback (usa dados reais do usuário) ─── */
+/* ── Rule-based fallback (uses the user's real data) ─── */
 function generateRuleBased(ctx: UserCtx | null): FIAAnalysis {
-  // Se não há dados reais, usa valores neutros
+  // If no real data is available, use neutral defaults
   const income  = ctx?.income  ?? 0;
   const expense = ctx?.expense ?? 0;
   const savings = Math.max(0, income - expense);
@@ -249,91 +249,91 @@ function generateRuleBased(ctx: UserCtx | null): FIAAnalysis {
   const overages = ctx?.budgetOverages ?? [];
 
   // ── Score (0-100) ─────────────────────────────────────
-  // Poupança (0-40 pts): 20% = 20 pts, 40% = 40 pts
+  // Savings (0-40 pts): 20% = 20 pts, 40% = 40 pts
   const savingsScore = Math.min(40, savingsRate * 0.8);
-  // Orçamento (0-30 pts): -10 por categoria estourada
+  // Budget (0-30 pts): -10 per overspent category
   const budgetScore  = Math.max(0, 30 - overages.length * 10);
-  // Metas (0-30 pts): proporção de metas no ritmo
+  // Goals (0-30 pts): proportion of goals on track
   const goalScore    = goals.length > 0
     ? (goals.filter(g => g.onTrack).length / goals.length) * 30
     : 15;
   const financialScore = Math.min(100, Math.round(savingsScore + budgetScore + goalScore));
 
-  // ── Perfil de risco ───────────────────────────────────
-  const profile: "conservador" | "moderado" | "arrojado" =
-    savingsRate < 10 ? "conservador" :
-    savingsRate < 25 ? "moderado"    : "arrojado";
+  // ── Risk profile ───────────────────────────────────
+  const profile: "conservative" | "moderate" | "aggressive" =
+    savingsRate < 10 ? "conservative" :
+    savingsRate < 25 ? "moderate"    : "aggressive";
 
-  // ── Aporte mensal recomendado ─────────────────────────
+  // ── Recommended monthly contribution ─────────────────────
   const minContrib = income > 0 ? Math.round(savings * 0.2 / 10) * 10 : 0;
   const maxContrib = income > 0 ? Math.round(savings * 0.35 / 10) * 10 : 0;
   const fmtR = (n: number) =>
-    n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+    n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
   const contribReason = income > 0
-    ? `Sua renda é ${fmtR(income)} e suas despesas são ${fmtR(expense)}. O excedente de ${fmtR(savings)} permite aportes entre 20-35% (${fmtR(minContrib)}–${fmtR(maxContrib)}).`
-    : "Registre suas receitas e despesas para receber uma recomendação personalizada.";
+    ? `Your income is ${fmtR(income)} and your expenses are ${fmtR(expense)}. The surplus of ${fmtR(savings)} allows for contributions between 20-35% (${fmtR(minContrib)}–${fmtR(maxContrib)}).`
+    : "Log your income and expenses to get a personalized recommendation.";
 
-  // ── Alocação sugerida por perfil ─────────────────────
+  // ── Suggested allocation by profile ─────────────────────
   const allocations: FIAAnalysis["allocation"] =
-    profile === "conservador"
+    profile === "conservative"
       ? [
-          { asset: "Tesouro Selic 2026", category: "fixed_income", allocation: 50, risk: 12, expectedReturn: "~13,25% a.a.", timeframe: "Imediato", rationale: "Liquidez máxima enquanto você constrói sua reserva de emergência." },
-          { asset: "CDB 100% CDI",       category: "fixed_income", allocation: 30, risk: 15, expectedReturn: "~13% a.a.",    timeframe: "1-2 anos", rationale: "Rendimento ligado ao CDI com proteção do FGC até R$250k." },
-          { asset: "Tesouro IPCA+ 2029", category: "fixed_income", allocation: 15, risk: 18, expectedReturn: "IPCA + 6,2% a.a.", timeframe: "2-3 anos", rationale: "Proteção contra inflação com prazo adequado." },
-          { asset: "BOVA11 — ETF Ibovespa", category: "etf",       allocation:  4, risk: 55, expectedReturn: "12-18% a.a.", timeframe: "5+ anos", rationale: "Pequena exposição à renda variável para começar a diversificar." },
-          { asset: "MXRF11 — FII de Papel", category: "fii",       allocation:  1, risk: 40, expectedReturn: "~11% a.a.",   timeframe: "1-2 anos", rationale: "Experiência inicial com FIIs e dividendos mensais." },
+          { asset: "US Treasury Bills",      category: "fixed_income", allocation: 50, risk: 12, expectedReturn: "~5% p.a.",   timeframe: "Immediate", rationale: "Maximum liquidity while you build your emergency fund." },
+          { asset: "High-Yield Savings / CD", category: "fixed_income", allocation: 30, risk: 15, expectedReturn: "~4.5% p.a.", timeframe: "1-2 years", rationale: "FDIC-insured yield tied to the current rate environment." },
+          { asset: "TIPS (Treasury Inflation-Protected)", category: "fixed_income", allocation: 15, risk: 18, expectedReturn: "CPI + 2% p.a.", timeframe: "2-3 years", rationale: "Inflation protection with a suitable time horizon." },
+          { asset: "VTI — Total Market ETF", category: "etf",         allocation:  4, risk: 55, expectedReturn: "8-10% p.a.", timeframe: "5+ years", rationale: "Small exposure to equities to start diversifying." },
+          { asset: "VNQ — REIT ETF",         category: "fii",         allocation:  1, risk: 40, expectedReturn: "~7% p.a.",   timeframe: "1-2 years", rationale: "Initial experience with REITs and monthly dividends." },
         ]
-      : profile === "arrojado"
+      : profile === "aggressive"
       ? [
-          { asset: "BOVA11 — ETF Ibovespa",  category: "etf",          allocation: 35, risk: 55, expectedReturn: "12-18% a.a.", timeframe: "5+ anos", rationale: "Exposição ampla ao Ibovespa com custo mínimo de 0,10% a.a." },
-          { asset: "Tesouro Selic 2026",      category: "fixed_income", allocation: 20, risk: 12, expectedReturn: "~13,25% a.a.", timeframe: "Imediato", rationale: "Reserva de oportunidade e liquidez para rebalanceamento." },
-          { asset: "MXRF11 — FII de Papel",   category: "fii",          allocation: 20, risk: 45, expectedReturn: "~11% a.a.", timeframe: "1-2 anos", rationale: "Dividendos mensais isentos de IR complementam a carteira." },
-          { asset: "Ações BR (VALE3/ITUB4)",  category: "stock",        allocation: 15, risk: 70, expectedReturn: "Variável",  timeframe: "3+ anos", rationale: "Empresas sólidas do Ibovespa para retorno acima do índice." },
-          { asset: "Tesouro IPCA+ 2029",      category: "fixed_income", allocation: 10, risk: 18, expectedReturn: "IPCA + 6,2% a.a.", timeframe: "2-3 anos", rationale: "Âncora de inflação na carteira." },
+          { asset: "VTI — Total Market ETF", category: "etf",          allocation: 35, risk: 55, expectedReturn: "8-10% p.a.", timeframe: "5+ years", rationale: "Broad market exposure at minimal cost (~0.03% expense ratio)." },
+          { asset: "US Treasury Bills",       category: "fixed_income", allocation: 20, risk: 12, expectedReturn: "~5% p.a.",  timeframe: "Immediate", rationale: "Opportunity reserve and liquidity for rebalancing." },
+          { asset: "VNQ — REIT ETF",          category: "fii",          allocation: 20, risk: 45, expectedReturn: "~7% p.a.", timeframe: "1-2 years", rationale: "Monthly dividends complement the portfolio." },
+          { asset: "Blue-chip stocks (AAPL/MSFT)", category: "stock",   allocation: 15, risk: 70, expectedReturn: "Variable",  timeframe: "3+ years", rationale: "Solid large-cap names for returns above the index." },
+          { asset: "TIPS (Treasury Inflation-Protected)", category: "fixed_income", allocation: 10, risk: 18, expectedReturn: "CPI + 2% p.a.", timeframe: "2-3 years", rationale: "Inflation anchor for the portfolio." },
         ]
-      : [ // moderado
-          { asset: "Tesouro Selic 2026",      category: "fixed_income", allocation: 30, risk: 12, expectedReturn: "~13,25% a.a.", timeframe: "Imediato", rationale: "Liquidez e segurança para reserva de emergência." },
-          { asset: "BOVA11 — ETF Ibovespa",   category: "etf",          allocation: 25, risk: 55, expectedReturn: "12-18% a.a.", timeframe: "3+ anos", rationale: "Diversificação de baixo custo com liquidez diária." },
-          { asset: "Tesouro IPCA+ 2029",      category: "fixed_income", allocation: 20, risk: 18, expectedReturn: "IPCA + 6,2% a.a.", timeframe: "2-3 anos", rationale: "Proteção contra inflação com prazo adequado." },
-          { asset: "MXRF11 — FII de Papel",   category: "fii",          allocation: 15, risk: 45, expectedReturn: "~11% a.a.", timeframe: "1-2 anos", rationale: "Dividendos mensais isentos de IR." },
-          { asset: "PETR4 — Petrobras PN",    category: "stock",        allocation: 10, risk: 68, expectedReturn: "Variável + dividendos", timeframe: "1-2 anos", rationale: "Exposição ao setor de energia com histórico de dividendos." },
+      : [ // moderate
+          { asset: "US Treasury Bills",       category: "fixed_income", allocation: 30, risk: 12, expectedReturn: "~5% p.a.",  timeframe: "Immediate", rationale: "Liquidity and safety for the emergency fund." },
+          { asset: "VTI — Total Market ETF",  category: "etf",          allocation: 25, risk: 55, expectedReturn: "8-10% p.a.", timeframe: "3+ years", rationale: "Low-cost diversification with daily liquidity." },
+          { asset: "TIPS (Treasury Inflation-Protected)", category: "fixed_income", allocation: 20, risk: 18, expectedReturn: "CPI + 2% p.a.", timeframe: "2-3 years", rationale: "Inflation protection with a suitable time horizon." },
+          { asset: "VNQ — REIT ETF",          category: "fii",          allocation: 15, risk: 45, expectedReturn: "~7% p.a.", timeframe: "1-2 years", rationale: "Monthly dividend income." },
+          { asset: "Dividend stock (e.g. JNJ)", category: "stock",      allocation: 10, risk: 68, expectedReturn: "Variable + dividends", timeframe: "1-2 years", rationale: "Exposure to a defensive sector with a dividend track record." },
         ];
 
-  // ── Insights baseados nos dados reais ────────────────
+  // ── Insights based on real data ────────────────
   const insights: string[] = [];
   if (income === 0) {
-    insights.push("📋 Comece registrando suas receitas e despesas para análises personalizadas.");
+    insights.push("📋 Start by logging your income and expenses to get personalized analysis.");
   } else {
-    if (savingsRate >= 20) insights.push(`✅ Parabéns! Sua taxa de poupança de ${savingsRate.toFixed(0)}% é excelente. Continue assim para acelerar seu patrimônio.`);
-    else if (savingsRate > 0) insights.push(`📊 Sua taxa de poupança atual é ${savingsRate.toFixed(0)}%. Tente aumentar para 20% cortando despesas não essenciais.`);
-    else insights.push(`⚠️ Suas despesas superam sua renda neste período. Identifique gastos para cortar antes de investir.`);
+    if (savingsRate >= 20) insights.push(`✅ Congrats! Your savings rate of ${savingsRate.toFixed(0)}% is excellent. Keep it up to accelerate your net worth.`);
+    else if (savingsRate > 0) insights.push(`📊 Your current savings rate is ${savingsRate.toFixed(0)}%. Try increasing it to 20% by cutting non-essential expenses.`);
+    else insights.push(`⚠️ Your expenses exceed your income this period. Identify costs to cut before investing.`);
 
     if (overages.length > 0)
-      insights.push(`🚨 ${overages.length} categoria${overages.length > 1 ? "s" : ""} estourou o orçamento (${overages.map(o => o.name).join(", ")}). Revise esses gastos.`);
+      insights.push(`🚨 ${overages.length} categor${overages.length > 1 ? "ies" : "y"} went over budget (${overages.map(o => o.name).join(", ")}). Review these expenses.`);
     else
-      insights.push("✅ Você está dentro do orçamento neste mês. Ótima disciplina financeira!");
+      insights.push("✅ You're within budget this month. Great financial discipline!");
 
     if (goals.length > 0) {
       const onTrack = goals.filter(g => g.onTrack).length;
-      insights.push(`🎯 ${onTrack}/${goals.length} meta${goals.length > 1 ? "s" : ""} ${onTrack === 1 ? "está" : "estão"} no ritmo. ${onTrack < goals.length ? "Considere aumentar o aporte nas metas atrasadas." : "Continue com os aportes mensais."}`);
+      insights.push(`🎯 ${onTrack}/${goals.length} goal${goals.length > 1 ? "s" : ""} ${onTrack === 1 ? "is" : "are"} on track. ${onTrack < goals.length ? "Consider increasing contributions to the goals that are behind." : "Keep up the monthly contributions."}`);
     }
 
-    insights.push(`💰 Com ${fmtR(savings)} de excedente mensal, você pode aportar entre ${fmtR(minContrib)} e ${fmtR(maxContrib)} todo mês para construir patrimônio.`);
+    insights.push(`💰 With ${fmtR(savings)} of monthly surplus, you can contribute between ${fmtR(minContrib)} and ${fmtR(maxContrib)} every month to build net worth.`);
   }
 
-  // ── Próximos passos ───────────────────────────────────
+  // ── Next steps ───────────────────────────────────
   const nextSteps: string[] = [];
   if (income === 0) {
-    nextSteps.push("Registre suas receitas e despesas do mês atual");
-    nextSteps.push("Configure um orçamento mensal por categoria");
-    nextSteps.push("Defina pelo menos uma meta financeira");
+    nextSteps.push("Log your income and expenses for the current month");
+    nextSteps.push("Set up a monthly budget by category");
+    nextSteps.push("Define at least one financial goal");
   } else {
     if (overages.length > 0)
-      nextSteps.push(`Corte gastos em: ${overages.slice(0, 2).map(o => o.name).join(" e ")}`);
+      nextSteps.push(`Cut spending on: ${overages.slice(0, 2).map(o => o.name).join(" and ")}`);
     else
-      nextSteps.push("Mantenha a disciplina orçamentária do mês atual");
-    nextSteps.push(`Inicie um aporte de ${fmtR(minContrib)}/mês no Tesouro Selic como reserva de emergência`);
-    nextSteps.push("Após 6 meses de reserva, diversifique com renda variável (ETFs)");
+      nextSteps.push("Keep up the budget discipline this month");
+    nextSteps.push(`Start a ${fmtR(minContrib)}/month contribution to Treasury Bills as an emergency fund`);
+    nextSteps.push("After 6 months of reserve, diversify with equities (ETFs)");
   }
 
   return {
@@ -358,12 +358,12 @@ export async function POST(req: Request): Promise<Response> {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  // Rate limiting por usuário
+  // Per-user rate limiting
   const rl = checkRateLimit(user.id);
   if (!rl.allowed) {
     const retryAfter = Math.ceil((rl.resetAt - Date.now()) / 1000);
     return new Response(
-      JSON.stringify({ error: "Muitas requisições. Tente novamente em alguns minutos.", retryAfter }),
+      JSON.stringify({ error: "Too many requests. Please try again in a few minutes.", retryAfter }),
       {
         status: 429,
         headers: {
@@ -375,7 +375,7 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
-  // Busca contexto real do usuário para o prompt
+  // Fetch the user's real context for the prompt
   const ctx    = await fetchUserContext();
   const prompt = buildPrompt(ctx);
 
@@ -393,6 +393,6 @@ export async function POST(req: Request): Promise<Response> {
     }
   }
 
-  // Nenhum provedor de IA configurado → análise baseada em regras com dados reais
+  // No AI provider configured → rule-based analysis using real data
   return Response.json(generateRuleBased(ctx));
 }

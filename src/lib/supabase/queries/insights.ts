@@ -12,7 +12,7 @@ export interface Insight {
 }
 
 function fmt(n: number): string {
-  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+  return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 }
 
 export function generateInsights(data: DashboardData, budgets: BudgetItem[]): Insight[] {
@@ -32,8 +32,8 @@ export function generateInsights(data: DashboardData, budgets: BudgetItem[]): In
       severity: overPct > 30 ? "alert" : "warning",
       category: "alert",
       icon:     overPct > 30 ? "🚨" : "⚠️",
-      title:    `${b.categoryIcon} ${b.categoryName} acima do limite`,
-      description: `Você gastou ${fmt(b.spent)} de ${fmt(b.budgeted)} (${overPct}% além do orçado).`,
+      title:    `${b.categoryIcon} ${b.categoryName} over budget`,
+      description: `You spent ${fmt(b.spent)} of ${fmt(b.budgeted)} (${overPct}% over budget).`,
     });
   }
 
@@ -43,20 +43,20 @@ export function generateInsights(data: DashboardData, budgets: BudgetItem[]): In
     if (rate < 10) {
       insights.push({
         id: "savings-critical", type: "savings_low", severity: "alert", category: "alert", icon: "🔴",
-        title: "Taxa de poupança crítica",
-        description: `Você poupou apenas ${rate.toFixed(0)}% da renda este mês. O mínimo recomendado é 20%.`,
+        title: "Critical savings rate",
+        description: `You saved only ${rate.toFixed(0)}% of your income this month. The recommended minimum is 20%.`,
       });
     } else if (rate < 20) {
       insights.push({
         id: "savings-low", type: "savings_low", severity: "warning", category: "trend", icon: "⚠️",
-        title: "Taxa de poupança abaixo do ideal",
-        description: `Poupança de ${rate.toFixed(0)}% este mês. Meta recomendada: 20% ou mais.`,
+        title: "Savings rate below target",
+        description: `${rate.toFixed(0)}% saved this month. Recommended target: 20% or more.`,
       });
     } else {
       insights.push({
         id: "savings-ok", type: "savings_good", severity: "info", category: "win", icon: "✅",
-        title: "Poupança saudável",
-        description: `${rate.toFixed(0)}% da renda poupada — acima da meta de 20%. Continue assim!`,
+        title: "Healthy savings rate",
+        description: `${rate.toFixed(0)}% of income saved — above the 20% target. Keep it up!`,
       });
     }
   }
@@ -66,10 +66,10 @@ export function generateInsights(data: DashboardData, budgets: BudgetItem[]): In
   for (const g of offTrack.slice(0, 1)) {
     insights.push({
       id: `goal-${g.id}`, type: "goal_forecast_changed", severity: "warning", category: "forecast", icon: "🎯",
-      title: `Meta "${g.name}" fora do ritmo`,
+      title: `"${g.name}" goal is off track`,
       description: g.monthlyNeeded
-        ? `Precisaria de ${fmt(g.monthlyNeeded)}/mês para atingir no prazo definido.`
-        : "Ajuste os aportes para manter o prazo da meta.",
+        ? `You'd need ${fmt(g.monthlyNeeded)}/month to reach it by the target date.`
+        : "Adjust your contributions to stay on track for this goal's deadline.",
     });
   }
 
@@ -77,8 +77,8 @@ export function generateInsights(data: DashboardData, budgets: BudgetItem[]): In
   if (summary.expense > 0 && summary.availableCash < summary.expense * 0.5 && summary.availableCash >= 0) {
     insights.push({
       id: "low-cash", type: "low_balance", severity: "alert", category: "alert", icon: "💸",
-      title: "Saldo disponível baixo",
-      description: `${fmt(summary.availableCash)} disponível — menos de 50% das suas despesas do período.`,
+      title: "Low available balance",
+      description: `${fmt(summary.availableCash)} available — less than 50% of your expenses this period.`,
     });
   }
 
@@ -88,8 +88,8 @@ export function generateInsights(data: DashboardData, budgets: BudgetItem[]): In
     if (top.percentage > 40) {
       insights.push({
         id: `top-cat-${top.categoryId}`, type: "high_category_spend", severity: "info", category: "trend", icon: "📊",
-        title: `${top.icon} ${top.categoryName} concentra ${top.percentage.toFixed(0)}% das despesas`,
-        description: `${fmt(top.amount)} no período. Considere revisar ou diversificar este gasto.`,
+        title: `${top.icon} ${top.categoryName} makes up ${top.percentage.toFixed(0)}% of expenses`,
+        description: `${fmt(top.amount)} this period. Consider reviewing or diversifying this spending.`,
       });
     }
   }

@@ -1,11 +1,11 @@
-export type InvestorProfile = "conservador" | "moderado" | "arrojado";
+export type InvestorProfile = "conservative" | "moderate" | "aggressive";
 export type AIProvider     = "gemini" | "deepseek" | "mock";
 
 export interface AllocationItem {
   asset: string;
   category: string;   // "stock" | "etf" | "fii" | "fixed_income" | "crypto"
-  allocation: number; // percentual 0-100
-  risk: number;       // 0-100 (0=sem risco, 100=altíssimo risco)
+  allocation: number; // percentage 0-100
+  risk: number;       // 0-100 (0=no risk, 100=very high risk)
   expectedReturn: string;
   timeframe: string;
   rationale: string;
@@ -23,7 +23,7 @@ export interface FIAAnalysis {
   insights: string[];
   nextSteps: string[];
   confidence: number;
-  // Metadados (adicionados pela rota, não pela IA)
+  // Metadata (added by the route, not by the AI)
   generatedAt: string;
   aiProvider: AIProvider;
 }

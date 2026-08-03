@@ -22,12 +22,12 @@ export function NewGoalButton() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const amount = parseFloat(target.replace(",", "."));
-    if (!name.trim() || !amount) { show("Nome e valor são obrigatórios", "error"); return; }
+    if (!name.trim() || !amount) { show("Name and amount are required", "error"); return; }
 
     setLoading(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { show("Sessão expirada", "error"); setLoading(false); return; }
+    if (!user) { show("Session expired", "error"); setLoading(false); return; }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase.from("goals") as any).insert({
@@ -40,9 +40,9 @@ export function NewGoalButton() {
       status:        "active",
     });
     setLoading(false);
-    if (error) { show("Erro: " + error.message, "error"); return; }
+    if (error) { show("Error: " + error.message, "error"); return; }
 
-    show("Meta criada!", "success");
+    show("Goal created!", "success");
     setOpen(false);
     reset();
     router.refresh();
@@ -52,10 +52,9 @@ export function NewGoalButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-sm font-semibold px-4 py-2 rounded-xl"
-        style={{ background: "var(--numi-income)", color: "#0B1020" }}
+        className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce text-sm px-4 py-2.5"
       >
-        + Nova Meta
+        + New Goal
       </button>
 
       {open && (
@@ -64,27 +63,27 @@ export function NewGoalButton() {
 
           <div
             className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)", maxHeight: "92dvh", overflowY: "auto" }}
+            style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)", maxHeight: "92dvh", overflowY: "auto" }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[var(--numi-text)]">Nova Meta</h2>
+              <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>New Goal</h2>
               <button onClick={() => { setOpen(false); reset(); }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              {/* Ícone */}
+              {/* Icon */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-2 block">Ícone</label>
+                <label className="text-sm font-medium mb-2 block" style={{ color: "var(--numi-landing-heading)" }}>Icon</label>
                 <div className="flex flex-wrap gap-2">
                   {GOAL_ICONS.map(i => (
                     <button key={i} type="button" onClick={() => setIcon(i)}
                       className="w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-colors"
                       style={{
-                        background: icon === i ? "rgba(52,211,153,0.15)" : "var(--numi-input-bg)",
-                        border: `1px solid ${icon === i ? "var(--numi-income)" : "var(--numi-border)"}`,
+                        background: icon === i ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
+                        border: `1px solid ${icon === i ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
                       }}>
                       {i}
                     </button>
@@ -92,37 +91,34 @@ export function NewGoalButton() {
                 </div>
               </div>
 
-              {/* Nome */}
+              {/* Name */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Nome da meta</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Goal name</label>
                 <input value={name} onChange={e => setName(e.target.value)}
-                  placeholder="Ex: Reserva de emergência, Viagem..." required
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                  placeholder="e.g. Emergency fund, Trip..." required
+                  className="numi-landing-input" />
               </div>
 
-              {/* Valor alvo */}
+              {/* Target amount */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Valor alvo (R$)</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Target amount ($)</label>
                 <input value={target} onChange={e => setTarget(e.target.value)}
-                  type="text" inputMode="decimal" placeholder="0,00" required
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                  type="text" inputMode="decimal" placeholder="0.00" required
+                  className="numi-landing-input" />
               </div>
 
-              {/* Prazo */}
+              {/* Deadline */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Prazo (opcional)</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Deadline (optional)</label>
                 <input value={deadline} onChange={e => setDeadline(e.target.value)}
                   type="date" min={new Date().toISOString().slice(0, 10)}
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)", colorScheme: "light" }} />
+                  className="numi-landing-input"
+                  style={{ colorScheme: "light" }} />
               </div>
 
               <button type="submit" disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
-                {loading ? "Salvando..." : "Criar meta"}
+                className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base mt-1 disabled:opacity-60 disabled:pointer-events-none">
+                {loading ? "Saving..." : "Create goal"}
               </button>
             </form>
           </div>

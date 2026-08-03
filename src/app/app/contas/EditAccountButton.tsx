@@ -9,12 +9,12 @@ import type { AccountWithBalance } from "@/types/app";
 type AccountType = "checking" | "savings" | "credit_card" | "cash" | "investment" | "joint";
 
 const TYPE_OPTIONS: { value: AccountType; label: string; icon: string }[] = [
-  { value: "checking",    label: "Conta Corrente",   icon: "🏦" },
-  { value: "savings",     label: "Poupança",         icon: "💰" },
-  { value: "credit_card", label: "Cartão de Crédito",icon: "💳" },
-  { value: "cash",        label: "Carteira/Dinheiro",icon: "👛" },
-  { value: "investment",  label: "Investimentos",    icon: "📈" },
-  { value: "joint",       label: "Conta Conjunta",   icon: "🤝" },
+  { value: "checking",    label: "Checking",     icon: "🏦" },
+  { value: "savings",     label: "Savings",      icon: "💰" },
+  { value: "credit_card", label: "Credit Card",  icon: "💳" },
+  { value: "cash",        label: "Cash",         icon: "👛" },
+  { value: "investment",  label: "Investments",  icon: "📈" },
+  { value: "joint",       label: "Joint Account",icon: "🤝" },
 ];
 
 const COLORS = ["#10B981","#3B82F6","#F59E0B","#F97316","#8B5CF6","#EC4899","#EF4444","#64748B"];
@@ -34,7 +34,7 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim()) { show("Nome obrigatório", "error"); return; }
+    if (!name.trim()) { show("Name is required", "error"); return; }
 
     setLoading(true);
     const supabase = createClient();
@@ -55,9 +55,9 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase.from("accounts") as any).update(row).eq("id", account.id);
     setLoading(false);
-    if (error) { show("Erro: " + error.message, "error"); return; }
+    if (error) { show("Error: " + error.message, "error"); return; }
 
-    show("Conta atualizada!", "success");
+    show("Account updated!", "success");
     setOpen(false);
     router.refresh();
   }
@@ -66,10 +66,10 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
     <>
       <button
         onClick={() => setOpen(true)}
-        aria-label="Editar conta"
+        aria-label="Edit account"
         className="w-7 h-7 flex items-center justify-center rounded-lg text-xs shrink-0 transition-colors"
         style={{ color: "var(--numi-text-3)" }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-text) 6%, transparent)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text)"; }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-landing-heading) 6%, transparent)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-landing-heading)"; }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text-3)"; }}
       >
         ✏️
@@ -81,20 +81,20 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
 
           <div
             className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)", maxHeight: "92dvh", overflowY: "auto" }}
+            style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)", maxHeight: "92dvh", overflowY: "auto" }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[var(--numi-text)]">Editar Conta</h2>
+              <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>Edit Account</h2>
               <button onClick={() => setOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              {/* Tipo */}
+              {/* Type */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Tipo</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Type</label>
                 <div className="grid grid-cols-3 gap-2">
                   {TYPE_OPTIONS.map(opt => (
                     <button
@@ -103,9 +103,11 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
                       onClick={() => setType(opt.value)}
                       className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-xs font-medium transition-colors"
                       style={{
-                        background: type === opt.value ? "rgba(52,211,153,0.15)" : "var(--numi-input-bg)",
-                        border: `1px solid ${type === opt.value ? "var(--numi-income)" : "var(--numi-border)"}`,
-                        color: type === opt.value ? "var(--numi-income)" : "var(--numi-text-2)",
+                        background: type === opt.value
+                          ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)"
+                          : "#FFFFFF",
+                        border: `1.5px solid ${type === opt.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                        color: type === opt.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
                       }}
                     >
                       <span className="text-lg">{opt.icon}</span>
@@ -115,49 +117,44 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
                 </div>
               </div>
 
-              {/* Nome */}
-              <Field label="Nome da conta">
-                <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Nubank, Bradesco..." required
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+              {/* Name */}
+              <Field label="Account name">
+                <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Chase, Wells Fargo..." required
+                  className="numi-landing-input" />
               </Field>
 
-              {/* Instituição */}
-              <Field label="Banco/Instituição (opcional)">
-                <input value={institution} onChange={e => setInstitution(e.target.value)} placeholder="Ex: Nubank"
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+              {/* Institution */}
+              <Field label="Bank / Institution (optional)">
+                <input value={institution} onChange={e => setInstitution(e.target.value)} placeholder="e.g. Chase"
+                  className="numi-landing-input" />
               </Field>
 
-              {/* Campos extras para cartão */}
+              {/* Extra fields for credit card */}
               {type === "credit_card" && (
                 <>
-                  <Field label="Limite do cartão (R$)">
+                  <Field label="Credit limit ($)">
                     <input value={creditLimit} onChange={e => setCreditLimit(e.target.value)}
-                      type="text" inputMode="decimal" placeholder="0,00"
-                      className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                      style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                      type="text" inputMode="decimal" placeholder="0.00"
+                      className="numi-landing-input" />
                   </Field>
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label="Dia de fechamento">
+                    <Field label="Statement closing day">
                       <input value={billingDay} onChange={e => setBillingDay(e.target.value)}
-                        type="number" min={1} max={31} placeholder="Ex: 25"
-                        className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                        style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                        type="number" min={1} max={31} placeholder="e.g. 25"
+                        className="numi-landing-input" />
                     </Field>
-                    <Field label="Dia de vencimento">
+                    <Field label="Due day">
                       <input value={dueDay} onChange={e => setDueDay(e.target.value)}
-                        type="number" min={1} max={31} placeholder="Ex: 5"
-                        className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                        style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                        type="number" min={1} max={31} placeholder="e.g. 5"
+                        className="numi-landing-input" />
                     </Field>
                   </div>
                 </>
               )}
 
-              {/* Cor */}
+              {/* Color */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-2 block">Cor</label>
+                <label className="text-sm font-medium mb-2 block" style={{ color: "var(--numi-landing-heading)" }}>Color</label>
                 <div className="flex gap-2 flex-wrap">
                   {COLORS.map(c => (
                     <button key={c} type="button" onClick={() => setColor(c)}
@@ -172,10 +169,12 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
                 </div>
               </div>
 
-              <button type="submit" disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
-                {loading ? "Salvando..." : "Salvar alterações"}
+              <button
+                type="submit"
+                disabled={loading}
+                className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base mt-1 disabled:opacity-60 disabled:pointer-events-none"
+              >
+                {loading ? "Saving..." : "Save changes"}
               </button>
             </form>
           </div>
@@ -188,7 +187,7 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">{label}</label>
+      <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>{label}</label>
       {children}
     </div>
   );

@@ -21,7 +21,7 @@ export function InsightsBanner({ insights }: Props) {
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm font-semibold text-[var(--numi-text)]">💡 Insights</p>
         <Link href="/app/insights" className="text-xs text-[var(--numi-income)] hover:underline">
-          Ver todos
+          View all
         </Link>
       </div>
 

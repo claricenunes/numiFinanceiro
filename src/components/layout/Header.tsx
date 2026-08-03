@@ -11,49 +11,48 @@ export function Header() {
   return (
     <header
       className="flex items-center justify-between px-5 lg:px-6 h-16 flex-shrink-0 sticky top-0 z-40"
-      style={{ background: "var(--numi-bg)", borderBottom: "1px solid var(--numi-border)" }}
+      style={{ background: "#FFFFFF", borderBottom: "1px solid rgba(22, 50, 31, 0.08)" }}
     >
-      {/* Esquerda: toggle menu (mobile) + toggle sidebar (desktop) + logo mobile */}
+      {/* Left: mobile menu toggle + desktop sidebar toggle + mobile logo */}
       <div className="flex items-center gap-3">
-        {/* Mobile: abre o drawer */}
+        {/* Mobile: opens the drawer */}
         <button
           onClick={toggleMobileMenu}
-          className="flex lg:hidden w-8 h-8 items-center justify-center rounded-lg text-[var(--numi-text-2)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] hover:text-[var(--numi-text)] transition-colors"
-          aria-label="Abrir menu"
+          className="flex lg:hidden w-8 h-8 items-center justify-center rounded-lg text-[var(--numi-text-2)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)] hover:text-[var(--numi-landing-heading)] transition-colors"
+          aria-label="Open menu"
         >
           <MenuIcon className="w-4 h-4" />
         </button>
 
-        {/* Desktop: colapsa/expande sidebar */}
+        {/* Desktop: collapses/expands the sidebar */}
         <button
           onClick={toggleSidebar}
-          className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg text-[var(--numi-text-2)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)] hover:text-[var(--numi-text)] transition-colors"
+          className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg text-[var(--numi-text-2)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)] hover:text-[var(--numi-landing-heading)] transition-colors"
           aria-label="Toggle sidebar"
         >
           <MenuIcon className="w-4 h-4" />
         </button>
 
-        {/* Logo visível apenas no mobile */}
-        <div className="flex lg:hidden items-center gap-2">
+        {/* Logo visible only on mobile */}
+        <div className="flex lg:hidden items-center">
           <span
-            className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.3)" }}
+            className="text-2xl leading-none"
+            style={{ color: "var(--numi-landing-heading)", fontFamily: "var(--font-logo)" }}
           >
-            <span className="w-2.5 h-2.5 rounded-full bg-[var(--numi-income)] block" />
+            numi
           </span>
-          <span className="text-base font-semibold text-[var(--numi-text)] tracking-tight">Numi</span>
         </div>
       </div>
 
-      {/* Centro: seletor de período */}
+      {/* Center: period selector */}
       <PeriodSelector />
 
-      {/* Direita: avatar do usuário */}
+      {/* Right: user avatar */}
       <div className="flex items-center gap-2">
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer select-none"
-          style={{ background: "rgba(52,211,153,0.15)", color: "var(--numi-income)", border: "1px solid rgba(52,211,153,0.3)" }}
-          title={profile?.full_name ?? "Perfil"}
+          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer select-none text-white"
+          style={{ background: "var(--numi-landing-nav-bg)" }}
+          title={profile?.full_name ?? "Profile"}
         >
           {profile?.full_name?.charAt(0).toUpperCase() ?? "?"}
         </div>

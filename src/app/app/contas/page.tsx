@@ -6,15 +6,15 @@ import { FadeIn } from "@/components/common/FadeIn";
 import { NewAccountButton } from "./NewAccountButton";
 import { EditAccountButton } from "./EditAccountButton";
 
-export const metadata: Metadata = { title: "Contas" };
+export const metadata: Metadata = { title: "Accounts" };
 
 const TYPE_LABEL: Record<string, string> = {
-  checking:    "Corrente",
-  savings:     "Poupança",
-  credit_card: "Crédito",
-  cash:        "Carteira",
-  investment:  "Investimentos",
-  joint:       "Conjunta",
+  checking:    "Checking",
+  savings:     "Savings",
+  credit_card: "Credit",
+  cash:        "Cash",
+  investment:  "Investments",
+  joint:       "Joint",
 };
 
 const TYPE_ICON: Record<string, string> = {
@@ -48,47 +48,47 @@ export default async function ContasPage() {
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-[var(--numi-text)]">Contas</h1>
+        <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--numi-landing-heading)" }}>Accounts</h1>
         <NewAccountButton />
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         <SummaryCard
-          label="Patrimônio Líquido"
+          label="Net Worth"
           value={formatCurrency(netWorth)}
-          sub="Contas + Investimentos"
+          sub="Accounts + Investments"
           valueColor="var(--numi-income)"
           className="col-span-2 lg:col-span-1"
         />
         <SummaryCard
-          label="Disponível"
+          label="Available"
           value={formatCurrency(netLiquid)}
-          sub="Excl. investimentos"
+          sub="Excl. investments"
         />
         <SummaryCard
-          label="Fatura aberta"
+          label="Open balance"
           value={formatCurrency(totalBill)}
-          sub="Cartões de crédito"
+          sub="Credit cards"
           valueColor="var(--numi-expense)"
         />
         <SummaryCard
-          label="Investido"
+          label="Invested"
           value={formatCurrency(invested)}
-          sub="Corretoras"
+          sub="Brokerages"
           valueColor="var(--numi-info)"
         />
       </div>
 
       {/* Account list */}
-      <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
-        Suas contas
+      <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--numi-landing-tagline)" }}>
+        Your accounts
       </p>
       {accounts.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-4xl mb-3">🏦</p>
-          <p className="text-[var(--numi-text-2)] font-medium">Nenhuma conta cadastrada</p>
-          <p className="text-sm text-[var(--numi-text-3)] mt-1">Clique em "+ Nova Conta" para começar</p>
+          <p className="text-[var(--numi-text-2)] font-medium">No accounts yet</p>
+          <p className="text-sm text-[var(--numi-text-3)] mt-1">Click &quot;+ New Account&quot; to get started</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -101,7 +101,7 @@ export default async function ContasPage() {
   );
 }
 
-/* ── Sub-componentes ─────────────────────────────────── */
+/* ── Sub-components ─────────────────────────────────── */
 
 function SummaryCard({
   label, value, sub, valueColor, className,
@@ -112,10 +112,10 @@ function SummaryCard({
   return (
     <div
       className={`rounded-2xl p-4 ${className ?? ""}`}
-      style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
     >
       <p className="text-xs text-[var(--numi-text-2)] mb-1">{label}</p>
-      <p className="text-xl font-bold" style={{ color: valueColor ?? "var(--numi-text)" }}>{value}</p>
+      <p className="text-xl font-bold" style={{ color: valueColor ?? "var(--numi-landing-heading)" }}>{value}</p>
       <p className="text-xs text-[var(--numi-text-3)] mt-1">{sub}</p>
     </div>
   );
@@ -134,7 +134,7 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
   return (
     <div
       className="rounded-2xl p-5 flex flex-col gap-4"
-      style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)" }}
+      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
     >
       {/* Top row: icon + name + badge */}
       <div className="flex items-start justify-between gap-2">
@@ -150,7 +150,7 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
             {icon}
           </span>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-[var(--numi-text)] truncate">{account.name}</p>
+            <p className="text-sm font-semibold truncate" style={{ color: "var(--numi-landing-heading)" }}>{account.name}</p>
             <p className="text-xs text-[var(--numi-text-3)] truncate">{account.institution ?? "—"}</p>
           </div>
         </div>
@@ -168,23 +168,23 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
       {/* Balance */}
       <div>
         <p className="text-xs text-[var(--numi-text-2)] mb-1">
-          {isCreditCard ? "Fatura atual" : "Saldo"}
+          {isCreditCard ? "Current bill" : "Balance"}
         </p>
         <p
           className="text-2xl font-bold"
-          style={{ color: isCreditCard ? "var(--numi-expense)" : "var(--numi-text)" }}
+          style={{ color: isCreditCard ? "var(--numi-expense)" : "var(--numi-landing-heading)" }}
         >
           {formatCurrency(isCreditCard ? bill : account.currentBalance)}
         </p>
 
         {isCreditCard && available !== null && (
           <p className="text-xs text-[var(--numi-text-3)] mt-1">
-            Disponível {formatCurrency(available)} de {formatCurrency(account.creditLimit!)}
+            {formatCurrency(available)} available of {formatCurrency(account.creditLimit!)}
           </p>
         )}
         {isCreditCard && account.dueDay && (
           <p className="mt-1 text-xs font-medium" style={{ color: "var(--numi-warning)" }}>
-            Vence dia {account.dueDay}
+            Due on day {account.dueDay}
           </p>
         )}
       </div>

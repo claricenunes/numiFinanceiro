@@ -11,10 +11,10 @@ const GOAL_ICONS = ["🎯","🏠","✈️","🚗","📚","💻","💍","👶","�
 type GoalStatus = "active" | "completed" | "cancelled" | "paused";
 
 const STATUS_OPTIONS: { value: GoalStatus; label: string }[] = [
-  { value: "active",    label: "Ativa" },
-  { value: "paused",    label: "Pausada" },
-  { value: "completed", label: "Concluída" },
-  { value: "cancelled", label: "Cancelada" },
+  { value: "active",    label: "Active" },
+  { value: "paused",    label: "Paused" },
+  { value: "completed", label: "Completed" },
+  { value: "cancelled", label: "Cancelled" },
 ];
 
 export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
@@ -31,7 +31,7 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const amount = parseFloat(target.replace(",", "."));
-    if (!name.trim() || !amount) { show("Nome e valor são obrigatórios", "error"); return; }
+    if (!name.trim() || !amount) { show("Name and amount are required", "error"); return; }
 
     setLoading(true);
     const supabase = createClient();
@@ -49,9 +49,9 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
       .eq("id", goal.id);
 
     setLoading(false);
-    if (error) { show("Erro: " + error.message, "error"); return; }
+    if (error) { show("Error: " + error.message, "error"); return; }
 
-    show("Meta atualizada!", "success");
+    show("Goal updated!", "success");
     setOpen(false);
     router.refresh();
   }
@@ -60,10 +60,10 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        aria-label="Editar meta"
+        aria-label="Edit goal"
         className="w-6 h-6 flex items-center justify-center rounded-lg text-xs shrink-0 transition-colors"
         style={{ color: "var(--numi-text-3)" }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-text) 6%, transparent)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text)"; }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-landing-heading) 6%, transparent)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-landing-heading)"; }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text-3)"; }}
       >
         ✏️
@@ -75,27 +75,27 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
 
           <div
             className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "var(--numi-modal)", border: "1px solid var(--numi-border)", maxHeight: "92dvh", overflowY: "auto" }}
+            style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)", maxHeight: "92dvh", overflowY: "auto" }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[var(--numi-text)]">Editar Meta</h2>
+              <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>Edit Goal</h2>
               <button onClick={() => setOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-text)] hover:bg-[color-mix(in_srgb,var(--numi-text)_6%,transparent)]">
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              {/* Ícone */}
+              {/* Icon */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-2 block">Ícone</label>
+                <label className="text-sm font-medium mb-2 block" style={{ color: "var(--numi-landing-heading)" }}>Icon</label>
                 <div className="flex flex-wrap gap-2">
                   {GOAL_ICONS.map(i => (
                     <button key={i} type="button" onClick={() => setIcon(i)}
                       className="w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-colors"
                       style={{
-                        background: icon === i ? "rgba(52,211,153,0.15)" : "var(--numi-input-bg)",
-                        border: `1px solid ${icon === i ? "var(--numi-income)" : "var(--numi-border)"}`,
+                        background: icon === i ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
+                        border: `1px solid ${icon === i ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
                       }}>
                       {i}
                     </button>
@@ -103,44 +103,42 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
                 </div>
               </div>
 
-              {/* Nome */}
+              {/* Name */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Nome da meta</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Goal name</label>
                 <input value={name} onChange={e => setName(e.target.value)}
-                  placeholder="Ex: Reserva de emergência, Viagem..." required
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                  placeholder="e.g. Emergency fund, Trip..." required
+                  className="numi-landing-input" />
               </div>
 
-              {/* Valor alvo */}
+              {/* Target amount */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Valor alvo (R$)</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Target amount ($)</label>
                 <input value={target} onChange={e => setTarget(e.target.value)}
-                  type="text" inputMode="decimal" placeholder="0,00" required
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)" }} />
+                  type="text" inputMode="decimal" placeholder="0.00" required
+                  className="numi-landing-input" />
               </div>
 
-              {/* Prazo */}
+              {/* Deadline */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Prazo (opcional)</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Deadline (optional)</label>
                 <input value={deadline} onChange={e => setDeadline(e.target.value)}
                   type="date"
-                  className="w-full px-3 py-2.5 rounded-lg text-[var(--numi-text)] text-sm outline-none"
-                  style={{ border: "1px solid var(--numi-border)", background: "var(--numi-input-bg)", colorScheme: "light" }} />
+                  className="numi-landing-input"
+                  style={{ colorScheme: "light" }} />
               </div>
 
               {/* Status */}
               <div>
-                <label className="text-xs font-medium text-[var(--numi-text-4)] mb-1.5 block">Status</label>
+                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Status</label>
                 <div className="grid grid-cols-4 gap-2">
                   {STATUS_OPTIONS.map(s => (
                     <button key={s.value} type="button" onClick={() => setStatus(s.value)}
                       className="py-2 px-1 rounded-lg text-xs font-medium transition-colors"
                       style={{
-                        background: status === s.value ? "rgba(52,211,153,0.15)" : "var(--numi-input-bg)",
-                        border: `1px solid ${status === s.value ? "var(--numi-income)" : "var(--numi-border)"}`,
-                        color: status === s.value ? "var(--numi-income)" : "var(--numi-text-2)",
+                        background: status === s.value ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
+                        border: `1px solid ${status === s.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                        color: status === s.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
                       }}>
                       {s.label}
                     </button>
@@ -149,9 +147,8 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
               </div>
 
               <button type="submit" disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold mt-1"
-                style={{ background: "var(--numi-income)", color: "#0B1020", opacity: loading ? 0.6 : 1 }}>
-                {loading ? "Salvando..." : "Salvar alterações"}
+                className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base mt-1 disabled:opacity-60 disabled:pointer-events-none">
+                {loading ? "Saving..." : "Save changes"}
               </button>
             </form>
           </div>

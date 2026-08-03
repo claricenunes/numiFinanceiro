@@ -7,11 +7,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
-import type { Metadata } from "next";
 
 const schema = z.object({
-  email: z.string().email("E-mail inválido"),
-  password: z.string().min(1, "Senha obrigatória"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(1, "Password is required"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -42,8 +41,8 @@ export default function LoginPage() {
     if (error) {
       setServerError(
         error.message === "Invalid login credentials"
-          ? "E-mail ou senha incorretos."
-          : "Erro ao entrar. Tente novamente."
+          ? "Incorrect email or password."
+          : "Error signing in. Please try again."
       );
       return;
     }
@@ -66,38 +65,40 @@ export default function LoginPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-[var(--numi-text)] mb-1">Bem-vinda de volta</h1>
-      <p className="text-sm text-[var(--numi-text-2)] mb-6">Entre na sua conta para continuar.</p>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1.5" style={{ color: "var(--numi-landing-heading)" }}>
+        Welcome back
+      </h1>
+      <p className="text-sm text-[var(--numi-text-2)] mb-7">Sign in to your account to continue.</p>
 
       {/* Google OAuth */}
       <button
         type="button"
         onClick={handleGoogleLogin}
         disabled={isGoogleLoading || isSubmitting}
-        className="btn-outline mb-4"
+        className="numi-pill-btn numi-pill-btn-outline-dark w-full mb-5 gap-2 py-3"
       >
         <GoogleIcon />
-        {isGoogleLoading ? "Redirecionando…" : "Entrar com Google"}
+        {isGoogleLoading ? "Redirecting…" : "Continue with Google"}
       </button>
 
-      <div className="flex items-center gap-3 mb-4">
-        <div className="flex-1 h-px bg-[var(--numi-border)]" />
-        <span className="text-xs text-[var(--numi-text-3)]">ou com e-mail</span>
-        <div className="flex-1 h-px bg-[var(--numi-border)]" />
+      <div className="flex items-center gap-3 mb-5">
+        <div className="flex-1 h-px" style={{ background: "rgba(22, 50, 31, 0.12)" }} />
+        <span className="text-xs text-[var(--numi-text-3)]">or with email</span>
+        <div className="flex-1 h-px" style={{ background: "rgba(22, 50, 31, 0.12)" }} />
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
-        {/* E-mail */}
+        {/* Email */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-[var(--numi-text-2)]">
-            E-mail
+          <label htmlFor="email" className="text-sm font-medium" style={{ color: "var(--numi-landing-heading)" }}>
+            Email
           </label>
           <input
             id="email"
             type="email"
             autoComplete="email"
-            placeholder="voce@email.com"
-            className="input-base"
+            placeholder="you@email.com"
+            className="numi-landing-input"
             aria-invalid={!!errors.email}
             {...register("email")}
           />
@@ -106,14 +107,14 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Senha */}
+        {/* Password */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm font-medium text-[var(--numi-text-2)]">
-              Senha
+            <label htmlFor="password" className="text-sm font-medium" style={{ color: "var(--numi-landing-heading)" }}>
+              Password
             </label>
-            <Link href="/forgot-password" className="text-xs text-[var(--numi-income)] hover:underline">
-              Esqueceu a senha?
+            <Link href="/forgot-password" className="text-xs font-medium hover:underline" style={{ color: "var(--numi-landing-tagline)" }}>
+              Forgot password?
             </Link>
           </div>
           <input
@@ -121,7 +122,7 @@ export default function LoginPage() {
             type="password"
             autoComplete="current-password"
             placeholder="••••••••"
-            className="input-base"
+            className="numi-landing-input"
             aria-invalid={!!errors.password}
             {...register("password")}
           />
@@ -130,12 +131,12 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Erro do servidor */}
+        {/* Server error */}
         {serverError && (
           <div
             role="alert"
-            className="rounded-lg px-4 py-3 text-sm text-[var(--numi-expense)]"
-            style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}
+            className="rounded-2xl px-4 py-3 text-sm text-[var(--numi-expense)]"
+            style={{ background: "rgba(217, 83, 79, 0.08)", border: "1px solid rgba(217, 83, 79, 0.2)" }}
           >
             {serverError}
           </div>
@@ -144,16 +145,16 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting || isGoogleLoading}
-          className="btn-primary mt-1"
+          className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full mt-1 py-3 text-base disabled:opacity-60 disabled:pointer-events-none"
         >
-          {isSubmitting ? "Entrando…" : "Entrar"}
+          {isSubmitting ? "Signing in…" : "Sign in"}
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-[var(--numi-text-2)]">
-        Não tem conta?{" "}
-        <Link href="/register" className="text-[var(--numi-income)] font-medium hover:underline">
-          Criar conta grátis
+        Don&apos;t have an account?{" "}
+        <Link href="/register" className="font-semibold hover:underline" style={{ color: "var(--numi-landing-tagline)" }}>
+          Create free account
         </Link>
       </p>
     </>

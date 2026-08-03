@@ -19,7 +19,7 @@ interface Props {
   locale?: "pt-BR" | "en-US";
 }
 
-export function ExpenseChart({ categories, compact = false, locale = "pt-BR" }: Props) {
+export function ExpenseChart({ categories, compact = false, locale = "en-US" }: Props) {
   const total = categories.reduce((s, c) => s + c.amount, 0);
   const currency = locale === "en-US" ? "USD" : "BRL";
   const format = (value: number) => formatCurrency(value, currency, false, locale);

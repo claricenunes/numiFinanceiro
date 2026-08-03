@@ -33,9 +33,9 @@ export default async function DashboardPage({
 
   const orbStatus = getOrbStatus(summary.savingsRate);
   const statusMessage = {
-    good:    "Você está economizando bem este mês.",
-    warning: "Fique de olho nos gastos — sua economia caiu um pouco.",
-    alert:   "Sua economia está baixa neste período.",
+    good:    "You're saving well this month.",
+    warning: "Keep an eye on spending — your savings dipped a bit.",
+    alert:   "Your savings are low this period.",
   }[orbStatus];
 
   return (
@@ -43,8 +43,8 @@ export default async function DashboardPage({
       <div className="mb-5 flex items-center gap-4">
         <AIOrb status={orbStatus} />
         <div>
-          <h1 className="text-xl font-bold text-[var(--numi-text)]">
-            Olá{firstName ? `, ${firstName}` : ""} 👋
+          <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--numi-landing-heading)" }}>
+            Hi{firstName ? `, ${firstName}` : ""} 👋
           </h1>
           <p className="text-sm text-[var(--numi-text-3)] mt-0.5">
             {statusMessage}

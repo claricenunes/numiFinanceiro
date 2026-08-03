@@ -8,7 +8,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 
 const schema = z.object({
-  email: z.string().email("E-mail inválido"),
+  email: z.string().email("Invalid email"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
     });
 
     if (error) {
-      setServerError("Erro ao enviar e-mail. Tente novamente.");
+      setServerError("Error sending email. Please try again.");
       return;
     }
 
@@ -42,16 +42,18 @@ export default function ForgotPasswordPage() {
   if (emailSent) {
     return (
       <div className="text-center">
-        <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center"
-             style={{ background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.3)" }}>
+        <div
+          className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
+          style={{ background: "color-mix(in srgb, var(--numi-landing-accent) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--numi-landing-accent) 35%, transparent)" }}
+        >
           <span className="text-2xl">✉️</span>
         </div>
-        <h2 className="text-xl font-bold text-[var(--numi-text)] mb-2">E-mail enviado</h2>
+        <h2 className="text-xl font-bold mb-2" style={{ color: "var(--numi-landing-heading)" }}>Email sent</h2>
         <p className="text-sm text-[var(--numi-text-2)] mb-6">
-          Verifique sua caixa de entrada e clique no link para redefinir sua senha.
+          Check your inbox and click the link to reset your password.
         </p>
-        <Link href="/login" className="text-sm text-[var(--numi-income)] hover:underline">
-          Voltar para o login
+        <Link href="/login" className="text-sm font-semibold hover:underline" style={{ color: "var(--numi-landing-tagline)" }}>
+          Back to login
         </Link>
       </div>
     );
@@ -61,27 +63,29 @@ export default function ForgotPasswordPage() {
     <>
       <Link
         href="/login"
-        className="inline-flex items-center gap-1.5 text-sm text-[var(--numi-text-2)] hover:text-[var(--numi-text)] mb-6 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-[var(--numi-text-2)] hover:text-[var(--numi-landing-heading)] mb-6 transition-colors"
       >
-        <span aria-hidden>←</span> Voltar
+        <span aria-hidden>←</span> Back
       </Link>
 
-      <h1 className="text-2xl font-bold text-[var(--numi-text)] mb-1">Esqueceu a senha?</h1>
-      <p className="text-sm text-[var(--numi-text-2)] mb-6">
-        Informe seu e-mail e enviaremos um link para criar uma nova senha.
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1.5" style={{ color: "var(--numi-landing-heading)" }}>
+        Forgot password?
+      </h1>
+      <p className="text-sm text-[var(--numi-text-2)] mb-7">
+        Enter your email and we&apos;ll send you a link to create a new password.
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-[var(--numi-text-2)]">
-            E-mail
+          <label htmlFor="email" className="text-sm font-medium" style={{ color: "var(--numi-landing-heading)" }}>
+            Email
           </label>
           <input
             id="email"
             type="email"
             autoComplete="email"
-            placeholder="voce@email.com"
-            className="input-base"
+            placeholder="you@email.com"
+            className="numi-landing-input"
             aria-invalid={!!errors.email}
             {...register("email")}
           />
@@ -93,15 +97,19 @@ export default function ForgotPasswordPage() {
         {serverError && (
           <div
             role="alert"
-            className="rounded-lg px-4 py-3 text-sm text-[var(--numi-expense)]"
-            style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}
+            className="rounded-2xl px-4 py-3 text-sm text-[var(--numi-expense)]"
+            style={{ background: "rgba(217, 83, 79, 0.08)", border: "1px solid rgba(217, 83, 79, 0.2)" }}
           >
             {serverError}
           </div>
         )}
 
-        <button type="submit" disabled={isSubmitting} className="btn-primary">
-          {isSubmitting ? "Enviando…" : "Enviar link"}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base disabled:opacity-60 disabled:pointer-events-none"
+        >
+          {isSubmitting ? "Sending…" : "Send link"}
         </button>
       </form>
     </>
