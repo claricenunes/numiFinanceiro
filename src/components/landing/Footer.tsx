@@ -33,7 +33,7 @@ export function Footer() {
                 <Link
                   key={link}
                   href="#"
-                  className="text-sm text-[var(--numi-text-2)] hover:text-[var(--numi-text)] transition-colors w-fit"
+                  className="text-sm text-[var(--numi-text-2)] hover:text-[var(--numi-landing-tagline)] transition-colors w-fit"
                 >
                   {link}
                 </Link>

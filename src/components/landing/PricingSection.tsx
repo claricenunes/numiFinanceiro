@@ -43,8 +43,8 @@ export function PricingSection() {
   return (
     <section className="px-4 py-24 lg:py-32 max-w-6xl mx-auto">
       <Reveal className="text-center mb-16">
-        <p className="text-sm font-semibold mb-3" style={{ color: "#98BB8A" }}>Pricing</p>
-        <h2 className="text-3xl lg:text-4xl font-bold text-[var(--numi-text)] max-w-2xl mx-auto leading-tight">
+        <p className="text-sm font-semibold mb-3" style={{ color: "var(--numi-landing-tagline)" }}>Pricing</p>
+        <h2 className="text-3xl lg:text-4xl font-bold max-w-2xl mx-auto leading-tight" style={{ color: "var(--numi-landing-heading)" }}>
           Simple plans, no surprises
         </h2>
       </Reveal>
@@ -54,12 +54,15 @@ export function PricingSection() {
           <StaggerItem
             key={plan.name}
             className={plan.highlighted ? "glass-card p-7 flex flex-col gap-6 lg:scale-105" : "glass-card p-7 flex flex-col gap-6"}
-            style={plan.highlighted ? { border: "1.5px solid #98BB8A" } : undefined}
+            style={plan.highlighted ? { border: "1.5px solid var(--numi-landing-accent)" } : undefined}
           >
             {plan.highlighted && (
               <span
                 className="text-xs font-semibold w-fit px-2.5 py-1 rounded-full"
-                style={{ background: "#98BB8A22", color: "#98BB8A" }}
+                style={{
+                  background: "color-mix(in srgb, var(--numi-landing-accent) 15%, transparent)",
+                  color: "var(--numi-landing-accent)",
+                }}
               >
                 Most popular
               </span>
@@ -78,7 +81,7 @@ export function PricingSection() {
             <ul className="flex flex-col gap-2.5">
               {plan.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "#98BB8A" }} strokeWidth={2.5} aria-hidden="true" />
+                  <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "var(--numi-landing-accent)" }} strokeWidth={2.5} aria-hidden="true" />
                   <span className="text-sm text-[var(--numi-text-2)]">{feature}</span>
                 </li>
               ))}
@@ -86,8 +89,12 @@ export function PricingSection() {
 
             <Link
               href="/register"
-              className={plan.highlighted ? "btn-primary numi-landing-btn-primary" : "btn-outline"}
-              style={{ width: "100%", padding: "0.65rem 1rem", marginTop: "auto" }}
+              className={
+                plan.highlighted
+                  ? "numi-pill-btn numi-pill-btn-accent numi-cta-bounce"
+                  : "numi-pill-btn numi-pill-btn-outline-dark"
+              }
+              style={{ width: "100%", marginTop: "auto" }}
             >
               Get started
             </Link>

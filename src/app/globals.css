@@ -195,12 +195,6 @@ html:not(.light) .glass-card {
 .btn-primary:hover  { filter: brightness(0.92); }
 .btn-primary:active { transform: scale(0.97); }
 
-/* Cor específica dos botões primários da landing — não mexe em
-   --numi-income, que é usada no app inteiro pra indicar receita/valores
-   positivos, não só a cor dos botões. */
-.numi-landing-btn-primary { background: #98BB8A; }
-.numi-landing-btn-primary:hover { filter: brightness(0.94); }
-
 .btn-primary:disabled {
   background: var(--numi-border);
   color: var(--numi-text-3);
@@ -277,6 +271,20 @@ html:not(.light) .glass-card {
 }
 
 .numi-pill-btn-accent:hover { filter: brightness(1.05); }
+
+/* Same pill shape as .numi-pill-btn-outline, but for light/cream
+   backgrounds (BeforeAfter, Pricing) — the nav variant's light text/
+   border reads invisible outside the dark pill-nav. */
+.numi-pill-btn-outline-dark {
+  color: var(--numi-landing-heading);
+  border: 1px solid color-mix(in srgb, var(--numi-landing-heading) 25%, transparent);
+  background: transparent;
+}
+
+.numi-pill-btn-outline-dark:hover {
+  border-color: var(--numi-landing-heading);
+  background: color-mix(in srgb, var(--numi-landing-heading) 6%, transparent);
+}
 
 .numi-pill-btn-dark {
   color: var(--numi-landing-nav-text);

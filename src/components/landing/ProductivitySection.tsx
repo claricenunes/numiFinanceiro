@@ -18,8 +18,8 @@ export function ProductivitySection() {
     <section className="px-4 py-24 lg:py-32 max-w-6xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
         <Reveal direction="left">
-          <p className="text-sm font-semibold mb-3" style={{ color: "#98BB8A" }}>Productivity</p>
-          <h2 className="text-3xl lg:text-4xl font-bold text-[var(--numi-text)] leading-tight mb-6">
+          <p className="text-sm font-semibold mb-3" style={{ color: "var(--numi-landing-tagline)" }}>Productivity</p>
+          <h2 className="text-3xl lg:text-4xl font-bold leading-tight mb-6" style={{ color: "var(--numi-landing-heading)" }}>
             One system for your money, not ten spreadsheets
           </h2>
 
@@ -28,9 +28,9 @@ export function ProductivitySection() {
               <StaggerItem key={item} className="flex items-start gap-3">
                 <span
                   className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-                  style={{ background: "#98BB8A22" }}
+                  style={{ background: "color-mix(in srgb, var(--numi-landing-accent) 15%, transparent)" }}
                 >
-                  <Check className="w-3 h-3" style={{ color: "#98BB8A" }} strokeWidth={3} aria-hidden="true" />
+                  <Check className="w-3 h-3" style={{ color: "var(--numi-landing-accent)" }} strokeWidth={3} aria-hidden="true" />
                 </span>
                 <p className="text-sm lg:text-base text-[var(--numi-text-2)] leading-relaxed">{item}</p>
               </StaggerItem>

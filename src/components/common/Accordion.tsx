@@ -21,7 +21,7 @@ export function AccordionItem({ question, children }: AccordionItemProps) {
       >
         {question}
         <ChevronDown
-          className="shrink-0 w-5 h-5 text-[var(--numi-text-3)] transition-transform duration-200 group-open:rotate-180"
+          className="shrink-0 w-5 h-5 text-[var(--numi-text-3)] transition-[transform,color] duration-200 group-open:rotate-180 group-open:text-[var(--numi-landing-tagline)]"
           aria-hidden="true"
         />
       </summary>

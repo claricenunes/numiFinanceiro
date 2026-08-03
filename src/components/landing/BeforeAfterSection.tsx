@@ -20,7 +20,7 @@ export function BeforeAfterSection() {
   return (
     <section className="px-4 py-24 lg:py-32 max-w-5xl mx-auto">
       <Reveal className="text-center mb-12">
-        <h2 className="text-3xl lg:text-4xl font-bold text-[var(--numi-text)] max-w-xl mx-auto leading-tight">
+        <h2 className="text-3xl lg:text-4xl font-bold max-w-xl mx-auto leading-tight" style={{ color: "var(--numi-landing-heading)" }}>
           Your money works with you
         </h2>
       </Reveal>
@@ -50,12 +50,12 @@ export function BeforeAfterSection() {
       <Reveal className="flex flex-col sm:flex-row gap-3 justify-center mt-12">
         <Link
           href="/register"
-          className="btn-primary numi-landing-btn-primary"
-          style={{ width: "auto", padding: "0.75rem 2rem" }}
+          className="numi-pill-btn numi-pill-btn-dark numi-cta-bounce"
+          style={{ padding: "0.75rem 2rem" }}
         >
           Start for free
         </Link>
-        <Link href="/login" className="btn-outline" style={{ width: "auto", padding: "0.75rem 2rem" }}>
+        <Link href="/login" className="numi-pill-btn numi-pill-btn-outline-dark" style={{ padding: "0.75rem 2rem" }}>
           I have an account
         </Link>
       </Reveal>

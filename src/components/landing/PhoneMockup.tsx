@@ -89,11 +89,17 @@ export function PhoneMockup({ scrollYProgress, revealedStep }: PhoneMockupProps)
   const effectiveStep = revealedStep ?? MESSAGE_PAIRS.length - 1;
   const visibleMessages = ALL_MESSAGES.slice(0, (effectiveStep + 1) * 2);
 
+  // Instant snap, not a native smooth scroll — a second, uncoordinated
+  // animation timeline (the browser's own scroll easing) running at the
+  // same time as the bubble's own rise+fade below fought with it and
+  // read as janky/conflicting motion. The container jumps to the bottom
+  // immediately (before paint), and the new bubble's own transform is
+  // the only "arriving" motion left to see.
   useEffect(() => {
     const el = messagesRef.current;
     if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: reducedMotion ? "auto" : "smooth" });
-  }, [effectiveStep, reducedMotion]);
+    el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
+  }, [effectiveStep]);
 
   // The idle "bob" float is only for the standalone presentation.
   // Once this phone is driven by scroll (scale-only per the section's
@@ -128,7 +134,12 @@ export function PhoneMockup({ scrollYProgress, revealedStep }: PhoneMockupProps)
                     ? "self-start bg-[#F7EEE4] text-[var(--numi-landing-heading)] rounded-bl-sm"
                     : "self-end text-white rounded-br-sm"
                 }`}
-                style={msg.from === "user" ? { background: "var(--numi-landing-accent)", color: "var(--numi-landing-accent-text)" } : undefined}
+                style={{
+                  willChange: "transform, opacity",
+                  ...(msg.from === "user"
+                    ? { background: "var(--numi-landing-accent)", color: "var(--numi-landing-accent-text)" }
+                    : undefined),
+                }}
               >
                 {msg.text}
                 {msg.chart && <SpendingBarsChart lastMonth={msg.chart.lastMonth} thisMonth={msg.chart.thisMonth} />}

@@ -40,8 +40,8 @@ export function FeaturesSection() {
   return (
     <section className="px-4 py-24 lg:py-32 max-w-6xl mx-auto">
       <Reveal className="text-center mb-16">
-        <p className="text-sm font-semibold mb-3" style={{ color: "#98BB8A" }}>Features</p>
-        <h2 className="text-3xl lg:text-4xl font-bold text-[var(--numi-text)] max-w-2xl mx-auto leading-tight">
+        <p className="text-sm font-semibold mb-3" style={{ color: "var(--numi-landing-tagline)" }}>Features</p>
+        <h2 className="text-3xl lg:text-4xl font-bold max-w-2xl mx-auto leading-tight" style={{ color: "var(--numi-landing-heading)" }}>
           Everything your finances need, nothing they don&apos;t
         </h2>
       </Reveal>

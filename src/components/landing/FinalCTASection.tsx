@@ -29,7 +29,7 @@ export function FinalCTASection() {
             className="w-20 h-auto select-none"
           />
         </motion.div>
-        <h2 className="text-3xl lg:text-4xl font-bold text-[var(--numi-text)] max-w-lg leading-tight">
+        <h2 className="text-3xl lg:text-4xl font-bold max-w-lg leading-tight" style={{ color: "var(--numi-landing-heading)" }}>
           Ready to actually understand your money?
         </h2>
         <p className="text-lg text-[var(--numi-text-2)] max-w-md">
@@ -37,8 +37,8 @@ export function FinalCTASection() {
         </p>
         <Link
           href="/register"
-          className="btn-primary numi-landing-btn-primary"
-          style={{ width: "auto", padding: "0.75rem 2.25rem" }}
+          className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce"
+          style={{ padding: "0.75rem 2.25rem" }}
         >
           Start for free
         </Link>
