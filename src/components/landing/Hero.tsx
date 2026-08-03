@@ -3,14 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, useMotionValue, useMotionValueEvent } from "framer-motion";
-import { FadeIn } from "@/components/common/FadeIn";
 import { usePrefersReducedMotion } from "@/components/common/motion/usePrefersReducedMotion";
 import { RotatingWord } from "@/components/common/motion/RotatingWord";
 import { PhoneMockup } from "./PhoneMockup";
 import { DashboardCards } from "./DashboardCards";
 import { OrganicWave } from "./OrganicWave";
 
-const CTA_OVERSHOOT: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
 // Deliberately not var(--numi-landing-nav-bg) — that's the header's own
 // color, and this rising panel needs to read as a distinct surface, not
 // a continuation of the header. Matches AnalyticsScrollSection's own
@@ -131,43 +129,37 @@ export function Hero() {
     setRevealedStep((prev) => (prev === idx ? prev : idx));
   });
 
+  // No mount-triggered entrance animation on this copy — it sits above
+  // the fold, visible the instant the page loads, and a JS-driven
+  // fade/slide-in is one more thing that could get stuck at its initial
+  // (invisible) state. Opacity here is already driven by `heroTextOpacity`
+  // (the scroll-linked wrapper below), which is real, working, and
+  // initialized to 1 — no separate entrance transition needed on top of it.
   const heroCopy = (
     <>
-      <FadeIn delay={0.1} duration={0.5} y={16}>
-        <h1
-          className="text-6xl sm:text-7xl lg:text-7xl xl:text-8xl font-extrabold leading-[0.95] tracking-tight mb-7"
-          style={{ color: "var(--numi-landing-heading)" }}
-        >
-          Your finances,
-          <br />
-          <RotatingWord
-            words={["organized.", "under control.", "simplified.", "on autopilot."]}
-          />
-        </h1>
-      </FadeIn>
-
-      <FadeIn delay={0.35} duration={0.5} y={16}>
-        <p className="text-3xl sm:text-4xl font-bold mb-7" style={{ color: "var(--numi-landing-tagline)" }}>
-          Simpler. Clearer. In control.
-        </p>
-      </FadeIn>
-
-      <FadeIn delay={0.35} duration={0.5} y={16}>
-        <p className="text-lg sm:text-xl text-[var(--numi-text-2)] max-w-lg mb-10">
-          Numi is the AI finance assistant that helps you understand where your money goes —
-          accounts, spending, goals, and investments, all in one place.
-        </p>
-      </FadeIn>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, delay: 0.4, ease: CTA_OVERSHOOT }}
+      <h1
+        className="text-6xl sm:text-7xl lg:text-7xl xl:text-8xl font-extrabold leading-[0.95] tracking-tight mb-7"
+        style={{ color: "var(--numi-landing-heading)" }}
       >
-        <Link href="/register" className="numi-pill-btn numi-pill-btn-dark numi-cta-bounce text-lg px-10 py-4">
-          Try it for free
-        </Link>
-      </motion.div>
+        Your finances,
+        <br />
+        <RotatingWord
+          words={["organized.", "under control.", "simplified.", "on autopilot."]}
+        />
+      </h1>
+
+      <p className="text-3xl sm:text-4xl font-bold mb-7" style={{ color: "var(--numi-landing-tagline)" }}>
+        Simpler. Clearer. In control.
+      </p>
+
+      <p className="text-lg sm:text-xl text-[var(--numi-text-2)] max-w-lg mb-10">
+        Numi is the AI finance assistant that helps you understand where your money goes —
+        accounts, spending, goals, and investments, all in one place.
+      </p>
+
+      <Link href="/register" className="numi-pill-btn numi-pill-btn-dark numi-cta-bounce text-lg px-10 py-4">
+        Try it for free
+      </Link>
     </>
   );
 

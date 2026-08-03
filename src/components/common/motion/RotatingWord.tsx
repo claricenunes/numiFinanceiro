@@ -13,6 +13,11 @@ interface RotatingWordProps {
 
 export function RotatingWord({ words, interval = 2200, className, suffix = "" }: RotatingWordProps) {
   const [index, setIndex] = useState(0);
+  // The very first word must render visible immediately — it's often
+  // above the fold — so it skips the entrance animation entirely rather
+  // than depending on a mount-triggered transition to reach opacity:1.
+  // Only words swapped in later (via the interval) animate.
+  const [isFirst, setIsFirst] = useState(true);
 
   useEffect(() => {
     const prefersReducedMotion =
@@ -20,7 +25,10 @@ export function RotatingWord({ words, interval = 2200, className, suffix = "" }:
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) return;
 
-    const id = setInterval(() => setIndex((i) => (i + 1) % words.length), interval);
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % words.length);
+      setIsFirst(false);
+    }, interval);
     return () => clearInterval(id);
   }, [words.length, interval]);
 
@@ -36,7 +44,7 @@ export function RotatingWord({ words, interval = 2200, className, suffix = "" }:
         <motion.span
           key={words[index]}
           className="col-start-1 row-start-1 whitespace-nowrap"
-          initial={{ opacity: 0, y: 10 }}
+          initial={isFirst ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}

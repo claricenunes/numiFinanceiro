@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { FadeIn } from "@/components/common/FadeIn";
 
 const NAV_LINKS = [
   { href: "#features", label: "Features" },
@@ -12,11 +11,18 @@ const NAV_LINKS = [
  * Floating pill navbar (dark-green, rounded-full) — mirrors the
  * "capsule nav on pastel background" pattern, restyled with Numi's
  * own wordmark and color system instead of a copied brand.
+ *
+ * Deliberately no mount/entrance animation here — this header must
+ * stay visible for the entire page (sticky, above every other section,
+ * including the GSAP-pinned ones further down), and a JS-driven
+ * fade/slide-in is one more thing that could theoretically get stuck
+ * at its initial (invisible) state. Always-rendered at full opacity is
+ * more important than a subtle entrance effect for a persistent nav.
  */
 export function LandingHeader() {
   return (
-    <header className="sticky top-6 z-50 w-full px-4 lg:px-6">
-      <FadeIn className="max-w-[1500px] mx-auto">
+    <header className="sticky top-6 z-[100] w-full px-4 lg:px-6">
+      <div className="max-w-[1500px] mx-auto">
         <div className="numi-pill-nav h-[92px] lg:h-[104px] px-7 lg:px-10 flex items-center justify-between gap-6 shadow-lg shadow-black/10">
           <div className="flex items-center gap-8 lg:gap-12">
             <Link href="/" className="shrink-0 flex items-center">
@@ -53,7 +59,7 @@ export function LandingHeader() {
             </Link>
           </div>
         </div>
-      </FadeIn>
+      </div>
     </header>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, type MotionValue } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePrefersReducedMotion } from "@/components/common/motion/usePrefersReducedMotion";
 import { PhoneFrame } from "./PhoneFrame";
 
@@ -89,17 +89,23 @@ export function PhoneMockup({ scrollYProgress, revealedStep }: PhoneMockupProps)
   const effectiveStep = revealedStep ?? MESSAGE_PAIRS.length - 1;
   const visibleMessages = ALL_MESSAGES.slice(0, (effectiveStep + 1) * 2);
 
-  // Instant snap, not a native smooth scroll — a second, uncoordinated
-  // animation timeline (the browser's own scroll easing) running at the
-  // same time as the bubble's own rise+fade below fought with it and
-  // read as janky/conflicting motion. The container jumps to the bottom
-  // immediately (before paint), and the new bubble's own transform is
-  // the only "arriving" motion left to see.
+  // Messages already present at mount render with initial={false} — no
+  // entrance animation to depend on for content that must be visible
+  // the instant the phone appears. Only messages that arrive *after*
+  // mount (via scroll revealing a later step) get the fade-in. Captured
+  // once via a lazy initializer (not a ref) since reading ref.current
+  // during render isn't allowed.
+  const [mountedCount] = useState(() => visibleMessages.length);
+
+  // The container's own smooth scroll IS the "message arriving" motion —
+  // the bubble itself only fades in (see below), so there is exactly one
+  // moving thing at a time instead of two independent animations (scroll
+  // easing + a transform) racing each other on the same content.
   useEffect(() => {
     const el = messagesRef.current;
     if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
-  }, [effectiveStep]);
+    el.scrollTo({ top: el.scrollHeight, behavior: reducedMotion ? "auto" : "smooth" });
+  }, [effectiveStep, reducedMotion]);
 
   // The idle "bob" float is only for the standalone presentation.
   // Once this phone is driven by scroll (scale-only per the section's
@@ -121,21 +127,22 @@ export function PhoneMockup({ scrollYProgress, revealedStep }: PhoneMockupProps)
             {visibleMessages.map((msg, i) => (
               <motion.div
                 key={i}
-                // New messages rise up from below the chat (like a real
-                // messaging app), not fade in place — a large positive y
-                // that eases down to 0, stacked with a fade. The second
-                // bubble of a pair starts a beat after the first so the
-                // two feel like they're arriving one after another.
-                initial={reducedMotion ? false : { opacity: 0, y: 56 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: reducedMotion ? 0 : (i % 2) * 0.12 }}
+                // Opacity-only entrance — the container's own smooth
+                // scroll (above) already provides the "sliding into view"
+                // motion, so the bubble doesn't also animate a transform;
+                // one clean motion cue instead of two fighting each other.
+                // The second bubble of a pair fades in a beat after the
+                // first so the two still feel like they arrive in turn.
+                initial={reducedMotion || i < mountedCount ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.35, ease: "easeOut", delay: reducedMotion ? 0 : (i % 2) * 0.12 }}
                 className={`shrink-0 max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-snug ${
                   msg.from === "numi"
                     ? "self-start bg-[#F7EEE4] text-[var(--numi-landing-heading)] rounded-bl-sm"
                     : "self-end text-white rounded-br-sm"
                 }`}
                 style={{
-                  willChange: "transform, opacity",
+                  willChange: "opacity",
                   ...(msg.from === "user"
                     ? { background: "var(--numi-landing-accent)", color: "var(--numi-landing-accent-text)" }
                     : undefined),

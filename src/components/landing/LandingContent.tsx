@@ -4,6 +4,9 @@ import { LandingHeader } from "./LandingHeader";
 import { Hero } from "./Hero";
 import { FeatureMarqueeSection } from "./FeatureMarqueeSection";
 import { AnimatedHeroBackground } from "./AnimatedHeroBackground";
+import { ResourcesSection } from "./ResourcesSection";
+import { HorizontalStatementSection } from "./HorizontalStatementSection";
+import { CTASection } from "./CTASection";
 import { FeaturesSection } from "./FeaturesSection";
 import { DashboardShowcaseSection } from "./DashboardShowcaseSection";
 import { AnalyticsScrollSection } from "./AnalyticsScrollSection";
@@ -24,6 +27,9 @@ export function LandingContent() {
         <Hero />
         <FeatureMarqueeSection />
       </div>
+      <ResourcesSection />
+      <HorizontalStatementSection />
+      <CTASection />
       <DashboardShowcaseSection />
       <FeaturesSection />
       <AnalyticsScrollSection />
