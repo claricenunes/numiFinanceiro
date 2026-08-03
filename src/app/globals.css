@@ -92,9 +92,9 @@ html.light {
   background: var(--numi-bg);
 }
 
-/* Fundo simples e chapado (creme quente) — sem gradientes/blobs coloridos.
-   Recomeçando do zero na identidade visual da landing; ajustar quando a
-   nova direção (mascote) estiver definida. */
+/* Fundo simples e chapado (creme quente) — base neutra sobre a qual as
+   seções com fundo colorido (pill-nav, cortinas verdes, cards coral)
+   ganham contraste. */
 html.light .numi-ambient-bg {
   background: #F7F5EC;
 }

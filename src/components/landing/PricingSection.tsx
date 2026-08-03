@@ -53,8 +53,17 @@ export function PricingSection() {
         {PLANS.map((plan) => (
           <StaggerItem
             key={plan.name}
-            className={plan.highlighted ? "glass-card p-7 flex flex-col gap-6 lg:scale-105" : "glass-card p-7 flex flex-col gap-6"}
-            style={plan.highlighted ? { border: "1.5px solid var(--numi-landing-accent)" } : undefined}
+            className={plan.highlighted ? "glass-card p-8 lg:p-9 flex flex-col gap-6 lg:scale-105" : "glass-card p-8 lg:p-9 flex flex-col gap-6"}
+            style={
+              plan.highlighted
+                ? {
+                    border: "1.5px solid var(--numi-landing-accent)",
+                    background:
+                      "linear-gradient(180deg, color-mix(in srgb, var(--numi-landing-accent) 6%, var(--numi-elevated)) 0%, var(--numi-elevated) 100%)",
+                    boxShadow: "0 25px 60px -20px color-mix(in srgb, var(--numi-landing-accent) 45%, transparent)",
+                  }
+                : undefined
+            }
           >
             {plan.highlighted && (
               <span

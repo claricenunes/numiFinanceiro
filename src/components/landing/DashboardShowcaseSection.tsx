@@ -44,41 +44,76 @@ export function DashboardShowcaseSection() {
       </Reveal>
 
       <Reveal delay={0.1}>
-        <div ref={containerRef} className="relative overflow-hidden rounded-3xl">
-          <motion.div
-            className="rounded-3xl border border-[var(--numi-border)] bg-[var(--numi-elevated)] shadow-[0_20px_60px_-20px_rgba(15,23,42,0.15)] overflow-hidden"
-            style={{ y: reducedMotion ? 0 : mockupParallaxY }}
-          >
-            <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[var(--numi-border)]">
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--numi-expense)", opacity: 0.6 }} />
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--numi-warning)", opacity: 0.6 }} />
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--numi-income)", opacity: 0.6 }} />
-            </div>
-
-            <div className="p-4 lg:p-8 flex flex-col gap-4">
-              <SummaryCards summary={MOCK_SUMMARY} locale="en-US" />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <ExpenseChart categories={MOCK_CATEGORIES} locale="en-US" />
-                <FlowChart data={MOCK_FLOW} locale="en-US" />
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <GoalsPreview goals={MOCK_GOALS} locale="en-US" />
-                <RecentTransactions transactions={MOCK_TRANSACTIONS} locale="en-US" />
-              </div>
-            </div>
-          </motion.div>
-
-          {!reducedMotion && (
-            <motion.div
-              aria-hidden="true"
-              className="absolute inset-x-0 bottom-0 top-1/2 z-10 pointer-events-none"
-              style={{
-                background: "var(--numi-landing-hero-bg-2)",
-                scaleY: curtainScale,
-                transformOrigin: "bottom",
-              }}
+        <div ref={containerRef} className="relative rounded-3xl">
+          {/* Large, soft, low-opacity shapes behind the frame — same
+              "depth" technique as CTASection's card, tying this mockup
+              into the rest of the page's visual language instead of
+              floating as a plain white rectangle on flat cream. */}
+          <div aria-hidden="true" className="absolute -inset-x-10 -inset-y-10 -z-10 overflow-hidden pointer-events-none">
+            <div
+              className="absolute -top-10 -left-10 w-[420px] h-[420px] rounded-full blur-3xl"
+              style={{ background: "var(--numi-landing-accent)", opacity: 0.12 }}
             />
-          )}
+            <div
+              className="absolute -bottom-16 -right-10 w-[420px] h-[420px] rounded-full blur-3xl"
+              style={{ background: "var(--numi-landing-nav-bg)", opacity: 0.1 }}
+            />
+          </div>
+
+          <div className="relative overflow-hidden rounded-3xl">
+            <motion.div
+              className="relative rounded-3xl border overflow-hidden"
+              style={{
+                y: reducedMotion ? 0 : mockupParallaxY,
+                background: "var(--numi-elevated)",
+                borderColor: "color-mix(in srgb, var(--numi-landing-heading) 10%, transparent)",
+                boxShadow: "0 30px 70px -25px color-mix(in srgb, var(--numi-landing-heading) 35%, transparent)",
+                // Scoped overrides — only inside this mockup, never touching
+                // the real tokens the actual logged-in app relies on. Ties
+                // the reused dashboard components' headings/labels/borders
+                // into the same dark-green/sage palette as the rest of the
+                // page, while leaving income/expense colors alone (real
+                // financial meaning shouldn't bend to match a color scheme).
+                ["--numi-text" as string]: "var(--numi-landing-heading)",
+                ["--numi-text-2" as string]: "var(--numi-landing-tagline)",
+                ["--numi-text-3" as string]: "color-mix(in srgb, var(--numi-landing-tagline) 55%, white)",
+                ["--numi-border" as string]: "color-mix(in srgb, var(--numi-landing-heading) 8%, transparent)",
+              }}
+            >
+              <div
+                className="flex items-center gap-1.5 px-4 py-3 border-b"
+                style={{ borderColor: "color-mix(in srgb, var(--numi-landing-heading) 8%, transparent)" }}
+              >
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--numi-expense)", opacity: 0.6 }} />
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--numi-warning)", opacity: 0.6 }} />
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--numi-landing-accent)", opacity: 0.7 }} />
+              </div>
+
+              <div className="p-4 lg:p-8 flex flex-col gap-4">
+                <SummaryCards summary={MOCK_SUMMARY} locale="en-US" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <ExpenseChart categories={MOCK_CATEGORIES} locale="en-US" />
+                  <FlowChart data={MOCK_FLOW} locale="en-US" />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <GoalsPreview goals={MOCK_GOALS} locale="en-US" />
+                  <RecentTransactions transactions={MOCK_TRANSACTIONS} locale="en-US" />
+                </div>
+              </div>
+            </motion.div>
+
+            {!reducedMotion && (
+              <motion.div
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 top-1/2 z-10 pointer-events-none"
+                style={{
+                  background: "var(--numi-landing-hero-bg-2)",
+                  scaleY: curtainScale,
+                  transformOrigin: "bottom",
+                }}
+              />
+            )}
+          </div>
         </div>
       </Reveal>
     </section>

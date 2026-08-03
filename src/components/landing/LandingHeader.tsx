@@ -13,15 +13,23 @@ const NAV_LINKS = [
  * own wordmark and color system instead of a copied brand.
  *
  * Deliberately no mount/entrance animation here — this header must
- * stay visible for the entire page (sticky, above every other section,
+ * stay visible for the entire page (above every other section,
  * including the GSAP-pinned ones further down), and a JS-driven
  * fade/slide-in is one more thing that could theoretically get stuck
  * at its initial (invisible) state. Always-rendered at full opacity is
  * more important than a subtle entrance effect for a persistent nav.
+ *
+ * `fixed`, not `sticky` — this component lives nested inside the hero
+ * band (kept there so the peach gradient shows through behind it,
+ * instead of a flat-cream seam), but `sticky` only stays docked while
+ * its own containing block (the hero band, only as tall as Hero +
+ * marquee) is in view — past that point it scrolls away with the rest
+ * of the page. `fixed` pins to the viewport itself regardless of which
+ * ancestor it's nested inside, so it stays put for the whole page.
  */
 export function LandingHeader() {
   return (
-    <header className="sticky top-6 z-[100] w-full px-4 lg:px-6">
+    <header className="fixed top-6 inset-x-0 z-[100] w-full px-4 lg:px-6">
       <div className="max-w-[1500px] mx-auto">
         <div className="numi-pill-nav h-[92px] lg:h-[104px] px-7 lg:px-10 flex items-center justify-between gap-6 shadow-lg shadow-black/10">
           <div className="flex items-center gap-8 lg:gap-12">

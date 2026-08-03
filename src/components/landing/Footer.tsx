@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { StaggerGroup, StaggerItem } from "@/components/common/motion/Stagger";
 
 const COLUMNS: { title: string; links: string[] }[] = [
@@ -15,15 +14,13 @@ export function Footer() {
     <footer className="px-4 pt-16 pb-8 border-t border-black/5">
       <div className="max-w-6xl mx-auto flex flex-col gap-12">
         <StaggerGroup className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          <StaggerItem className="col-span-2 lg:col-span-1 flex items-center gap-2">
-            <Image
-              src="/mascot/personagem2.png"
-              alt="Numi"
-              width={1113}
-              height={1414}
-              className="h-9 w-auto select-none"
-            />
-            <span className="text-base font-bold text-[var(--numi-text)]">Numi</span>
+          <StaggerItem className="col-span-2 lg:col-span-1 flex items-center">
+            <span
+              className="text-4xl leading-none"
+              style={{ color: "var(--numi-landing-heading)", fontFamily: "var(--font-logo)" }}
+            >
+              numi
+            </span>
           </StaggerItem>
 
           {COLUMNS.map((column) => (
