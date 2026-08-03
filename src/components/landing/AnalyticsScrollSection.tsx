@@ -11,36 +11,126 @@ if (typeof window !== "undefined") {
 }
 
 const GREEN_BG = "#32453A";
+const ACCENT = "var(--numi-landing-accent)";
 
-const CHAT_MESSAGES = [
-  "You spent $780 on Food this month.",
-  "Savings rate is up to 49%. 📈",
-  "Net worth: $24,380 (+3.2%).",
-  "3 new insights are ready for you. 👀",
-];
+type ChartKind = "ring" | "spark" | "bar" | "compare" | "dots";
 
-interface CardDef {
+interface MetricDef {
   label: string;
-  value: string;
-  sub: string;
-  targetX: number;
-  targetY: number;
+  chart: ChartKind;
+  caption: string;
+  value?: number;
+  compareA?: number;
+  compareB?: number;
 }
 
-const CARDS: CardDef[] = [
-  { label: "Health score", value: "82", sub: "out of 100", targetX: -280, targetY: -140 },
-  { label: "Net worth", value: "$24,380", sub: "+3.2% this month", targetX: 280, targetY: -160 },
-  { label: "Savings rate", value: "49%", sub: "of income", targetX: -300, targetY: 150 },
-  { label: "Insights", value: "3", sub: "ready to review", targetX: 300, targetY: 140 },
+// Same four metrics drive both the chat bubbles and the cards — a
+// message's chart is a small preview, the matching card is its
+// "expanded" chart, reinforcing that each message is what prompts its
+// card to slide out from behind the phone.
+const METRICS: MetricDef[] = [
+  { label: "Food spending", chart: "compare", caption: "$780 this month", compareA: 620, compareB: 780 },
+  { label: "Savings rate", chart: "bar", caption: "49% of income", value: 49 },
+  { label: "Net worth", chart: "spark", caption: "$24,380 (+3.2%)" },
+  { label: "Insights ready", chart: "dots", caption: "3 ready to review", value: 3 },
 ];
+
+const CARD_POSITIONS: { targetX: number; targetY: number }[] = [
+  { targetX: -280, targetY: -140 },
+  { targetX: -300, targetY: 150 },
+  { targetX: 280, targetY: -160 },
+  { targetX: 300, targetY: 140 },
+];
+
+function Ring({ value, size = 56 }: { value: number; size?: number }) {
+  const r = (size - 10) / 2;
+  const c = 2 * Math.PI * r;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90 shrink-0" aria-hidden="true">
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="6" />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke={ACCENT}
+        strokeWidth="6"
+        strokeLinecap="round"
+        strokeDasharray={c}
+        strokeDashoffset={c * (1 - value / 100)}
+      />
+    </svg>
+  );
+}
+
+function Spark({ width = 120, height = 36 }: { width?: number; height?: number }) {
+  return (
+    <svg viewBox="0 0 100 34" width={width} height={height} preserveAspectRatio="none" className="shrink-0" aria-hidden="true">
+      <polyline
+        points="0,30 20,25 38,22 55,14 72,16 100,3"
+        fill="none"
+        stroke={ACCENT}
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function Bar({ value, width }: { value: number; width?: string }) {
+  return (
+    <div className="h-2.5 rounded-full overflow-hidden shrink-0" style={{ width: width ?? "100%", background: "rgba(0,0,0,0.07)" }}>
+      <div className="h-full rounded-full" style={{ width: `${value}%`, background: ACCENT }} />
+    </div>
+  );
+}
+
+function Compare({ a, b, height = 40 }: { a: number; b: number; height?: number }) {
+  const max = Math.max(a, b);
+  return (
+    <div className="flex items-end gap-2 shrink-0" style={{ height, width: 72 }}>
+      <div className="flex-1 rounded-t-sm" style={{ height: `${(a / max) * 100}%`, background: "rgba(0,0,0,0.12)" }} />
+      <div className="flex-1 rounded-t-sm" style={{ height: `${(b / max) * 100}%`, background: ACCENT }} />
+    </div>
+  );
+}
+
+function Dots({ filled, total = 5 }: { filled: number; total?: number }) {
+  return (
+    <div className="flex items-center gap-1.5 shrink-0">
+      {Array.from({ length: total }).map((_, i) => (
+        <span key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: i < filled ? ACCENT : "rgba(0,0,0,0.1)" }} />
+      ))}
+    </div>
+  );
+}
+
+function Chart({ metric, size = "md" }: { metric: MetricDef; size?: "sm" | "md" }) {
+  switch (metric.chart) {
+    case "ring":
+      return <Ring value={metric.value ?? 0} size={size === "sm" ? 48 : 64} />;
+    case "spark":
+      return <Spark width={size === "sm" ? 100 : 130} height={size === "sm" ? 30 : 38} />;
+    case "bar":
+      return <Bar value={metric.value ?? 0} />;
+    case "compare":
+      return <Compare a={metric.compareA ?? 1} b={metric.compareB ?? 1} height={size === "sm" ? 32 : 44} />;
+    case "dots":
+      return <Dots filled={metric.value ?? 0} />;
+  }
+}
 
 /**
  * Scroll-linked showcase (GSAP ScrollTrigger, scrub): the green stage
  * behind the phone rises to cover the previous background while the
  * phone shrinks; data cards emerge from directly behind the phone
  * (opacity 0/scale 0.8 → opacity 1/scale 1, sliding out to their spread
- * positions) and the chat reveals internally. The left copy column is
- * untouched by any of this — no tween ever targets it.
+ * positions) and the chat reveals internally. Both the chat bubbles and
+ * the cards are chart-first (a mini graphic + a short caption) rather
+ * than sentences — the message is a small preview of the same chart its
+ * matching card shows larger. The left copy column is untouched by any
+ * of this — no tween ever targets it.
  */
 export function AnalyticsScrollSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -87,15 +177,15 @@ export function AnalyticsScrollSection() {
 
       // Phase 2: cards emerge from behind the phone (overlapping starts),
       // chat messages reveal in parallel.
-      CARDS.forEach((card, i) => {
+      CARD_POSITIONS.forEach((pos, i) => {
         tl.to(
           cardRefs.current[i],
-          { opacity: 1, scale: 1, x: card.targetX, y: card.targetY, ease: "none", duration: 0.9 },
+          { opacity: 1, scale: 1, x: pos.targetX, y: pos.targetY, ease: "none", duration: 0.9 },
           0.7 + i * 0.35
         );
       });
 
-      CHAT_MESSAGES.forEach((_, i) => {
+      METRICS.forEach((_, i) => {
         tl.to(
           messageRefs.current[i],
           { opacity: 1, y: 0, ease: "none", duration: 0.5 },
@@ -147,22 +237,31 @@ export function AnalyticsScrollSection() {
 
           <div className="relative flex items-center justify-center" style={{ minHeight: 720 }}>
             <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none" style={{ background: GREEN_BG }} />
-            {CARDS.map((card) => (
+            {METRICS.map((metric, i) => (
               <div
-                key={card.label}
-                className="absolute w-[170px] rounded-2xl bg-white p-4 shadow-lg"
-                style={{ left: "50%", top: "50%", marginLeft: -85 + card.targetX, marginTop: -50 + card.targetY }}
+                key={metric.label}
+                className="absolute w-[170px] rounded-2xl bg-white p-4 shadow-lg flex flex-col gap-2.5"
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  marginLeft: -85 + CARD_POSITIONS[i].targetX,
+                  marginTop: -60 + CARD_POSITIONS[i].targetY,
+                }}
               >
-                <p className="text-xs font-medium text-[var(--numi-text-3)]">{card.label}</p>
-                <p className="text-2xl font-bold text-[var(--numi-text)]">{card.value}</p>
-                <p className="text-[11px] text-[var(--numi-text-3)]">{card.sub}</p>
+                <p className="text-xs font-medium text-[var(--numi-text-3)]">{metric.label}</p>
+                <Chart metric={metric} />
+                <p className="text-[11px] font-semibold text-[var(--numi-text)]">{metric.caption}</p>
               </div>
             ))}
             <div className="relative z-10" style={{ transform: "scale(0.6)" }}>
               <PhoneFrame>
-                {CHAT_MESSAGES.map((text) => (
-                  <div key={text} className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-snug bg-[#F7EEE4] text-[var(--numi-landing-heading)]">
-                    {text}
+                {METRICS.map((metric) => (
+                  <div
+                    key={metric.label}
+                    className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 flex flex-col gap-2 bg-[#F7EEE4]"
+                  >
+                    <p className="text-[11px] font-medium text-[var(--numi-landing-heading)]/70">{metric.label}</p>
+                    <Chart metric={metric} size="sm" />
                   </div>
                 ))}
               </PhoneFrame>
@@ -199,29 +298,30 @@ export function AnalyticsScrollSection() {
             />
           </div>
 
-          {CARDS.map((card, i) => (
+          {METRICS.map((metric, i) => (
             <div
-              key={card.label}
+              key={metric.label}
               ref={(el) => { cardRefs.current[i] = el; }}
-              className="absolute z-10 w-[170px] rounded-2xl bg-white p-4 shadow-lg"
-              style={{ left: "50%", top: "50%", marginLeft: -85, marginTop: -50, willChange: "transform, opacity" }}
+              className="absolute z-10 w-[170px] rounded-2xl bg-white p-4 shadow-lg flex flex-col gap-2.5"
+              style={{ left: "50%", top: "50%", marginLeft: -85, marginTop: -60, willChange: "transform, opacity" }}
             >
-              <p className="text-xs font-medium text-[var(--numi-text-3)]">{card.label}</p>
-              <p className="text-2xl font-bold text-[var(--numi-text)]">{card.value}</p>
-              <p className="text-[11px] text-[var(--numi-text-3)]">{card.sub}</p>
+              <p className="text-xs font-medium text-[var(--numi-text-3)]">{metric.label}</p>
+              <Chart metric={metric} />
+              <p className="text-[11px] font-semibold text-[var(--numi-text)]">{metric.caption}</p>
             </div>
           ))}
 
           <div ref={phoneRef} className="relative z-20" style={{ willChange: "transform" }}>
             <PhoneFrame>
-              {CHAT_MESSAGES.map((text, i) => (
+              {METRICS.map((metric, i) => (
                 <div
-                  key={text}
+                  key={metric.label}
                   ref={(el) => { messageRefs.current[i] = el; }}
-                  className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-snug bg-[#F7EEE4] text-[var(--numi-landing-heading)]"
+                  className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 flex flex-col gap-2 bg-[#F7EEE4]"
                   style={{ willChange: "transform, opacity" }}
                 >
-                  {text}
+                  <p className="text-[11px] font-medium text-[var(--numi-landing-heading)]/70">{metric.label}</p>
+                  <Chart metric={metric} size="sm" />
                 </div>
               ))}
             </PhoneFrame>

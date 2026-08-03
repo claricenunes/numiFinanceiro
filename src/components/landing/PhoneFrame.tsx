@@ -1,21 +1,57 @@
 import { ArrowUp } from "lucide-react";
 import type { ReactNode } from "react";
 
+const DEFAULT_HEADER = (
+  <>
+    <span className="text-[var(--numi-landing-heading)] text-lg leading-none">‹</span>
+    <div className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: "var(--numi-landing-nav-bg)" }}>
+      N
+    </div>
+    <span className="text-sm font-semibold text-[var(--numi-landing-heading)]">Numi</span>
+    <span className="ml-auto text-[var(--numi-landing-heading)] text-xs opacity-60">ⓘ</span>
+  </>
+);
+
+const DEFAULT_FOOTER = (
+  <>
+    <div className="flex-1 h-9 rounded-full bg-black/[0.04] border border-black/5 flex items-center px-4">
+      <span className="text-[13px] text-[var(--numi-landing-heading)]/35">Message</span>
+    </div>
+    <div
+      className="h-8 w-8 rounded-full flex items-center justify-center shrink-0"
+      style={{ background: "var(--numi-landing-accent)" }}
+    >
+      <ArrowUp className="h-4 w-4" style={{ color: "var(--numi-landing-accent-text)" }} strokeWidth={2.5} />
+    </div>
+  </>
+);
+
 /**
  * Shared iPhone chrome (titanium frame, dynamic island, status bar,
- * Numi header row, home indicator) — pure presentation, no animation
- * or chat logic of its own. `children` renders inside the scrollable
- * screen area. Used by both the Hero's looping-chat mockup and the
- * scroll-driven showcase phone, so the two never drift apart visually.
+ * home indicator) — pure presentation, no animation logic of its own.
+ * `children` renders inside the scrollable screen area. Used by both
+ * the Hero's looping-chat mockup and the Analytics dashboard mockup, so
+ * the two never drift apart visually.
+ *
+ * `header`/`footer` default to the chat row (back + avatar + "Numi" +
+ * info) and message composer — pass `false` to omit either (e.g. a
+ * dashboard screen has no message composer) or a different node to
+ * replace it (e.g. a plain "Dashboard" title instead of the chat row).
  */
 export function PhoneFrame({
   children,
   className = "w-[300px] sm:w-[360px] lg:w-[400px]",
   screenHeightClassName = "h-[650px] lg:h-[760px]",
+  contentClassName = "flex-1 min-h-0 px-5 py-6 flex flex-col gap-3.5 overflow-hidden",
+  header = DEFAULT_HEADER,
+  footer = DEFAULT_FOOTER,
 }: {
   children: ReactNode;
   className?: string;
   screenHeightClassName?: string;
+  contentClassName?: string;
+  header?: ReactNode | false;
+  footer?: ReactNode | false;
 }) {
   return (
     <div className={`relative shrink-0 ${className}`}>
@@ -61,29 +97,15 @@ export function PhoneFrame({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 px-5 pt-3 pb-4 border-b border-black/5 bg-white">
-              <span className="text-[var(--numi-landing-heading)] text-lg leading-none">‹</span>
-              <div className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: "var(--numi-landing-nav-bg)" }}>
-                N
-              </div>
-              <span className="text-sm font-semibold text-[var(--numi-landing-heading)]">Numi</span>
-              <span className="ml-auto text-[var(--numi-landing-heading)] text-xs opacity-60">ⓘ</span>
-            </div>
+            {header !== false && (
+              <div className="flex items-center gap-2 px-5 pt-3 pb-4 border-b border-black/5 bg-white">{header}</div>
+            )}
 
-            <div className="flex-1 min-h-0 px-5 py-6 flex flex-col gap-3.5 overflow-hidden">{children}</div>
+            <div className={contentClassName}>{children}</div>
 
-            {/* Message input bar */}
-            <div className="flex items-center gap-2 px-5 pb-2">
-              <div className="flex-1 h-9 rounded-full bg-black/[0.04] border border-black/5 flex items-center px-4">
-                <span className="text-[13px] text-[var(--numi-landing-heading)]/35">Message</span>
-              </div>
-              <div
-                className="h-8 w-8 rounded-full flex items-center justify-center shrink-0"
-                style={{ background: "var(--numi-landing-accent)" }}
-              >
-                <ArrowUp className="h-4 w-4" style={{ color: "var(--numi-landing-accent-text)" }} strokeWidth={2.5} />
-              </div>
-            </div>
+            {footer !== false && (
+              <div className="flex items-center gap-2 px-5 pb-2">{footer}</div>
+            )}
 
             {/* Home indicator */}
             <div className="pb-2 pt-1 flex justify-center">
