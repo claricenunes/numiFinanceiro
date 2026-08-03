@@ -1,157 +1,140 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, type MotionValue } from "framer-motion";
-import { useEffect, useState } from "react";
+import { AnimatePresence, motion, type MotionValue } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { usePrefersReducedMotion } from "@/components/common/motion/usePrefersReducedMotion";
 import { PhoneFrame } from "./PhoneFrame";
 
-const CHAT_STEPS = [
-  { from: "numi" as const, text: "You spent 20% more on delivery this month. Want to adjust your goal?" },
-  { from: "user" as const, text: "Yes!" },
-  { from: "numi" as const, text: "Done. I'll let you know if you hit the new limit. 🎯" },
+interface ChatMessage {
+  from: "numi" | "user";
+  text: string;
+  /** Raw comparison values (e.g. dollar amounts) — renders a tiny inline bar chart under the bubble text, scaled relative to the larger of the two. */
+  chart?: { lastMonth: number; thisMonth: number };
+}
+
+// One continuous, ever-growing conversation — never a different screen,
+// never restarted. The first pair is already on screen the moment the
+// phone mounts (before any scroll); each further pair is revealed
+// together as the user scrolls, and everything shown before stays
+// visible — full history, nothing removed or replaced.
+const MESSAGE_PAIRS: [ChatMessage, ChatMessage][] = [
+  [
+    { from: "user", text: "Hi Numi! How did I do this month?" },
+    { from: "numi", text: "I've analyzed your finances. Here's a quick summary." },
+  ],
+  [
+    { from: "numi", text: "You spent 10% more than last month." },
+    { from: "numi", text: "📊 Last month: $2,430 • This month: $2,675", chart: { lastMonth: 2430, thisMonth: 2675 } },
+  ],
+  [
+    { from: "user", text: "Where did it go?" },
+    { from: "numi", text: "Mostly dining out — up 24%. 🍽️" },
+  ],
+  [
+    { from: "numi", text: "You also saved $180 less than usual." },
+    { from: "numi", text: "💰 That's mainly because of weekend trips." },
+  ],
+  [
+    { from: "user", text: "How can I improve?" },
+    { from: "numi", text: "Cutting dining expenses by 15% would put you back on track next month." },
+  ],
+  [
+    { from: "numi", text: "If you keep this pace, you'll reach your savings goal in 4 months. 🎯" },
+    { from: "user", text: "Great! Let's do it." },
+  ],
 ];
 
-const STEP_DELAY = 1400;
-const HOLD_DELAY = 2600;
+const ALL_MESSAGES = MESSAGE_PAIRS.flat();
 
-// Second act, shown once the user starts scrolling past the hero —
-// replaces the looping exchange above with proactive notifications,
-// revealed one at a time in sync with scroll (not on a timer).
-const SHOWCASE_MESSAGES = [
-  "Rent payment detected — I updated your budget automatically.",
-  "You're 12% under budget this month. Nice work! 🎉",
-  "Netflix renews in 3 days. Still want it?",
-  "Emergency fund just hit 60% of its goal. 💪",
-];
-const SHOWCASE_START = 0.1; // leaves room for the loop-chat crossfade before showcase messages begin
+// Pixel heights, not percentages — a percentage height only resolves
+// against a parent with a *definite* height, and these bars' direct
+// parent (the flex column wrapper) sizes to its content instead.
+const CHART_MAX_BAR_HEIGHT = 40;
+
+function SpendingBarsChart({ lastMonth, thisMonth }: { lastMonth: number; thisMonth: number }) {
+  const max = Math.max(lastMonth, thisMonth);
+  return (
+    <div className="mt-2.5 flex items-end gap-3">
+      <div className="flex flex-col items-center gap-1">
+        <div className="w-6 rounded-t-md bg-[var(--numi-landing-heading)]/20" style={{ height: (lastMonth / max) * CHART_MAX_BAR_HEIGHT }} />
+        <span className="text-[9px] leading-none text-[var(--numi-landing-heading)]/60">Last</span>
+      </div>
+      <div className="flex flex-col items-center gap-1">
+        <div className="w-6 rounded-t-md" style={{ height: (thisMonth / max) * CHART_MAX_BAR_HEIGHT, background: "var(--numi-landing-accent)" }} />
+        <span className="text-[9px] leading-none text-[var(--numi-landing-heading)]/60">This</span>
+      </div>
+    </div>
+  );
+}
 
 interface PhoneMockupProps {
-  /** When provided, the phone crossfades from its looping demo chat into
-   * scroll-synced showcase messages as this progresses past 0. */
+  /** When provided, only message pairs up to this index (0-based) are shown — the same step index driving the dashboard cards around the phone, so both stay in lockstep. Omit to show the full conversation immediately. */
+  revealedStep?: number;
   scrollYProgress?: MotionValue<number>;
 }
 
 /**
- * Phone mockup with a chat transcript styled after the app's own
- * bubble/avatar language. The conversation loops on a timer so the
- * hero always feels "alive" — until the user scrolls, at which point
- * it hands off to a second, scroll-driven set of messages.
+ * Phone mockup with a single, continuously-growing chat transcript —
+ * the first exchange is visible on mount, and each further step appends
+ * a pair of messages without ever clearing or replacing what's already
+ * there, so it reads as one real conversation being built up. The step
+ * index is computed by the parent (Hero) so the dashboard cards that
+ * surround the phone reveal in exact sync with the messages that
+ * prompted them.
  */
-export function PhoneMockup({ scrollYProgress }: PhoneMockupProps) {
-  const [visibleCount, setVisibleCount] = useState(0);
+export function PhoneMockup({ scrollYProgress, revealedStep }: PhoneMockupProps) {
   const reducedMotion = usePrefersReducedMotion();
+  const messagesRef = useRef<HTMLDivElement>(null);
+
+  const effectiveStep = revealedStep ?? MESSAGE_PAIRS.length - 1;
+  const visibleMessages = ALL_MESSAGES.slice(0, (effectiveStep + 1) * 2);
 
   useEffect(() => {
-    const prefersReducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) {
-      setVisibleCount(CHAT_STEPS.length);
-      return;
-    }
+    const el = messagesRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: reducedMotion ? "auto" : "smooth" });
+  }, [effectiveStep, reducedMotion]);
 
-    let cancelled = false;
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    const run = (step: number) => {
-      if (cancelled) return;
-      setVisibleCount(step);
-      if (step < CHAT_STEPS.length) {
-        timeoutId = setTimeout(() => run(step + 1), STEP_DELAY);
-      } else {
-        timeoutId = setTimeout(() => run(0), HOLD_DELAY);
-      }
-    };
-
-    timeoutId = setTimeout(() => run(1), STEP_DELAY);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(timeoutId);
-    };
-  }, []);
-
-  const loopOpacity = useMotionValue(1);
-  const msg0Opacity = useMotionValue(0);
-  const msg0Y = useMotionValue(10);
-  const msg1Opacity = useMotionValue(0);
-  const msg1Y = useMotionValue(10);
-  const msg2Opacity = useMotionValue(0);
-  const msg2Y = useMotionValue(10);
-  const msg3Opacity = useMotionValue(0);
-  const msg3Y = useMotionValue(10);
-  const messageMotions = [
-    { opacity: msg0Opacity, y: msg0Y },
-    { opacity: msg1Opacity, y: msg1Y },
-    { opacity: msg2Opacity, y: msg2Y },
-    { opacity: msg3Opacity, y: msg3Y },
-  ];
-
-  const sync = (latest: number) => {
-    loopOpacity.set(Math.max(0, 1 - latest / SHOWCASE_START));
-
-    const span = 1 - SHOWCASE_START;
-    const bandSize = span / SHOWCASE_MESSAGES.length;
-    messageMotions.forEach(({ opacity, y }, i) => {
-      const start = SHOWCASE_START + i * bandSize;
-      const t = Math.min(1, Math.max(0, (latest - start) / bandSize));
-      opacity.set(t);
-      y.set(10 * (1 - t));
-    });
-  };
-
-  const fallbackProgress = useMotionValue(0);
-  const progress = scrollYProgress ?? fallbackProgress;
-  useMotionValueEvent(progress, "change", (latest) => {
-    if (scrollYProgress) sync(latest);
-  });
-  useEffect(() => {
-    if (scrollYProgress) sync(scrollYProgress.get());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // The idle "bob" float is only for the standalone presentation.
+  // Once this phone is driven by scroll (scale-only per the section's
+  // spec), it must never carry its own independent translateY.
+  const enableBob = !reducedMotion && !scrollYProgress;
 
   return (
     <motion.div
-      animate={reducedMotion ? undefined : { y: [0, -8, 0] }}
-      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", repeatType: "mirror" }}
+      animate={enableBob ? { y: [0, -8, 0] } : undefined}
+      transition={enableBob ? { duration: 4, repeat: Infinity, ease: "easeInOut", repeatType: "mirror" } : undefined}
     >
       <PhoneFrame>
-        <div className="relative flex-1">
-          <motion.div className="absolute inset-0 flex flex-col gap-3.5" style={{ opacity: scrollYProgress ? loopOpacity : 1 }}>
-            <AnimatePresence>
-              {CHAT_STEPS.slice(0, visibleCount).map((step, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-snug ${
-                    step.from === "numi"
-                      ? "self-start bg-[#F7EEE4] text-[var(--numi-landing-heading)] rounded-bl-sm"
-                      : "self-end text-white rounded-br-sm"
-                  }`}
-                  style={step.from === "user" ? { background: "var(--numi-landing-accent)", color: "var(--numi-landing-accent-text)" } : undefined}
-                >
-                  {step.text}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
-
-          {scrollYProgress && (
-            <div className="absolute inset-0 flex flex-col gap-3.5">
-              {SHOWCASE_MESSAGES.map((text, i) => (
-                <motion.div
-                  key={text}
-                  style={{ opacity: messageMotions[i].opacity, y: messageMotions[i].y, willChange: "transform, opacity" }}
-                  className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-snug bg-[#F7EEE4] text-[var(--numi-landing-heading)]"
-                >
-                  {text}
-                </motion.div>
-              ))}
-            </div>
-          )}
+        <div
+          ref={messagesRef}
+          className="flex-1 min-h-0 flex flex-col gap-3.5 overflow-y-auto [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <AnimatePresence>
+            {visibleMessages.map((msg, i) => (
+              <motion.div
+                key={i}
+                // New messages rise up from below the chat (like a real
+                // messaging app), not fade in place — a large positive y
+                // that eases down to 0, stacked with a fade. The second
+                // bubble of a pair starts a beat after the first so the
+                // two feel like they're arriving one after another.
+                initial={reducedMotion ? false : { opacity: 0, y: 56 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: reducedMotion ? 0 : (i % 2) * 0.12 }}
+                className={`shrink-0 max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-snug ${
+                  msg.from === "numi"
+                    ? "self-start bg-[#F7EEE4] text-[var(--numi-landing-heading)] rounded-bl-sm"
+                    : "self-end text-white rounded-br-sm"
+                }`}
+                style={msg.from === "user" ? { background: "var(--numi-landing-accent)", color: "var(--numi-landing-accent-text)" } : undefined}
+              >
+                {msg.text}
+                {msg.chart && <SpendingBarsChart lastMonth={msg.chart.lastMonth} thisMonth={msg.chart.thisMonth} />}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </PhoneFrame>
     </motion.div>

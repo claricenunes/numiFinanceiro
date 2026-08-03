@@ -1,21 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform, useMotionValue, useMotionValueEvent } from "framer-motion";
+import { useLayoutEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePrefersReducedMotion } from "@/components/common/motion/usePrefersReducedMotion";
 import { PhoneFrame } from "./PhoneFrame";
 
-const ACCENT_GREEN = "#98BB8A";
-const SECTION_HEIGHT_VH = 280;
-// The sticky child only stays pinned while scrolling through
-// (sectionHeight - viewportHeight) of the section — as a fraction of the
-// section's own 0→1 scrollYProgress that's (H-100)/H, a fixed ratio since
-// both are in vh (viewport-independent). Every band must finish inside
-// this window, or its content gets scrolled away mid-animation before it
-// ever finishes revealing.
-const PIN_END = (SECTION_HEIGHT_VH - 100) / SECTION_HEIGHT_VH;
-const PHASE1_END = 0.35; // phone shrink + green circle expansion
-const CLAMP = (n: number) => Math.min(1, Math.max(0, n));
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+const GREEN_BG = "#32453A";
 
 const CHAT_MESSAGES = [
   "You spent $780 on Food this month.",
@@ -30,132 +25,138 @@ interface CardDef {
   sub: string;
   targetX: number;
   targetY: number;
-  start: number;
-  end: number;
 }
 
-// Sub-ranges overlap slightly (each starts before the previous fully
-// finishes) so the reveal feels organic rather than mechanically metered.
-// All four fit inside [PHASE1_END, PIN_END] — see PIN_END above.
-const PHASE2_SPAN = PIN_END - PHASE1_END;
 const CARDS: CardDef[] = [
-  { label: "Health score", value: "82", sub: "out of 100", targetX: -360, targetY: -150, start: PHASE1_END + PHASE2_SPAN * 0.0, end: PHASE1_END + PHASE2_SPAN * 0.32 },
-  { label: "Net worth", value: "$24,380", sub: "+3.2% this month", targetX: 360, targetY: -170, start: PHASE1_END + PHASE2_SPAN * 0.22, end: PHASE1_END + PHASE2_SPAN * 0.55 },
-  { label: "Savings rate", value: "49%", sub: "of income", targetX: -380, targetY: 170, start: PHASE1_END + PHASE2_SPAN * 0.45, end: PHASE1_END + PHASE2_SPAN * 0.78 },
-  { label: "Insights", value: "3", sub: "ready to review", targetX: 380, targetY: 160, start: PHASE1_END + PHASE2_SPAN * 0.68, end: PHASE1_END + PHASE2_SPAN * 1.0 },
+  { label: "Health score", value: "82", sub: "out of 100", targetX: -280, targetY: -140 },
+  { label: "Net worth", value: "$24,380", sub: "+3.2% this month", targetX: 280, targetY: -160 },
+  { label: "Savings rate", value: "49%", sub: "of income", targetX: -300, targetY: 150 },
+  { label: "Insights", value: "3", sub: "ready to review", targetX: 300, targetY: 140 },
 ];
 
 /**
- * Scroll-linked showcase: the phone shrinks while a green circle expands
- * to fill the viewport, then data cards emerge from behind the phone
- * (spreading to the corners) while the chat scrolls internally — all
- * tied 1:1 to scroll progress through this section, not a timer.
- * Replaces the static AnalyticsSection with the same underlying stats.
+ * Scroll-linked showcase (GSAP ScrollTrigger, scrub): the green stage
+ * behind the phone rises to cover the previous background while the
+ * phone shrinks; data cards emerge from directly behind the phone
+ * (opacity 0/scale 0.8 → opacity 1/scale 1, sliding out to their spread
+ * positions) and the chat reveals internally. The left copy column is
+ * untouched by any of this — no tween ever targets it.
  */
 export function AnalyticsScrollSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const greenPanelRef = useRef<HTMLDivElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const reducedMotion = usePrefersReducedMotion();
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
+  useLayoutEffect(() => {
+    if (reducedMotion) return;
+    if (!sectionRef.current || !stageRef.current) return;
 
-  const phoneScale = useTransform(scrollYProgress, [0, PHASE1_END], [1, 0.6]);
-  const clipPath = useTransform(scrollYProgress, (p) => {
-    const t = CLAMP(p / PHASE1_END);
-    return `circle(${t * 150}% at 50% 50%)`;
-  });
+    const ctx = gsap.context(() => {
+      const cards = cardRefs.current.filter((el): el is HTMLDivElement => el !== null);
+      const messages = messageRefs.current.filter((el): el is HTMLDivElement => el !== null);
 
-  // Cards and chat messages are updated together from a single scroll
-  // subscription (see AppShowcaseScrollSection / PhoneMockup for why:
-  // many independent useTransform hooks off one shared scrollYProgress
-  // produced inconsistent, non-monotonic values in this codebase).
-  const card0Opacity = useMotionValue(0);
-  const card0Scale = useMotionValue(0.8);
-  const card0X = useMotionValue(0);
-  const card0Y = useMotionValue(0);
-  const card1Opacity = useMotionValue(0);
-  const card1Scale = useMotionValue(0.8);
-  const card1X = useMotionValue(0);
-  const card1Y = useMotionValue(0);
-  const card2Opacity = useMotionValue(0);
-  const card2Scale = useMotionValue(0.8);
-  const card2X = useMotionValue(0);
-  const card2Y = useMotionValue(0);
-  const card3Opacity = useMotionValue(0);
-  const card3Scale = useMotionValue(0.8);
-  const card3X = useMotionValue(0);
-  const card3Y = useMotionValue(0);
-  const cardMotions = [
-    { opacity: card0Opacity, scale: card0Scale, x: card0X, y: card0Y },
-    { opacity: card1Opacity, scale: card1Scale, x: card1X, y: card1Y },
-    { opacity: card2Opacity, scale: card2Scale, x: card2X, y: card2Y },
-    { opacity: card3Opacity, scale: card3Scale, x: card3X, y: card3Y },
-  ];
+      gsap.set(greenPanelRef.current, { yPercent: 100 });
+      // transformOrigin + explicit x/y lock the phone's center to a fixed
+      // point — scale is the only property this element's tween ever sets,
+      // and x/y are pinned at 0 on every frame so nothing (this tween or
+      // otherwise) can introduce vertical drift.
+      gsap.set(phoneRef.current, { scale: 1, x: 0, y: 0, transformOrigin: "50% 50%" });
+      gsap.set(cards, { opacity: 0, scale: 0.8, x: 0, y: 0 });
+      gsap.set(messages, { opacity: 0, y: 20 });
 
-  const msg0Opacity = useMotionValue(0);
-  const msg0Y = useMotionValue(20);
-  const msg1Opacity = useMotionValue(0);
-  const msg1Y = useMotionValue(20);
-  const msg2Opacity = useMotionValue(0);
-  const msg2Y = useMotionValue(20);
-  const msg3Opacity = useMotionValue(0);
-  const msg3Y = useMotionValue(20);
-  const messageMotions = [
-    { opacity: msg0Opacity, y: msg0Y },
-    { opacity: msg1Opacity, y: msg1Y },
-    { opacity: msg2Opacity, y: msg2Y },
-    { opacity: msg3Opacity, y: msg3Y },
-  ];
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: () => `+=${window.innerHeight * 2.6}`,
+          scrub: true,
+          pin: true,
+          invalidateOnRefresh: true,
+        },
+      });
 
-  const sync = (latest: number) => {
-    CARDS.forEach((card, i) => {
-      const t = CLAMP((latest - card.start) / (card.end - card.start));
-      cardMotions[i].opacity.set(t);
-      cardMotions[i].scale.set(0.8 + t * 0.2);
-      cardMotions[i].x.set(card.targetX * t);
-      cardMotions[i].y.set(card.targetY * t);
-    });
+      // Phase 1: green stage rises + phone shrinks, simultaneously.
+      // The phone tween sets only `scale` (plus a static x:0/y:0 — same
+      // value start-to-end, never animated) so its center never moves.
+      tl.to(greenPanelRef.current, { yPercent: 0, ease: "none", duration: 1.2 }, 0);
+      tl.to(phoneRef.current, { scale: 0.6, x: 0, y: 0, ease: "none", duration: 1.2 }, 0);
 
-    const msgSpan = PHASE2_SPAN / CHAT_MESSAGES.length;
-    messageMotions.forEach(({ opacity, y }, i) => {
-      const start = PHASE1_END + i * msgSpan;
-      const t = CLAMP((latest - start) / msgSpan);
-      opacity.set(t);
-      y.set(20 * (1 - t));
-    });
-  };
+      // Phase 2: cards emerge from behind the phone (overlapping starts),
+      // chat messages reveal in parallel.
+      CARDS.forEach((card, i) => {
+        tl.to(
+          cardRefs.current[i],
+          { opacity: 1, scale: 1, x: card.targetX, y: card.targetY, ease: "none", duration: 0.9 },
+          0.7 + i * 0.35
+        );
+      });
 
-  useMotionValueEvent(scrollYProgress, "change", sync);
-  useEffect(() => {
-    sync(scrollYProgress.get());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      CHAT_MESSAGES.forEach((_, i) => {
+        tl.to(
+          messageRefs.current[i],
+          { opacity: 1, y: 0, ease: "none", duration: 0.5 },
+          0.9 + i * 0.3
+        );
+      });
+    }, sectionRef);
+
+    // Web fonts (and anything else) finishing layout after this effect's
+    // initial measurement would leave the pinned position calculated
+    // against stale geometry — refreshing once everything has settled
+    // re-measures and re-anchors it, which is what prevents the whole
+    // pinned block (phone + text) from drifting during real scrolling.
+    const refresh = () => ScrollTrigger.refresh();
+    if (typeof document !== "undefined" && "fonts" in document) {
+      document.fonts.ready.then(refresh);
+    }
+    window.addEventListener("load", refresh);
+
+    return () => {
+      ctx.revert();
+      window.removeEventListener("load", refresh);
+    };
+  }, [reducedMotion]);
 
   if (reducedMotion) {
     return (
-      <section className="relative py-24 lg:py-32 overflow-hidden" style={{ background: ACCENT_GREEN }}>
-        <div className="relative max-w-5xl mx-auto px-4 flex items-center justify-center" style={{ minHeight: 640 }}>
-          {CARDS.map((card) => (
-            <div
-              key={card.label}
-              className="absolute w-[180px] rounded-2xl bg-white p-4 shadow-lg"
-              style={{ left: "50%", top: "50%", marginLeft: -90 + card.targetX, marginTop: -50 + card.targetY }}
-            >
-              <p className="text-xs font-medium text-[var(--numi-text-3)]">{card.label}</p>
-              <p className="text-2xl font-bold text-[var(--numi-text)]">{card.value}</p>
-              <p className="text-[11px] text-[var(--numi-text-3)]">{card.sub}</p>
+      <section className="px-4 py-24 lg:py-32 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div>
+            <p className="text-sm font-semibold mb-3" style={{ color: "var(--numi-landing-tagline)" }}>Analytics</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-[var(--numi-text)] leading-tight mb-4">
+              Every number, one glance away
+            </h2>
+            <p className="text-base text-[var(--numi-text-2)] leading-relaxed max-w-md">
+              Health score, net worth, savings rate — the metrics that actually matter, always in view.
+            </p>
+          </div>
+
+          <div className="relative flex items-center justify-center" style={{ minHeight: 640 }}>
+            <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none" style={{ background: GREEN_BG }} />
+            {CARDS.map((card) => (
+              <div
+                key={card.label}
+                className="absolute w-[170px] rounded-2xl bg-white p-4 shadow-lg"
+                style={{ left: "50%", top: "50%", marginLeft: -85 + card.targetX, marginTop: -50 + card.targetY }}
+              >
+                <p className="text-xs font-medium text-[var(--numi-text-3)]">{card.label}</p>
+                <p className="text-2xl font-bold text-[var(--numi-text)]">{card.value}</p>
+                <p className="text-[11px] text-[var(--numi-text-3)]">{card.sub}</p>
+              </div>
+            ))}
+            <div className="relative z-10" style={{ transform: "scale(0.6)" }}>
+              <PhoneFrame>
+                {CHAT_MESSAGES.map((text) => (
+                  <div key={text} className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-snug bg-[#F7EEE4] text-[var(--numi-landing-heading)]">
+                    {text}
+                  </div>
+                ))}
+              </PhoneFrame>
             </div>
-          ))}
-          <div style={{ transform: "scale(0.6)" }}>
-            <PhoneFrame>
-              {CHAT_MESSAGES.map((text) => (
-                <div key={text} className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-snug bg-[#F7EEE4] text-[var(--numi-landing-heading)]">
-                  {text}
-                </div>
-              ))}
-            </PhoneFrame>
           </div>
         </div>
       </section>
@@ -163,50 +164,58 @@ export function AnalyticsScrollSection() {
   }
 
   return (
-    <section ref={sectionRef} className="relative" style={{ height: `${SECTION_HEIGHT_VH}vh` }}>
-      <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center">
-        <motion.div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: ACCENT_GREEN, clipPath, willChange: "clip-path" }}
-        />
+    <section ref={sectionRef} className="relative px-4 py-24 lg:py-32 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        {/* Static — no ref, no tween ever targets this column. */}
+        <div>
+          <p className="text-sm font-semibold mb-3" style={{ color: "var(--numi-landing-tagline)" }}>Analytics</p>
+          <h2 className="text-3xl lg:text-4xl font-bold text-[var(--numi-text)] leading-tight mb-4">
+            Every number, one glance away
+          </h2>
+          <p className="text-base text-[var(--numi-text-2)] leading-relaxed max-w-md">
+            Health score, net worth, savings rate — the metrics that actually matter, always in view.
+          </p>
+        </div>
 
-        <div className="relative w-full max-w-5xl mx-auto flex items-center justify-center" style={{ minHeight: 640 }}>
+        <div ref={stageRef} className="relative flex items-center justify-center" style={{ minHeight: 640 }}>
+          {/* Only the green panel is clipped to the rounded stage — cards
+              are free to spread past its edges without getting cut off. */}
+          <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+            <div
+              ref={greenPanelRef}
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{ background: GREEN_BG, willChange: "transform" }}
+            />
+          </div>
+
           {CARDS.map((card, i) => (
-            <motion.div
+            <div
               key={card.label}
-              className="absolute w-[180px] rounded-2xl bg-white p-4 shadow-lg"
-              style={{
-                left: "50%",
-                top: "50%",
-                marginLeft: -90,
-                marginTop: -50,
-                opacity: cardMotions[i].opacity,
-                scale: cardMotions[i].scale,
-                x: cardMotions[i].x,
-                y: cardMotions[i].y,
-                willChange: "transform, opacity",
-              }}
+              ref={(el) => { cardRefs.current[i] = el; }}
+              className="absolute z-10 w-[170px] rounded-2xl bg-white p-4 shadow-lg"
+              style={{ left: "50%", top: "50%", marginLeft: -85, marginTop: -50, willChange: "transform, opacity" }}
             >
               <p className="text-xs font-medium text-[var(--numi-text-3)]">{card.label}</p>
               <p className="text-2xl font-bold text-[var(--numi-text)]">{card.value}</p>
               <p className="text-[11px] text-[var(--numi-text-3)]">{card.sub}</p>
-            </motion.div>
+            </div>
           ))}
 
-          <motion.div className="relative z-10" style={{ scale: phoneScale, willChange: "transform" }}>
+          <div ref={phoneRef} className="relative z-20" style={{ willChange: "transform" }}>
             <PhoneFrame>
               {CHAT_MESSAGES.map((text, i) => (
-                <motion.div
+                <div
                   key={text}
-                  style={{ opacity: messageMotions[i].opacity, y: messageMotions[i].y, willChange: "transform, opacity" }}
+                  ref={(el) => { messageRefs.current[i] = el; }}
                   className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-snug bg-[#F7EEE4] text-[var(--numi-landing-heading)]"
+                  style={{ willChange: "transform, opacity" }}
                 >
                   {text}
-                </motion.div>
+                </div>
               ))}
             </PhoneFrame>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

@@ -1,3 +1,4 @@
+import { ArrowUp } from "lucide-react";
 import type { ReactNode } from "react";
 
 /**
@@ -10,11 +11,11 @@ import type { ReactNode } from "react";
 export function PhoneFrame({
   children,
   className = "w-[300px] sm:w-[360px] lg:w-[400px]",
-  screenMinHeightClassName = "min-h-[650px] lg:min-h-[760px]",
+  screenHeightClassName = "h-[650px] lg:h-[760px]",
 }: {
   children: ReactNode;
   className?: string;
-  screenMinHeightClassName?: string;
+  screenHeightClassName?: string;
 }) {
   return (
     <div className={`relative shrink-0 ${className}`}>
@@ -33,7 +34,7 @@ export function PhoneFrame({
         }}
       >
         <div className="rounded-[2.9rem] bg-black p-[9px]">
-          <div className={`relative bg-white rounded-[2.35rem] overflow-hidden flex flex-col ${screenMinHeightClassName}`}>
+          <div className={`relative bg-white rounded-[2.35rem] overflow-hidden flex flex-col ${screenHeightClassName}`}>
             {/* Dynamic island */}
             <div className="absolute left-1/2 top-[14px] -translate-x-1/2 h-[26px] w-[92px] bg-black rounded-full z-20" />
 
@@ -69,7 +70,20 @@ export function PhoneFrame({
               <span className="ml-auto text-[var(--numi-landing-heading)] text-xs opacity-60">ⓘ</span>
             </div>
 
-            <div className="flex-1 px-5 py-6 flex flex-col gap-3.5 overflow-hidden">{children}</div>
+            <div className="flex-1 min-h-0 px-5 py-6 flex flex-col gap-3.5 overflow-hidden">{children}</div>
+
+            {/* Message input bar */}
+            <div className="flex items-center gap-2 px-5 pb-2">
+              <div className="flex-1 h-9 rounded-full bg-black/[0.04] border border-black/5 flex items-center px-4">
+                <span className="text-[13px] text-[var(--numi-landing-heading)]/35">Message</span>
+              </div>
+              <div
+                className="h-8 w-8 rounded-full flex items-center justify-center shrink-0"
+                style={{ background: "var(--numi-landing-accent)" }}
+              >
+                <ArrowUp className="h-4 w-4" style={{ color: "var(--numi-landing-accent-text)" }} strokeWidth={2.5} />
+              </div>
+            </div>
 
             {/* Home indicator */}
             <div className="pb-2 pt-1 flex justify-center">
