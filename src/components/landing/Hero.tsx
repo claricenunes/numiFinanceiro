@@ -31,7 +31,7 @@ const SUB_DARK_HEX = "#B9D2B5";
 // unreachable literal 1. Bumping SECTION_HEIGHT_VH stretches the whole
 // sequence (and the "hold" after the last card, before the section
 // scrolls away) without touching any of the step timings below.
-const SECTION_HEIGHT_VH = 750;
+const SECTION_HEIGHT_VH = 620;
 const PIN_END = (SECTION_HEIGHT_VH - 100) / SECTION_HEIGHT_VH;
 function pinnedProgress(latest: number) {
   return Math.min(1, latest / PIN_END);
