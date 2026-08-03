@@ -2,7 +2,7 @@
 
 import { LandingHeader } from "./LandingHeader";
 import { Hero } from "./Hero";
-import { TrustBadges } from "./TrustBadges";
+import { FeatureMarqueeSection } from "./FeatureMarqueeSection";
 import { AnimatedHeroBackground } from "./AnimatedHeroBackground";
 import { FeaturesSection } from "./FeaturesSection";
 import { DashboardShowcaseSection } from "./DashboardShowcaseSection";
@@ -22,7 +22,7 @@ export function LandingContent() {
         <AnimatedHeroBackground />
         <LandingHeader />
         <Hero />
-        <TrustBadges />
+        <FeatureMarqueeSection />
       </div>
       <DashboardShowcaseSection />
       <FeaturesSection />
