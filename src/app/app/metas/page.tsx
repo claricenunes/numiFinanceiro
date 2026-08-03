@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Target, PartyPopper, Pause, Check, AlertTriangle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getGoals } from "@/lib/supabase/queries/goals";
+import { GOAL_ICON_MAP } from "@/lib/icons";
 import type { GoalWithProgress } from "@/types/app";
 import { ProgressBar } from "@/components/common/ProgressBar";
 import { FadeIn } from "@/components/common/FadeIn";
@@ -38,7 +40,7 @@ export default async function MetasPage() {
 
       {goals.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-4xl mb-3">🎯</p>
+          <Target size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
           <p className="text-[var(--numi-text-2)] font-medium">No goals yet</p>
           <p className="text-sm text-[var(--numi-text-3)] mt-1">Click &quot;+ New Goal&quot; to start tracking your progress</p>
         </div>
@@ -77,7 +79,10 @@ function GoalCard({ goal }: { goal: GoalWithProgress }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex items-center gap-2 min-w-0">
-              {goal.icon && <span className="text-xl">{goal.icon}</span>}
+              {(() => {
+                const GoalIcon = (goal.icon && GOAL_ICON_MAP[goal.icon]) || Target;
+                return <GoalIcon size={18} style={{ color }} className="shrink-0" />;
+              })()}
               <p className="text-base font-bold leading-tight" style={{ color: "var(--numi-landing-heading)" }}>{goal.name}</p>
             </div>
             <div className="flex items-center gap-1 shrink-0">
@@ -96,14 +101,14 @@ function GoalCard({ goal }: { goal: GoalWithProgress }) {
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             {isCompleted ? (
-              <p className="text-xs font-semibold" style={{ color: "var(--numi-info)" }}>🎉 Goal completed!</p>
+              <p className="text-xs font-semibold flex items-center gap-1" style={{ color: "var(--numi-info)" }}><PartyPopper size={12} /> Goal completed!</p>
             ) : isPaused ? (
-              <p className="text-xs text-[var(--numi-warning)]">⏸ Goal paused</p>
+              <p className="text-xs flex items-center gap-1" style={{ color: "var(--numi-warning)" }}><Pause size={12} /> Goal paused</p>
             ) : goal.isOnTrack ? (
-              <p className="text-xs font-semibold" style={{ color: "var(--numi-income)" }}>✓ On track</p>
+              <p className="text-xs font-semibold flex items-center gap-1" style={{ color: "var(--numi-income)" }}><Check size={12} /> On track</p>
             ) : (
-              <p className="text-xs" style={{ color: "var(--numi-warning)" }}>
-                ⚠ Would need {goal.monthlyNeeded ? formatCurrency(goal.monthlyNeeded) : "—"}/month
+              <p className="text-xs flex items-center gap-1" style={{ color: "var(--numi-warning)" }}>
+                <AlertTriangle size={12} /> Would need {goal.monthlyNeeded ? formatCurrency(goal.monthlyNeeded) : "—"}/month
               </p>
             )}
             {goal.daysRemaining !== null && !isCompleted && (

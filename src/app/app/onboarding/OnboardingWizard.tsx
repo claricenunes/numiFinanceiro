@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToastStore } from "@/stores/useToastStore";
+import { ACCOUNT_TYPE_ICON } from "@/lib/icons";
 
 interface Props {
   initialStep: number;
@@ -11,11 +12,11 @@ interface Props {
 }
 
 const ACCOUNT_TYPES = [
-  { value: "checking",    label: "Checking",   icon: "🏦" },
-  { value: "savings",     label: "Savings",    icon: "🏛️" },
-  { value: "cash",        label: "Cash",       icon: "💵" },
-  { value: "credit_card", label: "Card",       icon: "💳" },
-  { value: "investment",  label: "Investment", icon: "📈" },
+  { value: "checking",    label: "Checking" },
+  { value: "savings",     label: "Savings" },
+  { value: "cash",        label: "Cash" },
+  { value: "credit_card", label: "Card" },
+  { value: "investment",  label: "Investment" },
 ];
 
 export function OnboardingWizard({ initialStep, userName }: Props) {
@@ -112,7 +113,7 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
             <div className="flex flex-col gap-5">
               <div>
                 <p className="text-2xl font-bold tracking-tight mb-2" style={{ color: "var(--numi-landing-heading)" }}>
-                  Welcome to Numi 👋
+                  Welcome to Numi
                 </p>
                 <p className="text-sm text-[var(--numi-text-2)] leading-relaxed">
                   Your financial journey starts here. Let&apos;s set up your account in 2 quick steps.
@@ -171,24 +172,27 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
                   Type
                 </label>
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-                  {ACCOUNT_TYPES.map((t) => (
-                    <button
-                      key={t.value}
-                      type="button"
-                      onClick={() => setAccountType(t.value)}
-                      className="py-2.5 px-2 rounded-2xl text-xs font-medium flex flex-col items-center gap-1.5 transition-colors"
-                      style={{
-                        background: accountType === t.value
-                          ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)"
-                          : "#FFFFFF",
-                        border: `1.5px solid ${accountType === t.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
-                        color: accountType === t.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
-                      }}
-                    >
-                      <span className="text-base">{t.icon}</span>
-                      <span>{t.label}</span>
-                    </button>
-                  ))}
+                  {ACCOUNT_TYPES.map((t) => {
+                    const Icon = ACCOUNT_TYPE_ICON[t.value];
+                    return (
+                      <button
+                        key={t.value}
+                        type="button"
+                        onClick={() => setAccountType(t.value)}
+                        className="py-2.5 px-2 rounded-2xl text-xs font-medium flex flex-col items-center gap-1.5 transition-colors"
+                        style={{
+                          background: accountType === t.value
+                            ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)"
+                            : "#FFFFFF",
+                          border: `1.5px solid ${accountType === t.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                          color: accountType === t.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
+                        }}
+                      >
+                        <Icon size={18} />
+                        <span>{t.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

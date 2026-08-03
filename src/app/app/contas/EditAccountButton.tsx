@@ -2,19 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Pencil, X } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
+import { ACCOUNT_TYPE_ICON } from "@/lib/icons";
 import type { AccountWithBalance } from "@/types/app";
 
 type AccountType = "checking" | "savings" | "credit_card" | "cash" | "investment" | "joint";
 
-const TYPE_OPTIONS: { value: AccountType; label: string; icon: string }[] = [
-  { value: "checking",    label: "Checking",     icon: "🏦" },
-  { value: "savings",     label: "Savings",      icon: "💰" },
-  { value: "credit_card", label: "Credit Card",  icon: "💳" },
-  { value: "cash",        label: "Cash",         icon: "👛" },
-  { value: "investment",  label: "Investments",  icon: "📈" },
-  { value: "joint",       label: "Joint Account",icon: "🤝" },
+const TYPE_OPTIONS: { value: AccountType; label: string }[] = [
+  { value: "checking",    label: "Checking" },
+  { value: "savings",     label: "Savings" },
+  { value: "credit_card", label: "Credit Card" },
+  { value: "cash",        label: "Cash" },
+  { value: "investment",  label: "Investments" },
+  { value: "joint",       label: "Joint Account" },
 ];
 
 const COLORS = ["#10B981","#3B82F6","#F59E0B","#F97316","#8B5CF6","#EC4899","#EF4444","#64748B"];
@@ -72,7 +74,7 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-landing-heading) 6%, transparent)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-landing-heading)"; }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text-3)"; }}
       >
-        ✏️
+        <Pencil size={14} />
       </button>
 
       {open && (
@@ -87,7 +89,7 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
               <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>Edit Account</h2>
               <button onClick={() => setOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
-                ✕
+                <X size={16} />
               </button>
             </div>
 
@@ -96,24 +98,27 @@ export function EditAccountButton({ account }: { account: AccountWithBalance }) 
               <div>
                 <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Type</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {TYPE_OPTIONS.map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setType(opt.value)}
-                      className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-xs font-medium transition-colors"
-                      style={{
-                        background: type === opt.value
-                          ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)"
-                          : "#FFFFFF",
-                        border: `1.5px solid ${type === opt.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
-                        color: type === opt.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
-                      }}
-                    >
-                      <span className="text-lg">{opt.icon}</span>
-                      <span className="text-center leading-tight">{opt.label}</span>
-                    </button>
-                  ))}
+                  {TYPE_OPTIONS.map(opt => {
+                    const Icon = ACCOUNT_TYPE_ICON[opt.value];
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setType(opt.value)}
+                        className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-xs font-medium transition-colors"
+                        style={{
+                          background: type === opt.value
+                            ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)"
+                            : "#FFFFFF",
+                          border: `1.5px solid ${type === opt.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                          color: type === opt.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
+                        }}
+                      >
+                        <Icon size={18} />
+                        <span className="text-center leading-tight">{opt.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

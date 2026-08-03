@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
 
@@ -69,7 +70,7 @@ export function ContributeButton({ goalId, goalName }: { goalId: string; goalNam
               </div>
               <button onClick={() => { setOpen(false); reset(); }}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
-                ✕
+                <X size={16} />
               </button>
             </div>
 

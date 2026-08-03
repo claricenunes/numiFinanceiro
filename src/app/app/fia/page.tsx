@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { AlertTriangle, Zap, BarChart3, Lightbulb, Briefcase, type LucideIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
+import { ASSET_TYPE_ICON } from "@/lib/icons";
 import type { FIAAnalysis, AllocationItem } from "@/types/fia";
 
 /* ── Palette ──────────────────────────────────────────── */
@@ -15,9 +17,7 @@ const ASSET_COLOR: Record<string, string> = {
   crypto:       "#F97316",
 };
 
-const ASSET_ICON: Record<string, string> = {
-  stock: "📈", etf: "📊", fii: "🏢", fixed_income: "🏛️", crypto: "₿",
-};
+const ASSET_ICON: Record<string, LucideIcon> = ASSET_TYPE_ICON;
 
 function riskLabel(n: number): string {
   if (n <= 30) return "low";
@@ -68,6 +68,7 @@ function ScoreRing({ score }: { score: number }) {
 
 function AllocationCard({ rec, amount }: { rec: AllocationItem; amount: number }) {
   const color  = ASSET_COLOR[rec.category] ?? "#94A3B8";
+  const Icon   = ASSET_ICON[rec.category] ?? Briefcase;
   const rLabel = riskLabel(rec.risk);
   const rCol   = riskColor(rec.risk);
 
@@ -78,10 +79,10 @@ function AllocationCard({ rec, amount }: { rec: AllocationItem; amount: number }
     >
       <div className="flex items-start gap-3 mb-3">
         <span
-          className="text-lg flex items-center justify-center w-9 h-9 rounded-xl shrink-0"
-          style={{ background: `${color}18`, border: `1px solid ${color}30` }}
+          className="flex items-center justify-center w-9 h-9 rounded-xl shrink-0"
+          style={{ background: `${color}18`, border: `1px solid ${color}30`, color }}
         >
-          {ASSET_ICON[rec.category] ?? "💼"}
+          <Icon size={18} />
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
@@ -174,7 +175,7 @@ export default function FIAPage() {
   if (error || !analysis) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <p className="text-4xl">⚠️</p>
+        <AlertTriangle size={36} style={{ color: "var(--numi-warning)" }} />
         <p className="text-[var(--numi-text-2)] font-medium">{error ?? "Unknown error"}</p>
         <button
           onClick={fetchAnalysis}
@@ -193,10 +194,11 @@ export default function FIAPage() {
     "var(--numi-income)";
 
   const isAI = analysis.aiProvider !== "mock";
+  const BadgeIcon = isAI ? Zap : BarChart3;
   const badgeText =
-    analysis.aiProvider === "gemini"   ? "⚡ Gemini" :
-    analysis.aiProvider === "deepseek" ? "⚡ DeepSeek" :
-    "📊 Based on your data";
+    analysis.aiProvider === "gemini"   ? "Gemini" :
+    analysis.aiProvider === "deepseek" ? "DeepSeek" :
+    "Based on your data";
   const badgeColor = isAI ? "var(--numi-income)" : "var(--numi-info)";
 
   // Reference contribution used to calculate per-asset values
@@ -228,12 +230,13 @@ export default function FIAPage() {
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-xl font-bold" style={{ color: "var(--numi-landing-heading)" }}>Smart Investing</h1>
             <span
-              className="text-xs font-semibold px-2 py-0.5 rounded-full"
+              className="text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1"
               style={{
                 background: `color-mix(in srgb, ${badgeColor} 14%, transparent)`,
                 color: badgeColor,
               }}
             >
+              <BadgeIcon size={12} />
               {badgeText}
             </span>
           </div>
@@ -264,7 +267,7 @@ export default function FIAPage() {
           className="flex items-start gap-3 rounded-xl px-4 py-3 mb-5 text-sm"
           style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "var(--numi-info)" }}
         >
-          <span className="text-base shrink-0 mt-0.5">💡</span>
+          <Lightbulb size={16} className="shrink-0 mt-0.5" />
           <p>
             This analysis was calculated from your real data (income, expenses, goals and budget).
             For generative AI recommendations, set a key in{" "}

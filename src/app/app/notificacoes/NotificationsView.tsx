@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Siren, AlertTriangle, Lightbulb, Bell, type LucideIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useToastStore } from "@/stores/useToastStore";
 import type { Notification } from "@/lib/supabase/queries/notifications";
 
-const SEVERITY_ICON: Record<string, string> = {
-  alert:   "🚨",
-  warning: "⚠️",
-  info:    "💡",
+const SEVERITY_ICON: Record<string, LucideIcon> = {
+  alert:   Siren,
+  warning: AlertTriangle,
+  info:    Lightbulb,
 };
 
 const SEVERITY_COLOR: Record<string, string> = {
@@ -63,7 +64,7 @@ export function NotificationsView({ notifications: initial }: Props) {
   if (items.length === 0) {
     return (
       <div className="text-center py-24">
-        <p className="text-4xl mb-3">🔔</p>
+        <Bell size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
         <p className="text-[var(--numi-text-2)] font-medium">No notifications</p>
         <p className="text-sm text-[var(--numi-text-3)] mt-1">
           You&apos;ll get alerts about budgets, goals and important transactions
@@ -93,6 +94,7 @@ export function NotificationsView({ notifications: initial }: Props) {
       <div className="flex flex-col gap-2">
         {items.map((n) => {
           const color = SEVERITY_COLOR[n.severity] ?? "var(--numi-info)";
+          const Icon  = SEVERITY_ICON[n.severity] ?? Bell;
           return (
             <div
               key={n.id}
@@ -106,8 +108,8 @@ export function NotificationsView({ notifications: initial }: Props) {
               }}
             >
               <div className="flex items-start gap-3">
-                <span className="text-xl flex-shrink-0 mt-0.5">
-                  {SEVERITY_ICON[n.severity] ?? "🔔"}
+                <span className="flex-shrink-0 mt-0.5" style={{ color }}>
+                  <Icon size={18} />
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">

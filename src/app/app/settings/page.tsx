@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Moon, Sun, Monitor, type LucideIcon } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { useUserStore } from "@/stores/useUserStore";
 import { createClient } from "@/lib/supabase/client";
@@ -257,11 +258,12 @@ export default function SettingsPage() {
         <p className="text-xs text-[var(--numi-text-4)] mb-3">Theme</p>
         <div className="grid grid-cols-3 gap-2">
           {(["dark", "light", "system"] as const).map((t) => {
-            const meta = {
-              dark:   { label: "Dark",   icon: "🌙" },
-              light:  { label: "Light",  icon: "☀️" },
-              system: { label: "System", icon: "💻" },
-            }[t];
+            const meta: Record<string, { label: string; icon: LucideIcon }> = {
+              dark:   { label: "Dark",   icon: Moon },
+              light:  { label: "Light",  icon: Sun },
+              system: { label: "System", icon: Monitor },
+            };
+            const { label, icon: Icon } = meta[t];
             const active = currentTheme === t;
             return (
               <button
@@ -274,8 +276,8 @@ export default function SettingsPage() {
                   color: active ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
                 }}
               >
-                <span className="text-xl">{meta.icon}</span>
-                <span>{meta.label}</span>
+                <Icon size={20} />
+                <span>{label}</span>
               </button>
             );
           })}

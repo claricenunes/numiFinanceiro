@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CreditCard } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { formatDateRelative } from "@/lib/utils/date";
 import type { TransactionRow } from "@/types/app";
@@ -43,12 +44,12 @@ export function RecentTransactions({ transactions, locale = "en-US" }: Props) {
               key={tx.id}
               className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 cursor-pointer hover:bg-[color-mix(in_srgb,var(--numi-text)_4%,transparent)] -mx-2 px-2 rounded-lg transition-colors"
             >
-              {/* Ícone */}
+              {/* Icon */}
               <span
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
                 style={{ background: `${tx.categoryColor}18` }}
               >
-                {tx.categoryIcon ?? "💳"}
+                {tx.categoryIcon ?? <CreditCard size={16} />}
               </span>
 
               {/* Descrição + conta */}

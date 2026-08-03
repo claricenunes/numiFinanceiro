@@ -44,7 +44,7 @@ export default async function DashboardPage({
         <AIOrb status={orbStatus} />
         <div>
           <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--numi-landing-heading)" }}>
-            Hi{firstName ? `, ${firstName}` : ""} 👋
+            Hi{firstName ? `, ${firstName}` : ""}
           </h1>
           <p className="text-sm text-[var(--numi-text-3)] mt-0.5">
             {statusMessage}

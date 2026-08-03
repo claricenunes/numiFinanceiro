@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { TrendingUp, type LucideIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getInvestments } from "@/lib/supabase/queries/investments";
+import { ASSET_TYPE_ICON, DEFAULT_ICON } from "@/lib/icons";
 import type { PositionRow } from "@/types/app";
 import { AllocationChart } from "./AllocationChart";
 import { FadeIn } from "@/components/common/FadeIn";
@@ -9,13 +11,13 @@ import { UpdatePricesButton } from "./UpdatePricesButton";
 
 export const metadata: Metadata = { title: "Investments" };
 
-const ASSET_META: Record<string, { label: string; color: string; icon: string }> = {
-  stock:        { label: "Stock",       color: "#34D399", icon: "📈" },
-  etf:          { label: "ETF",         color: "#38BDF8", icon: "📊" },
-  fii:          { label: "REIT",        color: "#FBBF24", icon: "🏢" },
-  fixed_income: { label: "Fixed Income", color: "#6366F1", icon: "🏛️" },
-  crypto:       { label: "Crypto",      color: "#F97316", icon: "₿" },
-  cash:         { label: "Cash",        color: "#94A3B8", icon: "💵" },
+const ASSET_META: Record<string, { label: string; color: string }> = {
+  stock:        { label: "Stock",        color: "#34D399" },
+  etf:          { label: "ETF",          color: "#38BDF8" },
+  fii:          { label: "REIT",         color: "#FBBF24" },
+  fixed_income: { label: "Fixed Income", color: "#6366F1" },
+  crypto:       { label: "Crypto",       color: "#F97316" },
+  cash:         { label: "Cash",         color: "#94A3B8" },
 };
 
 const monthLabel = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" }).format(new Date());
@@ -74,7 +76,7 @@ export default async function InvestimentosPage() {
 
       {positions.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-4xl mb-3">📈</p>
+          <TrendingUp size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
           <p className="text-[var(--numi-text-2)] font-medium">No positions yet</p>
           <p className="text-sm text-[var(--numi-text-3)] mt-1">Add your investments to track your portfolio</p>
         </div>
@@ -114,7 +116,8 @@ export default async function InvestimentosPage() {
 }
 
 function PositionCard({ pos }: { pos: PositionRow }) {
-  const meta       = ASSET_META[pos.type] ?? { label: pos.type, color: "#94A3B8", icon: "📦" };
+  const meta       = ASSET_META[pos.type] ?? { label: pos.type, color: "#94A3B8" };
+  const Icon: LucideIcon = ASSET_TYPE_ICON[pos.type] ?? DEFAULT_ICON;
   const plPositive = (pos.profitLoss ?? 0) >= 0;
   const plColor    = plPositive ? "var(--numi-income)" : "var(--numi-expense)";
 
@@ -122,10 +125,10 @@ function PositionCard({ pos }: { pos: PositionRow }) {
     <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}>
       <div className="flex items-start gap-3">
         <span
-          className="flex items-center justify-center text-base shrink-0"
-          style={{ width: 40, height: 40, borderRadius: 12, background: `${meta.color}22`, border: `1px solid ${meta.color}44` }}
+          className="flex items-center justify-center shrink-0"
+          style={{ width: 40, height: 40, borderRadius: 12, background: `${meta.color}22`, border: `1px solid ${meta.color}44`, color: meta.color }}
         >
-          {meta.icon}
+          <Icon size={18} />
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">

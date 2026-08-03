@@ -2,22 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
-
-const GOAL_ICONS = ["🎯","🏠","✈️","🚗","📚","💻","💍","👶","🏖️","💰","🛡️","🎓","🏋️","🎸","🌍"];
+import { GOAL_ICON_MAP, GOAL_ICON_KEYS } from "@/lib/icons";
 
 export function NewGoalButton() {
   const [open,     setOpen]     = useState(false);
   const [loading,  setLoading]  = useState(false);
   const [name,     setName]     = useState("");
-  const [icon,     setIcon]     = useState("🎯");
+  const [icon,     setIcon]     = useState("target");
   const [target,   setTarget]   = useState("");
   const [deadline, setDeadline] = useState("");
   const router = useRouter();
   const { show } = useToastStore();
 
-  function reset() { setName(""); setIcon("🎯"); setTarget(""); setDeadline(""); }
+  function reset() { setName(""); setIcon("target"); setTarget(""); setDeadline(""); }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,7 +69,7 @@ export function NewGoalButton() {
               <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>New Goal</h2>
               <button onClick={() => { setOpen(false); reset(); }}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
-                ✕
+                <X size={16} />
               </button>
             </div>
 
@@ -78,16 +78,20 @@ export function NewGoalButton() {
               <div>
                 <label className="text-sm font-medium mb-2 block" style={{ color: "var(--numi-landing-heading)" }}>Icon</label>
                 <div className="flex flex-wrap gap-2">
-                  {GOAL_ICONS.map(i => (
-                    <button key={i} type="button" onClick={() => setIcon(i)}
-                      className="w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-colors"
-                      style={{
-                        background: icon === i ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
-                        border: `1px solid ${icon === i ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
-                      }}>
-                      {i}
-                    </button>
-                  ))}
+                  {GOAL_ICON_KEYS.map(key => {
+                    const Icon = GOAL_ICON_MAP[key];
+                    return (
+                      <button key={key} type="button" onClick={() => setIcon(key)}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+                        style={{
+                          background: icon === key ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
+                          border: `1px solid ${icon === key ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                          color: icon === key ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
+                        }}>
+                        <Icon size={16} />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

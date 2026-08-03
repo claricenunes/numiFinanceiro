@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Landmark } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getAccounts } from "@/lib/supabase/queries/accounts";
+import { ACCOUNT_TYPE_ICON } from "@/lib/icons";
 import type { AccountWithBalance } from "@/types/app";
 import { FadeIn } from "@/components/common/FadeIn";
 import { NewAccountButton } from "./NewAccountButton";
@@ -15,15 +17,6 @@ const TYPE_LABEL: Record<string, string> = {
   cash:        "Cash",
   investment:  "Investments",
   joint:       "Joint",
-};
-
-const TYPE_ICON: Record<string, string> = {
-  checking:    "🏦",
-  savings:     "💰",
-  credit_card: "💳",
-  cash:        "👛",
-  investment:  "📈",
-  joint:       "🤝",
 };
 
 export default async function ContasPage() {
@@ -86,7 +79,7 @@ export default async function ContasPage() {
       </p>
       {accounts.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-4xl mb-3">🏦</p>
+          <Landmark size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
           <p className="text-[var(--numi-text-2)] font-medium">No accounts yet</p>
           <p className="text-sm text-[var(--numi-text-3)] mt-1">Click &quot;+ New Account&quot; to get started</p>
         </div>
@@ -122,7 +115,7 @@ function SummaryCard({
 }
 
 function AccountCard({ account }: { account: AccountWithBalance }) {
-  const icon        = TYPE_ICON[account.type]  ?? "🏦";
+  const Icon        = ACCOUNT_TYPE_ICON[account.type] ?? Landmark;
   const label       = TYPE_LABEL[account.type] ?? account.type;
   const color       = account.color ?? "#10B981";
   const isCreditCard = account.type === "credit_card";
@@ -140,14 +133,15 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0">
           <span
-            className="flex items-center justify-center text-lg shrink-0"
+            className="flex items-center justify-center shrink-0"
             style={{
               width: 40, height: 40, borderRadius: 12,
               background: `${color}22`,
               border: `1px solid ${color}44`,
+              color,
             }}
           >
-            {icon}
+            <Icon size={18} />
           </span>
           <div className="min-w-0">
             <p className="text-sm font-semibold truncate" style={{ color: "var(--numi-landing-heading)" }}>{account.name}</p>

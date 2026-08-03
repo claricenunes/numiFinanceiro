@@ -2,18 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
+import { ASSET_TYPE_ICON } from "@/lib/icons";
 
 type AssetType = "stock" | "etf" | "fii" | "fixed_income" | "crypto" | "cash";
 
-const TYPE_OPTIONS: { value: AssetType; label: string; icon: string }[] = [
-  { value: "stock",        label: "Stock",        icon: "📈" },
-  { value: "etf",          label: "ETF",          icon: "📊" },
-  { value: "fii",          label: "REIT",         icon: "🏢" },
-  { value: "fixed_income", label: "Fixed Income", icon: "🏛️" },
-  { value: "crypto",       label: "Crypto",       icon: "₿"  },
-  { value: "cash",         label: "Cash",         icon: "💵" },
+const TYPE_OPTIONS: { value: AssetType; label: string }[] = [
+  { value: "stock",        label: "Stock" },
+  { value: "etf",          label: "ETF" },
+  { value: "fii",          label: "REIT" },
+  { value: "fixed_income", label: "Fixed Income" },
+  { value: "crypto",       label: "Crypto" },
+  { value: "cash",         label: "Cash" },
 ];
 
 type Account = { id: string; name: string };
@@ -111,7 +113,7 @@ export function NewPositionButton() {
               <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>New Position</h2>
               <button onClick={() => { setOpen(false); reset(); }}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
-                ✕
+                <X size={16} />
               </button>
             </div>
 
@@ -120,18 +122,21 @@ export function NewPositionButton() {
               <div>
                 <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Type</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {TYPE_OPTIONS.map(opt => (
-                    <button key={opt.value} type="button" onClick={() => setType(opt.value)}
-                      className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-xs font-medium transition-colors"
-                      style={{
-                        background: type === opt.value ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
-                        border: `1px solid ${type === opt.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
-                        color: type === opt.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
-                      }}>
-                      <span className="text-lg">{opt.icon}</span>
-                      <span>{opt.label}</span>
-                    </button>
-                  ))}
+                  {TYPE_OPTIONS.map(opt => {
+                    const Icon = ASSET_TYPE_ICON[opt.value];
+                    return (
+                      <button key={opt.value} type="button" onClick={() => setType(opt.value)}
+                        className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-xs font-medium transition-colors"
+                        style={{
+                          background: type === opt.value ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
+                          border: `1px solid ${type === opt.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                          color: type === opt.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
+                        }}>
+                        <Icon size={18} />
+                        <span>{opt.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

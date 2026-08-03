@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { Check, AlertTriangle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
+import { GOAL_ICON_MAP } from "@/lib/icons";
 import type { GoalWithProgress } from "@/types/app";
 
 interface Props {
@@ -22,16 +24,16 @@ export function GoalsPreview({ goals, locale = "en-US" }: Props) {
           viewAll: "View all",
           empty: "No active goals.",
           create: "+ Create first goal",
-          onTrack: "✓ On track",
-          needsPerMonth: (amount: string) => `⚠ Would need ${amount}/month`,
+          onTrack: "On track",
+          needsPerMonth: (amount: string) => `Would need ${amount}/month`,
         }
       : {
           title: "Metas",
           viewAll: "Ver todas",
           empty: "Nenhuma meta ativa.",
           create: "+ Criar primeira meta",
-          onTrack: "✓ No ritmo certo",
-          needsPerMonth: (amount: string) => `⚠ Precisaria de ${amount}/mês`,
+          onTrack: "No ritmo certo",
+          needsPerMonth: (amount: string) => `Precisaria de ${amount}/mês`,
         };
 
   return (
@@ -52,11 +54,13 @@ export function GoalsPreview({ goals, locale = "en-US" }: Props) {
         </div>
       ) : (
         <ul className="flex flex-col gap-4">
-          {active.map((goal) => (
+          {active.map((goal) => {
+            const GoalIcon = goal.icon ? GOAL_ICON_MAP[goal.icon] : undefined;
+            return (
             <li key={goal.id} className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2 text-sm font-medium text-[var(--numi-text)]">
-                  {goal.icon && <span>{goal.icon}</span>}
+                  {GoalIcon && <GoalIcon size={14} />}
                   {goal.name}
                 </span>
                 <span className="text-xs text-[var(--numi-text-2)]">
@@ -88,14 +92,15 @@ export function GoalsPreview({ goals, locale = "en-US" }: Props) {
               </div>
 
               {goal.isOnTrack ? (
-                <p className="text-xs text-[var(--numi-income)]">{t.onTrack}</p>
+                <p className="text-xs flex items-center gap-1 text-[var(--numi-income)]"><Check size={12} /> {t.onTrack}</p>
               ) : (
-                <p className="text-xs text-[var(--numi-warning)]">
-                  {t.needsPerMonth(goal.monthlyNeeded ? format(goal.monthlyNeeded) : "—")}
+                <p className="text-xs flex items-center gap-1 text-[var(--numi-warning)]">
+                  <AlertTriangle size={12} /> {t.needsPerMonth(goal.monthlyNeeded ? format(goal.monthlyNeeded) : "—")}
                 </p>
               )}
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </div>

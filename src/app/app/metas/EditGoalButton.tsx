@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Pencil, X } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
+import { GOAL_ICON_MAP, GOAL_ICON_KEYS } from "@/lib/icons";
 import type { GoalWithProgress } from "@/types/app";
-
-const GOAL_ICONS = ["🎯","🏠","✈️","🚗","📚","💻","💍","👶","🏖️","💰","🛡️","🎓","🏋️","🎸","🌍"];
 
 type GoalStatus = "active" | "completed" | "cancelled" | "paused";
 
@@ -21,7 +21,7 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
   const [open,     setOpen]     = useState(false);
   const [loading,  setLoading]  = useState(false);
   const [name,     setName]     = useState(goal.name);
-  const [icon,     setIcon]     = useState(goal.icon ?? "🎯");
+  const [icon,     setIcon]     = useState(goal.icon && GOAL_ICON_MAP[goal.icon] ? goal.icon : "target");
   const [target,   setTarget]   = useState(String(goal.targetAmount));
   const [deadline, setDeadline] = useState(goal.deadline ?? "");
   const [status,   setStatus]   = useState<GoalStatus>(goal.status);
@@ -66,7 +66,7 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-landing-heading) 6%, transparent)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-landing-heading)"; }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text-3)"; }}
       >
-        ✏️
+        <Pencil size={13} />
       </button>
 
       {open && (
@@ -81,7 +81,7 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
               <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>Edit Goal</h2>
               <button onClick={() => setOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
-                ✕
+                <X size={16} />
               </button>
             </div>
 
@@ -90,16 +90,20 @@ export function EditGoalButton({ goal }: { goal: GoalWithProgress }) {
               <div>
                 <label className="text-sm font-medium mb-2 block" style={{ color: "var(--numi-landing-heading)" }}>Icon</label>
                 <div className="flex flex-wrap gap-2">
-                  {GOAL_ICONS.map(i => (
-                    <button key={i} type="button" onClick={() => setIcon(i)}
-                      className="w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-colors"
-                      style={{
-                        background: icon === i ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
-                        border: `1px solid ${icon === i ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
-                      }}>
-                      {i}
-                    </button>
-                  ))}
+                  {GOAL_ICON_KEYS.map(key => {
+                    const Icon = GOAL_ICON_MAP[key];
+                    return (
+                      <button key={key} type="button" onClick={() => setIcon(key)}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+                        style={{
+                          background: icon === key ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
+                          border: `1px solid ${icon === key ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                          color: icon === key ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
+                        }}>
+                        <Icon size={16} />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

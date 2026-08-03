@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AlertOctagon, TrendingUp, Trophy, Telescope, Sparkles, type LucideIcon } from "lucide-react";
 import type { Insight } from "@/lib/supabase/queries/insights";
 
 type TabValue = "all" | "alert" | "trend" | "win" | "forecast";
@@ -14,11 +15,11 @@ const TABS: { value: TabValue; label: string }[] = [
   { value: "forecast", label: "Forecasts" },
 ];
 
-const CAT_STYLE: Record<string, { badge: string; color: string; label: string }> = {
-  alert:    { badge: "rgba(239,68,68,0.15)",  color: "var(--numi-expense)", label: "Alert" },
-  trend:    { badge: "rgba(59,130,246,0.15)", color: "var(--numi-info)",    label: "Trend" },
-  win:      { badge: "rgba(16,185,129,0.15)", color: "var(--numi-income)",  label: "Win" },
-  forecast: { badge: "rgba(245,158,11,0.15)", color: "var(--numi-warning)", label: "Forecast" },
+const CAT_STYLE: Record<string, { badge: string; color: string; label: string; icon: LucideIcon }> = {
+  alert:    { badge: "rgba(239,68,68,0.15)",  color: "var(--numi-expense)", label: "Alert",    icon: AlertOctagon },
+  trend:    { badge: "rgba(59,130,246,0.15)", color: "var(--numi-info)",    label: "Trend",    icon: TrendingUp },
+  win:      { badge: "rgba(16,185,129,0.15)", color: "var(--numi-income)",  label: "Win",      icon: Trophy },
+  forecast: { badge: "rgba(245,158,11,0.15)", color: "var(--numi-warning)", label: "Forecast", icon: Telescope },
 };
 
 interface Props {
@@ -50,10 +51,10 @@ export function InsightsView({ insights, periodLabel }: Props) {
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <StatCard count={counts.alert}    label="Alerts"    color="var(--numi-expense)" emoji="⛔" />
-        <StatCard count={counts.trend}    label="Trends"    color="var(--numi-info)" emoji="📊" />
-        <StatCard count={counts.win}      label="Wins"      color="var(--numi-income)" emoji="🏆" />
-        <StatCard count={counts.forecast} label="Forecasts" color="var(--numi-warning)" emoji="🔮" />
+        <StatCard count={counts.alert}    label="Alerts"    color="var(--numi-expense)" icon={AlertOctagon} />
+        <StatCard count={counts.trend}    label="Trends"    color="var(--numi-info)" icon={TrendingUp} />
+        <StatCard count={counts.win}      label="Wins"      color="var(--numi-income)" icon={Trophy} />
+        <StatCard count={counts.forecast} label="Forecasts" color="var(--numi-warning)" icon={Telescope} />
       </div>
 
       {/* Tab bar */}
@@ -83,7 +84,7 @@ export function InsightsView({ insights, periodLabel }: Props) {
       {/* Cards grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-4xl mb-3">✨</p>
+          <Sparkles size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
           <p className="text-[var(--numi-text-2)] font-medium">No insights in this category</p>
           <p className="text-xs text-[var(--numi-text-3)] mt-1">
             Keep tracking your finances to generate more insights
@@ -112,9 +113,9 @@ export function InsightsView({ insights, periodLabel }: Props) {
 }
 
 function StatCard({
-  count, label, color, emoji,
+  count, label, color, icon: Icon,
 }: {
-  count: number; label: string; color: string; emoji: string;
+  count: number; label: string; color: string; icon: LucideIcon;
 }) {
   return (
     <div
@@ -122,10 +123,10 @@ function StatCard({
       style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
     >
       <span
-        className="flex items-center justify-center text-base w-9 h-9 rounded-lg shrink-0"
-        style={{ background: `color-mix(in srgb, ${color} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 19%, transparent)` }}
+        className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
+        style={{ background: `color-mix(in srgb, ${color} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 19%, transparent)`, color }}
       >
-        {emoji}
+        <Icon size={16} />
       </span>
       <div>
         <p className="text-xl font-bold" style={{ color: "var(--numi-landing-heading)" }}>{count}</p>
@@ -137,6 +138,7 @@ function StatCard({
 
 function InsightCard({ insight }: { insight: Insight }) {
   const style = CAT_STYLE[insight.category] ?? CAT_STYLE.trend;
+  const Icon  = style.icon;
   const borderColor =
     insight.severity === "alert"   ? "rgba(239,68,68,0.22)" :
     insight.severity === "warning" ? "rgba(245,158,11,0.18)"  :
@@ -148,10 +150,10 @@ function InsightCard({ insight }: { insight: Insight }) {
       style={{ background: "#FFFFFF", border: `1px solid ${borderColor}`, boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
     >
       <span
-        className="flex items-center justify-center text-xl w-10 h-10 rounded-xl shrink-0"
-        style={{ background: style.badge, border: `1px solid color-mix(in srgb, ${style.color} 19%, transparent)` }}
+        className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
+        style={{ background: style.badge, border: `1px solid color-mix(in srgb, ${style.color} 19%, transparent)`, color: style.color }}
       >
-        {insight.icon}
+        <Icon size={18} />
       </span>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-1.5">
