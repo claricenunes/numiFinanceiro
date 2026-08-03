@@ -13,7 +13,7 @@ if (typeof window !== "undefined") {
 const GREEN_BG = "#32453A";
 const ACCENT = "var(--numi-landing-accent)";
 
-type ChartKind = "ring" | "spark" | "bar" | "compare" | "dots";
+type ChartKind = "ring" | "spark" | "bar" | "compare";
 
 interface MetricDef {
   label: string;
@@ -24,22 +24,26 @@ interface MetricDef {
   compareB?: number;
 }
 
-// Same four metrics drive both the chat bubbles and the cards — a
-// message's chart is a small preview, the matching card is its
-// "expanded" chart, reinforcing that each message is what prompts its
-// card to slide out from behind the phone.
-const METRICS: MetricDef[] = [
-  { label: "Food spending", chart: "compare", caption: "$780 this month", compareA: 620, compareB: 780 },
+// The phone shows a compact dashboard summary — not a chat — since the
+// real mobile dashboard screen doesn't exist yet; this is a stand-in
+// mockup of "what it'll roughly show", built from the same chart
+// primitives as the cards that slide out from behind it. Each row here
+// has a matching card (same order) that reveals alongside it; CARDS has
+// one extra entry (cash flow) that reveals last, as a bonus beat once
+// the phone's own rows have all settled.
+const DASHBOARD_ROWS: MetricDef[] = [
+  { label: "Financial health", chart: "ring", caption: "82 / 100", value: 82 },
+  { label: "Net worth", chart: "spark", caption: "$24,380" },
   { label: "Savings rate", chart: "bar", caption: "49% of income", value: 49 },
-  { label: "Net worth", chart: "spark", caption: "$24,380 (+3.2%)" },
-  { label: "Insights ready", chart: "dots", caption: "3 ready to review", value: 3 },
+  { label: "Spending", chart: "compare", caption: "$780 this month", compareA: 620, compareB: 780 },
 ];
 
-const CARD_POSITIONS: { targetX: number; targetY: number }[] = [
-  { targetX: -280, targetY: -140 },
-  { targetX: -300, targetY: 150 },
-  { targetX: 280, targetY: -160 },
-  { targetX: 300, targetY: 140 },
+const CARDS: (MetricDef & { targetX: number; targetY: number })[] = [
+  { ...DASHBOARD_ROWS[0], label: "Health score", targetX: -280, targetY: -140 },
+  { ...DASHBOARD_ROWS[3], label: "Food spending", targetX: -300, targetY: 150 },
+  { ...DASHBOARD_ROWS[1], targetX: 280, targetY: -160 },
+  { ...DASHBOARD_ROWS[2], targetX: 300, targetY: 140 },
+  { label: "Cash flow", chart: "compare", caption: "$6,200 in · $3,140 out", compareA: 3140, compareB: 6200, targetX: 0, targetY: -240 },
 ];
 
 function Ring({ value, size = 56 }: { value: number; size?: number }) {
@@ -96,41 +100,40 @@ function Compare({ a, b, height = 40 }: { a: number; b: number; height?: number 
   );
 }
 
-function Dots({ filled, total = 5 }: { filled: number; total?: number }) {
-  return (
-    <div className="flex items-center gap-1.5 shrink-0">
-      {Array.from({ length: total }).map((_, i) => (
-        <span key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: i < filled ? ACCENT : "rgba(0,0,0,0.1)" }} />
-      ))}
-    </div>
-  );
-}
-
 function Chart({ metric, size = "md" }: { metric: MetricDef; size?: "sm" | "md" }) {
   switch (metric.chart) {
     case "ring":
       return <Ring value={metric.value ?? 0} size={size === "sm" ? 48 : 64} />;
     case "spark":
-      return <Spark width={size === "sm" ? 100 : 130} height={size === "sm" ? 30 : 38} />;
+      return <Spark width={size === "sm" ? 88 : 130} height={size === "sm" ? 28 : 38} />;
     case "bar":
-      return <Bar value={metric.value ?? 0} />;
+      return <Bar value={metric.value ?? 0} width={size === "sm" ? "72px" : "100%"} />;
     case "compare":
       return <Compare a={metric.compareA ?? 1} b={metric.compareB ?? 1} height={size === "sm" ? 32 : 44} />;
-    case "dots":
-      return <Dots filled={metric.value ?? 0} />;
   }
 }
+
+const PHONE_HEADER = (
+  <>
+    <div className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: "var(--numi-landing-nav-bg)" }}>
+      N
+    </div>
+    <span className="text-sm font-semibold text-[var(--numi-landing-heading)]">Dashboard</span>
+    <span className="ml-auto text-xs" style={{ color: "var(--numi-landing-heading)", opacity: 0.5 }}>
+      This month
+    </span>
+  </>
+);
 
 /**
  * Scroll-linked showcase (GSAP ScrollTrigger, scrub): the green stage
  * behind the phone rises to cover the previous background while the
  * phone shrinks; data cards emerge from directly behind the phone
  * (opacity 0/scale 0.8 → opacity 1/scale 1, sliding out to their spread
- * positions) and the chat reveals internally. Both the chat bubbles and
- * the cards are chart-first (a mini graphic + a short caption) rather
- * than sentences — the message is a small preview of the same chart its
- * matching card shows larger. The left copy column is untouched by any
- * of this — no tween ever targets it.
+ * positions) and the phone's own dashboard rows reveal in parallel. The
+ * phone shows a compact dashboard summary (not a chat) — a stand-in for
+ * the real mobile dashboard screen, which doesn't exist yet. The left
+ * copy column is untouched by any of this — no tween ever targets it.
  */
 export function AnalyticsScrollSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -138,7 +141,7 @@ export function AnalyticsScrollSection() {
   const greenPanelRef = useRef<HTMLDivElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const reducedMotion = usePrefersReducedMotion();
 
   useLayoutEffect(() => {
@@ -147,7 +150,7 @@ export function AnalyticsScrollSection() {
 
     const ctx = gsap.context(() => {
       const cards = cardRefs.current.filter((el): el is HTMLDivElement => el !== null);
-      const messages = messageRefs.current.filter((el): el is HTMLDivElement => el !== null);
+      const rows = rowRefs.current.filter((el): el is HTMLDivElement => el !== null);
 
       gsap.set(greenPanelRef.current, { yPercent: 100 });
       // transformOrigin + explicit x/y lock the phone's center to a fixed
@@ -156,7 +159,7 @@ export function AnalyticsScrollSection() {
       // otherwise) can introduce vertical drift.
       gsap.set(phoneRef.current, { scale: 1, x: 0, y: 0, transformOrigin: "50% 50%" });
       gsap.set(cards, { opacity: 0, scale: 0.8, x: 0, y: 0 });
-      gsap.set(messages, { opacity: 0, y: 20 });
+      gsap.set(rows, { opacity: 0, y: 20 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -175,32 +178,25 @@ export function AnalyticsScrollSection() {
       tl.to(greenPanelRef.current, { yPercent: 0, ease: "none", duration: 1.2 }, 0);
       tl.to(phoneRef.current, { scale: 0.6, x: 0, y: 0, ease: "none", duration: 1.2 }, 0);
 
-      // Phase 2: cards emerge from behind the phone (overlapping starts),
-      // chat messages reveal in parallel.
-      CARD_POSITIONS.forEach((pos, i) => {
-        tl.to(
-          cardRefs.current[i],
-          { opacity: 1, scale: 1, x: pos.targetX, y: pos.targetY, ease: "none", duration: 0.9 },
-          0.7 + i * 0.35
-        );
+      // Phase 2: the first 4 cards emerge from behind the phone in sync
+      // with their matching dashboard row settling inside it.
+      CARDS.slice(0, 4).forEach((card, i) => {
+        tl.to(cardRefs.current[i], { opacity: 1, scale: 1, x: card.targetX, y: card.targetY, ease: "none", duration: 0.9 }, 0.7 + i * 0.35);
+      });
+      DASHBOARD_ROWS.forEach((_, i) => {
+        tl.to(rowRefs.current[i], { opacity: 1, y: 0, ease: "none", duration: 0.5 }, 0.9 + i * 0.3);
       });
 
-      METRICS.forEach((_, i) => {
-        tl.to(
-          messageRefs.current[i],
-          { opacity: 1, y: 0, ease: "none", duration: 0.5 },
-          0.9 + i * 0.3
-        );
-      });
+      // The 5th card (cash flow) has no row inside the phone — it's a
+      // bonus beat that slides out once the four paired reveals settle.
+      tl.to(cardRefs.current[4], { opacity: 1, scale: 1, x: CARDS[4].targetX, y: CARDS[4].targetY, ease: "none", duration: 0.9 }, 2.5);
 
       // Padding tween — animates nothing, just extends the timeline's
-      // total duration past the last real tween (card 3 finishes at
-      // 2.65). Without it, scrub maps scroll-progress 1.0 directly onto
-      // that same 2.65 mark, so the last card finished exactly as the
-      // section unpinned — no hold, it just ended right after the phone.
-      // This hold needs to be a clearly noticeable stretch of the green
-      // stage sitting fully settled before the page moves on to the
-      // next (coral-accented) section, not a token pause.
+      // total duration past the last real tween. Without it, scrub maps
+      // scroll-progress 1.0 directly onto the last card's finish, so the
+      // section unpins immediately after — no hold. This hold needs to
+      // be a clearly noticeable stretch of the green stage sitting fully
+      // settled before the page moves on, not a token pause.
       tl.to({}, { duration: 1.5 });
     }, sectionRef);
 
@@ -221,6 +217,24 @@ export function AnalyticsScrollSection() {
     };
   }, [reducedMotion]);
 
+  const dashboardScreen = (
+    <PhoneFrame header={PHONE_HEADER} footer={false} contentClassName="flex-1 min-h-0 px-5 py-2 flex flex-col overflow-hidden">
+      {DASHBOARD_ROWS.map((row, i) => (
+        <div
+          key={row.label}
+          ref={reducedMotion ? undefined : (el) => { rowRefs.current[i] = el; }}
+          className={`flex items-center justify-between gap-3 py-4 ${i < DASHBOARD_ROWS.length - 1 ? "border-b border-black/5" : ""}`}
+        >
+          <div className="flex flex-col gap-1 min-w-0">
+            <p className="text-xs font-medium text-[var(--numi-landing-heading)]/60 truncate">{row.label}</p>
+            <p className="text-sm font-semibold text-[var(--numi-landing-heading)] truncate">{row.caption}</p>
+          </div>
+          <Chart metric={row} size="sm" />
+        </div>
+      ))}
+    </PhoneFrame>
+  );
+
   if (reducedMotion) {
     return (
       <section className="px-4 py-24 lg:py-32 max-w-6xl mx-auto">
@@ -235,36 +249,21 @@ export function AnalyticsScrollSection() {
             </p>
           </div>
 
-          <div className="relative flex items-center justify-center" style={{ minHeight: 720 }}>
+          <div className="relative flex items-center justify-center pt-16" style={{ minHeight: 720 }}>
             <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none" style={{ background: GREEN_BG }} />
-            {METRICS.map((metric, i) => (
+            {CARDS.map((card) => (
               <div
-                key={metric.label}
+                key={card.label}
                 className="absolute w-[170px] rounded-2xl bg-white p-4 shadow-lg flex flex-col gap-2.5"
-                style={{
-                  left: "50%",
-                  top: "50%",
-                  marginLeft: -85 + CARD_POSITIONS[i].targetX,
-                  marginTop: -60 + CARD_POSITIONS[i].targetY,
-                }}
+                style={{ left: "50%", top: "50%", marginLeft: -85 + card.targetX, marginTop: -60 + card.targetY }}
               >
-                <p className="text-xs font-medium text-[var(--numi-text-3)]">{metric.label}</p>
-                <Chart metric={metric} />
-                <p className="text-[11px] font-semibold text-[var(--numi-text)]">{metric.caption}</p>
+                <p className="text-xs font-medium text-[var(--numi-text-3)]">{card.label}</p>
+                <Chart metric={card} />
+                <p className="text-[11px] font-semibold text-[var(--numi-text)]">{card.caption}</p>
               </div>
             ))}
             <div className="relative z-10" style={{ transform: "scale(0.6)" }}>
-              <PhoneFrame>
-                {METRICS.map((metric) => (
-                  <div
-                    key={metric.label}
-                    className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 flex flex-col gap-2 bg-[#F7EEE4]"
-                  >
-                    <p className="text-[11px] font-medium text-[var(--numi-landing-heading)]/70">{metric.label}</p>
-                    <Chart metric={metric} size="sm" />
-                  </div>
-                ))}
-              </PhoneFrame>
+              {dashboardScreen}
             </div>
           </div>
         </div>
@@ -286,7 +285,7 @@ export function AnalyticsScrollSection() {
           </p>
         </div>
 
-        <div ref={stageRef} className="relative flex items-center justify-center" style={{ minHeight: 720 }}>
+        <div ref={stageRef} className="relative flex items-center justify-center pt-16" style={{ minHeight: 720 }}>
           {/* Only the green panel is clipped to the rounded stage — cards
               are free to spread past its edges without getting cut off. */}
           <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
@@ -298,33 +297,21 @@ export function AnalyticsScrollSection() {
             />
           </div>
 
-          {METRICS.map((metric, i) => (
+          {CARDS.map((card, i) => (
             <div
-              key={metric.label}
+              key={card.label}
               ref={(el) => { cardRefs.current[i] = el; }}
               className="absolute z-10 w-[170px] rounded-2xl bg-white p-4 shadow-lg flex flex-col gap-2.5"
               style={{ left: "50%", top: "50%", marginLeft: -85, marginTop: -60, willChange: "transform, opacity" }}
             >
-              <p className="text-xs font-medium text-[var(--numi-text-3)]">{metric.label}</p>
-              <Chart metric={metric} />
-              <p className="text-[11px] font-semibold text-[var(--numi-text)]">{metric.caption}</p>
+              <p className="text-xs font-medium text-[var(--numi-text-3)]">{card.label}</p>
+              <Chart metric={card} />
+              <p className="text-[11px] font-semibold text-[var(--numi-text)]">{card.caption}</p>
             </div>
           ))}
 
           <div ref={phoneRef} className="relative z-20" style={{ willChange: "transform" }}>
-            <PhoneFrame>
-              {METRICS.map((metric, i) => (
-                <div
-                  key={metric.label}
-                  ref={(el) => { messageRefs.current[i] = el; }}
-                  className="self-start max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-3 flex flex-col gap-2 bg-[#F7EEE4]"
-                  style={{ willChange: "transform, opacity" }}
-                >
-                  <p className="text-[11px] font-medium text-[var(--numi-landing-heading)]/70">{metric.label}</p>
-                  <Chart metric={metric} size="sm" />
-                </div>
-              ))}
-            </PhoneFrame>
+            {dashboardScreen}
           </div>
         </div>
       </div>
