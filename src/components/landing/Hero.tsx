@@ -11,19 +11,28 @@ import { DashboardCards } from "./DashboardCards";
 import { OrganicWave } from "./OrganicWave";
 
 const CTA_OVERSHOOT: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
-const DARK_BG = "var(--numi-landing-nav-bg)";
+// Deliberately not var(--numi-landing-nav-bg) — that's the header's own
+// color, and this rising panel needs to read as a distinct surface, not
+// a continuation of the header. Matches AnalyticsScrollSection's own
+// green further down the page, so the two scroll-reveal sections share
+// one secondary-green identity instead of each inventing their own.
+const DARK_BG = "#32453A";
 const HEADING_DARK_HEX = "#E9F3E4";
 const SUB_DARK_HEX = "#B9D2B5";
 
-// The section is 260vh tall with a 100vh sticky child, so the CSS pin
-// itself only stays active until scrollYProgress reaches
-// (260-100)/260 — past that point the section is already unpinning and
-// scrolling away, however far from 1 scrollYProgress technically still
-// has to go. Every scroll-driven value below is authored against a
-// clean 0->1 range and then fed through `pinnedProgress`, which remaps
-// raw scrollYProgress so that range completes exactly at the real pin
-// end instead of at the unreachable literal 1.
-const PIN_END = 160 / 260;
+// The section is SECTION_HEIGHT_VH tall with a 100vh sticky child, so
+// the CSS pin itself only stays active until scrollYProgress reaches
+// (SECTION_HEIGHT_VH-100)/SECTION_HEIGHT_VH — past that point the
+// section is already unpinning and scrolling away, however far from 1
+// scrollYProgress technically still has to go. Every scroll-driven
+// value below is authored against a clean 0->1 range and then fed
+// through `pinnedProgress`, which remaps raw scrollYProgress so that
+// range completes exactly at the real pin end instead of at the
+// unreachable literal 1. Bumping SECTION_HEIGHT_VH stretches the whole
+// sequence (and the "hold" after the last card, before the section
+// scrolls away) without touching any of the step timings below.
+const SECTION_HEIGHT_VH = 750;
+const PIN_END = (SECTION_HEIGHT_VH - 100) / SECTION_HEIGHT_VH;
 function pinnedProgress(latest: number) {
   return Math.min(1, latest / PIN_END);
 }
@@ -61,7 +70,14 @@ export function Hero() {
   });
 
   const phoneScale = useTransform(scrollYProgress, [0, PIN_END], [1, 0.7]);
-  const overlayY = useTransform(scrollYProgress, [0, PIN_END], ["100%", "0%"]);
+  // The green panel finishes rising at pinnedProgress OVERLAY_END rather
+  // than at 1 — it used to only reach full coverage exactly as the pin
+  // ended, so the screen was never "just green" for any real stretch of
+  // scroll. Finishing at 0.5 means it's fully covering for the entire
+  // second half of the pin (a large span now that SECTION_HEIGHT_VH is
+  // 340), instead of only for an instant.
+  const OVERLAY_END = 0.5;
+  const overlayY = useTransform(scrollYProgress, [0, OVERLAY_END * PIN_END], ["100%", "0%"]);
 
   // Driven manually (useMotionValue + a single scroll subscription)
   // rather than useTransform — chaining multiple useTransform calls off
@@ -71,21 +87,32 @@ export function Hero() {
   // Page-transition-style exit: the copy rises a short distance early
   // (like the page itself scrolling away), holds there, then fades out
   // once it's already settled near the top. The CTA sits close to the
-  // bottom of the viewport (~806px of 900px) and the green panel rises
-  // from below, so without the upward shift the panel would reach it
-  // almost immediately; the -175px rise buys enough clearance (panel
-  // reaches the shifted position only around progress 0.30) for the
-  // fade to run at 0.18 -> 0.27, comfortably before that.
+  // bottom of the viewport (~806px of 900px), and with the panel now
+  // finishing its rise at OVERLAY_END=0.5 instead of 1, it reaches that
+  // shifted position much sooner (~pinnedProgress 0.15) — the rise+fade
+  // has to complete well before that, so both are compressed into the
+  // opening sliver of the pin.
   const HERO_TEXT_RISE = 175;
   const heroTextY = useMotionValue(0);
   const heroTextOpacity = useMotionValue(1);
   const showcaseTextOpacity = useMotionValue(0);
 
+  // Once the last card has settled (step 5, pinnedProgress 0.86) and
+  // held for a beat, the phone + cards rise together as one unit for
+  // the rest of the pin — the green panel is already filling the whole
+  // sticky container, so lifting them off-center reveals more of it
+  // underneath instead of just holding static until the section
+  // releases.
+  const CARD_RISE_START = 0.9;
+  const CARD_RISE_DISTANCE = 350;
+  const contentRiseY = useMotionValue(0);
+
   const syncHeroText = (latest: number) => {
     const p = pinnedProgress(latest);
-    heroTextY.set(-HERO_TEXT_RISE * Math.min(1, Math.max(0, p / 0.12)));
-    heroTextOpacity.set(1 - Math.min(1, Math.max(0, (p - 0.18) / 0.09)));
+    heroTextY.set(-HERO_TEXT_RISE * Math.min(1, Math.max(0, p / 0.05)));
+    heroTextOpacity.set(1 - Math.min(1, Math.max(0, (p - 0.07) / 0.04)));
     showcaseTextOpacity.set(Math.min(1, Math.max(0, (p - 0.3) / 0.2)));
+    contentRiseY.set(-CARD_RISE_DISTANCE * Math.min(1, Math.max(0, (p - CARD_RISE_START) / (1 - CARD_RISE_START))));
   };
 
   useMotionValueEvent(scrollYProgress, "change", syncHeroText);
@@ -145,7 +172,7 @@ export function Hero() {
   );
 
   return (
-    <section ref={sectionRef} className="relative" style={{ height: reducedMotion ? undefined : "260vh" }}>
+    <section ref={sectionRef} className="relative" style={{ height: reducedMotion ? undefined : `${SECTION_HEIGHT_VH}vh` }}>
       <OrganicWave />
 
       <div className="sticky top-0 h-screen overflow-hidden flex items-center pt-48 lg:pt-56 px-6 lg:px-12 xl:px-16">
@@ -175,7 +202,7 @@ export function Hero() {
             {!reducedMotion && (
               <motion.div
                 aria-hidden={false}
-                style={{ opacity: showcaseTextOpacity }}
+                style={{ opacity: showcaseTextOpacity, y: contentRiseY }}
                 className="absolute inset-0 flex flex-col items-center lg:items-start text-center lg:text-left justify-center pointer-events-none"
               >
                 <p className="text-sm font-semibold mb-3" style={{ color: "var(--numi-landing-tagline)" }}>Always on</p>
@@ -189,7 +216,10 @@ export function Hero() {
             )}
           </div>
 
-          <div className="relative shrink-0 flex items-center justify-center">
+          <motion.div
+            className="relative shrink-0 flex items-center justify-center"
+            style={reducedMotion ? undefined : { y: contentRiseY, willChange: "transform" }}
+          >
             {!reducedMotion && <DashboardCards revealedStep={revealedStep} />}
 
             <motion.div
@@ -201,7 +231,7 @@ export function Hero() {
                 revealedStep={reducedMotion ? undefined : revealedStep}
               />
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

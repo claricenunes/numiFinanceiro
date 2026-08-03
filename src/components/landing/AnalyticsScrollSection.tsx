@@ -72,7 +72,7 @@ export function AnalyticsScrollSection() {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top top",
-          end: () => `+=${window.innerHeight * 2.6}`,
+          end: () => `+=${window.innerHeight * 4.2}`,
           scrub: true,
           pin: true,
           invalidateOnRefresh: true,
@@ -102,6 +102,16 @@ export function AnalyticsScrollSection() {
           0.9 + i * 0.3
         );
       });
+
+      // Padding tween — animates nothing, just extends the timeline's
+      // total duration past the last real tween (card 3 finishes at
+      // 2.65). Without it, scrub maps scroll-progress 1.0 directly onto
+      // that same 2.65 mark, so the last card finished exactly as the
+      // section unpinned — no hold, it just ended right after the phone.
+      // This hold needs to be a clearly noticeable stretch of the green
+      // stage sitting fully settled before the page moves on to the
+      // next (coral-accented) section, not a token pause.
+      tl.to({}, { duration: 1.5 });
     }, sectionRef);
 
     // Web fonts (and anything else) finishing layout after this effect's
@@ -135,7 +145,7 @@ export function AnalyticsScrollSection() {
             </p>
           </div>
 
-          <div className="relative flex items-center justify-center" style={{ minHeight: 640 }}>
+          <div className="relative flex items-center justify-center" style={{ minHeight: 720 }}>
             <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none" style={{ background: GREEN_BG }} />
             {CARDS.map((card) => (
               <div
@@ -177,7 +187,7 @@ export function AnalyticsScrollSection() {
           </p>
         </div>
 
-        <div ref={stageRef} className="relative flex items-center justify-center" style={{ minHeight: 640 }}>
+        <div ref={stageRef} className="relative flex items-center justify-center" style={{ minHeight: 720 }}>
           {/* Only the green panel is clipped to the rounded stage — cards
               are free to spread past its edges without getting cut off. */}
           <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
