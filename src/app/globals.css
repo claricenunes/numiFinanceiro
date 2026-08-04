@@ -51,18 +51,21 @@
   --numi-info:    #38BDF8;
 }
 
-/* ── Modo claro (novo padrão: soft-glass + gradientes pastel) ── */
+/* ── Modo claro (paleta unificada com a landing: creme quente + verde-
+   escuro em vez de branco/cinza genérico — é o que dá o efeito "glass"
+   premium, já que .glass-card depende desses tokens terem alguma
+   temperatura de cor em vez de neutros frios) ── */
 html.light {
-  --numi-bg:          #FAFAFA;
-  --numi-surface:     rgba(255, 255, 255, 0.72);
-  --numi-elevated:    #FFFFFF;
-  --numi-modal:       #FFFFFF;
-  --numi-border:      rgba(15, 23, 42, 0.06);
+  --numi-bg:          #F7F5EC;
+  --numi-surface:     rgba(255, 253, 249, 0.75);
+  --numi-elevated:    #FFFDF9;
+  --numi-modal:       #FFFDF9;
+  --numi-border:      rgba(22, 50, 31, 0.08);
   --numi-text:        #0F172A;
   --numi-text-2:      #475569;
   --numi-text-3:      #64748B;
   --numi-text-4:      #94A3B8;
-  --numi-input-bg:    #F8FAFC;
+  --numi-input-bg:    #FBF9F3;
 
   --numi-income:  #10B981;
   --numi-expense: #EF4444;
@@ -143,11 +146,30 @@ body {
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--numi-border);
   border-radius: 24px;
-  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 30px rgba(22, 50, 31, 0.06);
 }
 
 html:not(.light) .glass-card {
   box-shadow: none;
+}
+
+/* Interactive surface (Card variant="interactive") — subtle lift + border
+   warm-up on hover, used for anything clickable (list rows, nav-like
+   cards) so hover state reads as "premium" rather than a flat opacity
+   change. */
+.glass-card-interactive {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  cursor: pointer;
+}
+
+.glass-card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--numi-landing-heading) 18%, var(--numi-border));
+  box-shadow: 0 16px 40px rgba(22, 50, 31, 0.1);
+}
+
+.glass-card-interactive:active {
+  transform: translateY(0);
 }
 
 .input-base {

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import { getPeriod, getCurrentPeriod } from "@/lib/utils/date";
 import type { PeriodType, Period } from "@/types/app";
 
@@ -125,65 +126,71 @@ export function PeriodSelector() {
         </button>
       </div>
 
-      {open && (
-        <div
-          className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-56 max-w-[90vw] rounded-2xl z-50 py-1"
-          style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 32px rgba(22, 50, 31, 0.14)" }}
-        >
-          <p className="px-3 py-1.5 text-xs font-medium text-[var(--numi-text-3)]">Quick ranges</p>
-          {PRESETS.map((p) => (
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="glass-card absolute top-full mt-2 left-1/2 -translate-x-1/2 w-56 max-w-[90vw] rounded-2xl z-50 py-1"
+            style={{ background: "var(--numi-elevated)" }}
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+          >
+            <p className="px-3 py-1.5 text-xs font-medium text-[var(--numi-text-3)]">Quick ranges</p>
+            {PRESETS.map((p) => (
+              <button
+                key={p.type}
+                type="button"
+                onClick={() => select(p.type)}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_5%,transparent)] transition-colors text-left"
+                style={{ color: "var(--numi-landing-heading)" }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: period.type === p.type ? "var(--numi-landing-accent)" : "transparent" }} />
+                {p.label}
+              </button>
+            ))}
+
+            <div className="my-1 h-px" style={{ background: "var(--numi-border)" }} />
+
             <button
-              key={p.type}
               type="button"
-              onClick={() => select(p.type)}
+              onClick={() => setShowCustom((s) => !s)}
               className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_5%,transparent)] transition-colors text-left"
               style={{ color: "var(--numi-landing-heading)" }}
             >
-              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: period.type === p.type ? "var(--numi-landing-accent)" : "transparent" }} />
-              {p.label}
+              <span className="w-1.5 h-1.5" />
+              Custom
             </button>
-          ))}
 
-          <div className="my-1 h-px" style={{ background: "rgba(22, 50, 31, 0.08)" }} />
-
-          <button
-            type="button"
-            onClick={() => setShowCustom((s) => !s)}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_5%,transparent)] transition-colors text-left"
-            style={{ color: "var(--numi-landing-heading)" }}
-          >
-            <span className="w-1.5 h-1.5" />
-            Custom
-          </button>
-
-          {showCustom && (
-            <div className="px-3 pb-3 flex flex-col gap-2">
-              <input
-                type="date"
-                value={customStart}
-                onChange={(e) => setCustomStart(e.target.value)}
-                className="numi-landing-input text-sm py-1.5"
-                style={{ colorScheme: "light" }}
-              />
-              <input
-                type="date"
-                value={customEnd}
-                onChange={(e) => setCustomEnd(e.target.value)}
-                className="numi-landing-input text-sm py-1.5"
-                style={{ colorScheme: "light" }}
-              />
-              <button
-                type="button"
-                onClick={applyCustom}
-                disabled={!customStart || !customEnd}
-                className="numi-pill-btn numi-pill-btn-accent py-1.5 text-sm disabled:opacity-60 disabled:pointer-events-none"
-              >
-                Apply
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+            {showCustom && (
+              <div className="px-3 pb-3 flex flex-col gap-2">
+                <input
+                  type="date"
+                  value={customStart}
+                  onChange={(e) => setCustomStart(e.target.value)}
+                  className="numi-landing-input text-sm py-1.5"
+                  style={{ colorScheme: "light" }}
+                />
+                <input
+                  type="date"
+                  value={customEnd}
+                  onChange={(e) => setCustomEnd(e.target.value)}
+                  className="numi-landing-input text-sm py-1.5"
+                  style={{ colorScheme: "light" }}
+                />
+                <button
+                  type="button"
+                  onClick={applyCustom}
+                  disabled={!customStart || !customEnd}
+                  className="numi-pill-btn numi-pill-btn-accent py-1.5 text-sm disabled:opacity-60 disabled:pointer-events-none"
+                >
+                  Apply
+                </button>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

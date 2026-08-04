@@ -2,77 +2,69 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import { Home, Landmark, PieChart, Target, Plus } from "lucide-react";
 import { useUIStore } from "@/stores/useUIStore";
 
-const NAV = [
-  { label: "Home",     href: "/app/dashboard",     icon: HomeIcon },
-  { label: "Accounts", href: "/app/contas",        icon: CardIcon },
-  { label: "Budget",   href: "/app/orcamento",     icon: ChartIcon },
-  { label: "Goals",    href: "/app/metas",         icon: TargetIcon },
-  { label: "Invest",   href: "/app/investimentos", icon: TrendIcon },
+const LEFT = [
+  { label: "Home", href: "/app/dashboard", icon: Home },
+  { label: "Accounts", href: "/app/contas", icon: Landmark },
+];
+
+const RIGHT = [
+  { label: "Budget", href: "/app/orcamento", icon: PieChart },
+  { label: "Goals", href: "/app/metas", icon: Target },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
   const { openQuickAdd } = useUIStore();
 
+  function isActive(href: string) {
+    return pathname === href || pathname.startsWith(href + "/");
+  }
+
   return (
     <nav
-      className="lg:hidden fixed bottom-0 inset-x-0 z-50 flex items-center justify-around px-2 pb-safe"
+      className="lg:hidden fixed bottom-0 inset-x-0 z-50 flex items-center justify-around px-2 pb-safe border-t"
       style={{
-        background: "color-mix(in srgb, #FFFFFF 92%, transparent)",
+        background: "color-mix(in srgb, var(--numi-elevated) 92%, transparent)",
         backdropFilter: "blur(12px)",
-        borderTop: "1px solid rgba(22, 50, 31, 0.08)",
+        borderColor: "var(--numi-border)",
         height: "64px",
       }}
     >
-      {NAV.map(({ label, href, icon: Icon }, i) => {
-        const active = pathname === href || pathname.startsWith(href + "/");
+      {LEFT.map((item) => (
+        <NavItem key={item.href} item={item} active={isActive(item.href)} />
+      ))}
 
-        // Center FAB
-        if (i === 2) {
-          return (
-            <div key="fab" className="flex flex-col items-center gap-1">
-              <button
-                onClick={() => openQuickAdd("expense")}
-                className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl shadow-lg transition-transform active:scale-95"
-                style={{ background: "var(--numi-landing-accent)", color: "var(--numi-landing-accent-text)", boxShadow: "0 4px 20px rgba(226, 137, 107, 0.45)" }}
-                aria-label="New transaction"
-              >
-                +
-              </button>
-            </div>
-          );
-        }
+      <motion.button
+        onClick={() => openQuickAdd("expense")}
+        whileTap={{ scale: 0.9 }}
+        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+        style={{ background: "var(--numi-landing-accent)", color: "var(--numi-landing-accent-text)", boxShadow: "0 4px 20px rgba(226, 137, 107, 0.45)" }}
+        aria-label="New transaction"
+      >
+        <Plus size={22} strokeWidth={2.5} />
+      </motion.button>
 
-        return (
-          <Link
-            key={href}
-            href={href}
-            className="flex flex-col items-center gap-1 min-w-[48px] transition-colors"
-            style={{ color: active ? "var(--numi-landing-heading)" : "var(--numi-text-3)" }}
-          >
-            <Icon className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{label}</span>
-          </Link>
-        );
-      })}
+      {RIGHT.map((item) => (
+        <NavItem key={item.href} item={item} active={isActive(item.href)} />
+      ))}
     </nav>
   );
 }
 
-function HomeIcon({ className }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
-}
-function CardIcon({ className }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>;
-}
-function ChartIcon({ className }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v10l6.5 3.5"/></svg>;
-}
-function TargetIcon({ className }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>;
-}
-function TrendIcon({ className }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>;
+function NavItem({ item, active }: { item: (typeof LEFT)[number]; active: boolean }) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      className="flex flex-col items-center gap-1 min-w-[48px] transition-colors"
+      style={{ color: active ? "var(--numi-landing-heading)" : "var(--numi-text-3)" }}
+    >
+      <Icon size={19} strokeWidth={active ? 2.25 : 1.75} />
+      <span className="text-[10px] font-medium">{item.label}</span>
+    </Link>
+  );
 }

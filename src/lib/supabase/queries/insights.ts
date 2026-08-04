@@ -16,7 +16,7 @@ function fmt(n: number): string {
 }
 
 export function generateInsights(data: DashboardData, budgets: BudgetItem[]): Insight[] {
-  const { summary, goals, categories } = data;
+  const { summary, goals, categories, previousCategories, recurringTotal } = data;
   const insights: Insight[] = [];
 
   /* ── 1. Budget overages (max 2) ─────────────────────── */
@@ -94,5 +94,65 @@ export function generateInsights(data: DashboardData, budgets: BudgetItem[]): In
     }
   }
 
-  return insights.slice(0, 4);
+  /* ── 6. Category that grew / shrank the most vs previous period ──── */
+  const prevAmountByCategory = new Map(previousCategories.map(c => [c.categoryName, c.amount]));
+  let topGrowth: { categoryName: string; icon: string; amount: number; pct: number } | null = null;
+  let topDecline: { categoryName: string; icon: string; amount: number; pct: number } | null = null;
+  for (const cat of categories) {
+    const prevAmount = prevAmountByCategory.get(cat.categoryName) ?? 0;
+    if (prevAmount <= 0) continue;
+    const pct = ((cat.amount - prevAmount) / prevAmount) * 100;
+    if (pct > 20 && (!topGrowth || pct > topGrowth.pct)) topGrowth = { ...cat, pct };
+    if (pct < -20 && (!topDecline || pct < topDecline.pct)) topDecline = { ...cat, pct };
+  }
+  if (topGrowth) {
+    insights.push({
+      id: `growth-${topGrowth.categoryName}`, type: "category_growth", severity: "warning", category: "trend", icon: "📈",
+      title: `${topGrowth.icon} ${topGrowth.categoryName} spending is up ${Math.round(topGrowth.pct)}%`,
+      description: `${fmt(topGrowth.amount)} this period vs last period — your fastest-growing category.`,
+    });
+  }
+  if (topDecline) {
+    insights.push({
+      id: `decline-${topDecline.categoryName}`, type: "category_decline", severity: "info", category: "win", icon: "📉",
+      title: `${topDecline.icon} ${topDecline.categoryName} spending is down ${Math.round(Math.abs(topDecline.pct))}%`,
+      description: `${fmt(topDecline.amount)} this period, down from last period. Nice trend.`,
+    });
+  }
+
+  /* ── 7. Recurring spend ─────────────────────────────── */
+  if (recurringTotal > 0) {
+    insights.push({
+      id: "recurring-total", type: "recurring_spend", severity: "info", category: "trend", icon: "🔁",
+      title: `${fmt(recurringTotal)} in recurring charges this period`,
+      description: "Subscriptions and recurring expenses — worth a quick review if any are no longer used.",
+    });
+  }
+
+  /* ── 8. Projected balance at month end (linear run-rate) ─────── */
+  if (summary.period.type === "current_month" && summary.expense > 0) {
+    const daysInPeriod = Math.round(
+      (new Date(summary.period.endDate + "T12:00:00").getTime() - new Date(summary.period.startDate + "T12:00:00").getTime()) / 86400000
+    ) + 1;
+    const rawElapsed = Math.round(
+      (Date.now() - new Date(summary.period.startDate + "T12:00:00").getTime()) / 86400000
+    ) + 1;
+    const daysElapsed = Math.min(Math.max(rawElapsed, 1), daysInPeriod);
+
+    if (daysElapsed < daysInPeriod) {
+      const avgDailySpend = summary.expense / daysElapsed;
+      const projectedExpense = summary.expense + avgDailySpend * (daysInPeriod - daysElapsed);
+      const projectedSavings = summary.income - projectedExpense;
+      insights.push({
+        id: "forecast-eom", type: "forecast_balance",
+        severity: projectedSavings >= 0 ? "info" : "warning", category: "forecast", icon: "🔮",
+        title: projectedSavings >= 0 ? "On pace to end the month with a surplus" : "On pace to end the month over budget",
+        description: projectedSavings >= 0
+          ? `At this rate, you'll have about ${fmt(projectedSavings)} left over by the end of the month.`
+          : `At this rate, you'll be short about ${fmt(Math.abs(projectedSavings))} by the end of the month.`,
+      });
+    }
+  }
+
+  return insights.slice(0, 8);
 }

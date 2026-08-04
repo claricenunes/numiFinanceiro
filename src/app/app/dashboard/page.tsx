@@ -1,16 +1,26 @@
 import type { Metadata } from "next";
 import { FadeIn } from "@/components/common/FadeIn";
-import { SummaryCards } from "@/components/dashboard/SummaryCards";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { DashboardGreeting } from "@/components/dashboard/DashboardGreeting";
+import { KpiGrid } from "@/components/dashboard/KpiGrid";
+import { NetWorthTrend } from "@/components/dashboard/NetWorthTrend";
+import { SpendingHeatmap } from "@/components/dashboard/SpendingHeatmap";
+import { InsightsBanner } from "@/components/dashboard/InsightsBanner";
 import { ExpenseChart } from "@/components/dashboard/ExpenseChart";
 import { FlowChart } from "@/components/dashboard/FlowChart";
+import { StatsStrip } from "@/components/dashboard/StatsStrip";
 import { GoalsPreview } from "@/components/dashboard/GoalsPreview";
+import { UpcomingPayments } from "@/components/dashboard/UpcomingPayments";
+import { InvestmentsPanel } from "@/components/dashboard/InvestmentsPanel";
+import { FinancialHealthCard } from "@/components/dashboard/FinancialHealthCard";
+import { QuickActions } from "@/components/dashboard/QuickActions";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
-import { InsightsBanner } from "@/components/dashboard/InsightsBanner";
-import { AIOrb } from "@/components/mascot/AIOrb";
 import { getOrbStatus } from "@/components/mascot/orbStatus";
 import { getDashboardData } from "@/lib/supabase/queries/dashboard";
 import { getBudgetItems }   from "@/lib/supabase/queries/budgets";
 import { generateInsights } from "@/lib/supabase/queries/insights";
+import { getInvestments } from "@/lib/supabase/queries/investments";
+import { computeHealthScore } from "@/lib/utils/financialHealth";
 import { parsePeriodFromParams } from "@/lib/utils/date";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -23,13 +33,15 @@ export default async function DashboardPage({
   const { from, to, pt } = await searchParams;
   const period = parsePeriodFromParams(from, to, pt);
 
-  const [dashData, budgetItems] = await Promise.all([
+  const [dashData, budgetItems, investments] = await Promise.all([
     getDashboardData(period),
     getBudgetItems(period.startDate, period.endDate),
+    getInvestments(),
   ]);
 
-  const { summary, categories, weeklyFlow, goals, transactions, firstName } = dashData;
+  const { summary, goals, transactions, firstName } = dashData;
   const insights = generateInsights(dashData, budgetItems);
+  const healthScore = computeHealthScore(summary, goals, budgetItems);
 
   const orbStatus = getOrbStatus(summary.savingsRate);
   const statusMessage = {
@@ -39,33 +51,49 @@ export default async function DashboardPage({
   }[orbStatus];
 
   return (
-    <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
-      <div className="mb-5 flex items-center gap-4">
-        <AIOrb status={orbStatus} />
-        <div>
-          <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--numi-landing-heading)" }}>
-            Hi{firstName ? `, ${firstName}` : ""}
-          </h1>
-          <p className="text-sm text-[var(--numi-text-3)] mt-0.5">
-            {statusMessage}
-          </p>
-        </div>
-      </div>
-
+    <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-7xl mx-auto">
+      <PageHeader title="Dashboard" />
       <div className="flex flex-col gap-4">
-        <SummaryCards summary={summary} />
+        <DashboardGreeting
+          firstName={firstName}
+          orbStatus={orbStatus}
+          statusMessage={statusMessage}
+          highlight={insights[0]}
+        />
+
+        <KpiGrid data={dashData} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <ExpenseChart categories={categories} />
-          <FlowChart data={weeklyFlow} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <GoalsPreview goals={goals} />
-          <RecentTransactions transactions={transactions} />
+          <NetWorthTrend history={dashData.netWorthHistory} />
+          <SpendingHeatmap
+            dailyExpenses={dashData.dailyExpenses}
+            startDate={period.startDate}
+            endDate={period.endDate}
+          />
         </div>
 
         <InsightsBanner insights={insights} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <ExpenseChart categories={dashData.categories} />
+          <FlowChart data={dashData.weeklyFlow} />
+        </div>
+
+        <StatsStrip data={dashData} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <GoalsPreview goals={goals} />
+          <UpcomingPayments bills={dashData.upcomingBills} goals={goals} />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <InvestmentsPanel positions={investments.positions} summary={investments.summary} />
+          <FinancialHealthCard score={healthScore} />
+        </div>
+
+        <QuickActions />
+
+        <RecentTransactions transactions={transactions} />
       </div>
     </FadeIn>
   );
