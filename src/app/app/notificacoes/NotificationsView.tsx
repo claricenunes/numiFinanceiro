@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { Siren, AlertTriangle, Lightbulb, Bell, type LucideIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useToastStore } from "@/stores/useToastStore";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Notification } from "@/lib/supabase/queries/notifications";
 
 const SEVERITY_ICON: Record<string, LucideIcon> = {
@@ -63,13 +66,13 @@ export function NotificationsView({ notifications: initial }: Props) {
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-24">
-        <Bell size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
-        <p className="text-[var(--numi-text-2)] font-medium">No notifications</p>
-        <p className="text-sm text-[var(--numi-text-3)] mt-1">
-          You&apos;ll get alerts about budgets, goals and important transactions
-        </p>
-      </div>
+      <Card>
+        <EmptyState
+          icon={Bell}
+          title="No notifications"
+          description="You'll get alerts about budgets, goals and important transactions"
+        />
+      </Card>
     );
   }
 
@@ -80,14 +83,9 @@ export function NotificationsView({ notifications: initial }: Props) {
           <p className="text-sm text-[var(--numi-text-4)]">
             {unreadCount} unread
           </p>
-          <button
-            onClick={markAllRead}
-            disabled={loading}
-            className="text-xs font-medium hover:opacity-80 transition-colors disabled:opacity-50"
-            style={{ color: "var(--numi-landing-heading)" }}
-          >
+          <Button variant="ghost" size="sm" loading={loading} onClick={markAllRead}>
             Mark all as read
-          </button>
+          </Button>
         </div>
       )}
 
@@ -96,15 +94,15 @@ export function NotificationsView({ notifications: initial }: Props) {
           const color = SEVERITY_COLOR[n.severity] ?? "var(--numi-info)";
           const Icon  = SEVERITY_ICON[n.severity] ?? Bell;
           return (
-            <div
+            <Card
               key={n.id}
+              padding="sm"
+              variant={n.is_read ? "default" : "interactive"}
               onClick={() => !n.is_read && markOneRead(n.id)}
-              className="rounded-2xl p-4 transition-colors"
               style={{
-                background: n.is_read ? "#FFFFFF" : "color-mix(in srgb, var(--numi-info) 6%, #FFFFFF)",
-                border:     `1px solid ${n.is_read ? "rgba(22, 50, 31, 0.08)" : "rgba(59,130,246,0.3)"}`,
-                boxShadow:  "0 8px 20px -12px rgba(22, 50, 31, 0.15)",
-                cursor:     n.is_read ? "default" : "pointer",
+                background: n.is_read ? "var(--numi-surface)" : `color-mix(in srgb, ${color} 5%, var(--numi-surface))`,
+                borderColor: n.is_read ? "var(--numi-border)" : `color-mix(in srgb, ${color} 30%, transparent)`,
+                cursor: n.is_read ? "default" : "pointer",
               }}
             >
               <div className="flex items-start gap-3">
@@ -127,7 +125,7 @@ export function NotificationsView({ notifications: initial }: Props) {
                   <p className="text-xs text-[var(--numi-text-3)] mt-2">{timeAgo(n.created_at)}</p>
                 </div>
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>

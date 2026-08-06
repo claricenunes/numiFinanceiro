@@ -6,6 +6,10 @@ import { GOAL_ICON_MAP } from "@/lib/icons";
 import type { GoalWithProgress } from "@/types/app";
 import { ProgressBar } from "@/components/common/ProgressBar";
 import { FadeIn } from "@/components/common/FadeIn";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { NewGoalButton } from "./NewGoalButton";
 import { ContributeButton } from "./ContributeButton";
 import { EditGoalButton } from "./EditGoalButton";
@@ -26,38 +30,25 @@ export default async function MetasPage() {
 
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--numi-landing-heading)" }}>Goals</h1>
-        <NewGoalButton />
-      </div>
+      <PageHeader title="Goals" actions={<NewGoalButton />} />
 
       {goals.length > 0 && (
         <div className="flex gap-2 mb-6 flex-wrap">
-          <Pill value={active}    label="active"    color="var(--numi-income)" />
-          <Pill value={completed} label="completed" color="var(--numi-info)" />
+          <Badge tone="income">{active} active</Badge>
+          <Badge tone="info">{completed} completed</Badge>
         </div>
       )}
 
       {goals.length === 0 ? (
-        <div className="text-center py-20">
-          <Target size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
-          <p className="text-[var(--numi-text-2)] font-medium">No goals yet</p>
-          <p className="text-sm text-[var(--numi-text-3)] mt-1">Click &quot;+ New Goal&quot; to start tracking your progress</p>
-        </div>
+        <Card>
+          <EmptyState icon={Target} title="No goals yet" description={'Click "+ New Goal" to start tracking your progress'} />
+        </Card>
       ) : (
         <div className="flex flex-col gap-4">
           {goals.map(goal => <GoalCard key={goal.id} goal={goal} />)}
         </div>
       )}
     </FadeIn>
-  );
-}
-
-function Pill({ value, label, color }: { value: number; label: string; color: string }) {
-  return (
-    <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: `color-mix(in srgb, ${color} 14%, transparent)`, color }}>
-      {value} {label}
-    </span>
   );
 }
 
@@ -68,9 +59,13 @@ function GoalCard({ goal }: { goal: GoalWithProgress }) {
   const isPaused    = goal.status === "paused";
 
   return (
-    <div
-      className="rounded-2xl p-5"
-      style={{ background: "#FFFFFF", border: `1px solid ${isCompleted ? "rgba(59,130,246,0.22)" : isPaused ? "rgba(245,158,11,0.22)" : "rgba(22, 50, 31, 0.08)"}`, boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
+    <Card
+      variant="interactive"
+      style={
+        isCompleted ? { borderColor: "rgba(59,130,246,0.22)" }
+        : isPaused ? { borderColor: "rgba(245,158,11,0.22)" }
+        : undefined
+      }
     >
       <div className="flex gap-4">
         <div className="shrink-0">
@@ -121,11 +116,11 @@ function GoalCard({ goal }: { goal: GoalWithProgress }) {
         </div>
       </div>
       {goal.status === "active" && (
-        <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}>
+        <div className="mt-4 pt-4 border-t" style={{ borderColor: "var(--numi-border)" }}>
           <ContributeButton goalId={goal.id} goalName={goal.name} />
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -137,7 +132,7 @@ function ProgressCircle({ percent, color, size = 80 }: { percent: number; color:
   const filled = Math.min(percent / 100, 1) * circumference;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(22, 50, 31, 0.1)" strokeWidth={7} />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--numi-border)" strokeWidth={7} />
       <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={7}
         strokeLinecap="round" strokeDasharray={`${filled} ${circumference}`}
         transform={`rotate(-90 ${cx} ${cy})`} />

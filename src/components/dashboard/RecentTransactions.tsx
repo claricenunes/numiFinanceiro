@@ -24,8 +24,8 @@ export function RecentTransactions({ transactions, locale = "en-US" }: Props) {
   return (
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-[var(--numi-text)]">{t.title}</p>
-        <Link href="/app/transacoes" className="text-xs text-[var(--numi-income)] hover:underline">
+        <p className="text-sm font-semibold" style={{ color: "var(--numi-landing-heading)" }}>{t.title}</p>
+        <Link href="/app/transacoes" className="text-xs hover:underline" style={{ color: "var(--numi-landing-tagline)" }}>
           {t.viewAll}
         </Link>
       </div>
@@ -33,7 +33,7 @@ export function RecentTransactions({ transactions, locale = "en-US" }: Props) {
       {transactions.length === 0 ? (
         <div className="text-center py-6">
           <p className="text-sm text-[var(--numi-text-3)]">{t.empty}</p>
-          <button className="text-xs text-[var(--numi-income)] hover:underline mt-1">
+          <button className="text-xs hover:underline mt-1" style={{ color: "var(--numi-landing-tagline)" }}>
             {t.create}
           </button>
         </div>

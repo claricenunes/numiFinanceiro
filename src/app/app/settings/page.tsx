@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Moon, Sun, Monitor, type LucideIcon } from "lucide-react";
+import { Moon, Sun, Monitor, LogOut, Download, type LucideIcon } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { useUserStore } from "@/stores/useUserStore";
 import { createClient } from "@/lib/supabase/client";
 import { FadeIn } from "@/components/common/FadeIn";
-import type { UserProfile } from "@/types/database";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 
 /* ── Export helpers ─────────────────────────────── */
 
@@ -186,11 +190,11 @@ export default function SettingsPage() {
 
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-2xl mx-auto">
-      <h1 className="text-xl font-bold mb-8" style={{ color: "var(--numi-landing-heading)" }}>Settings</h1>
+      <PageHeader title="Settings" />
 
       {/* ── Profile ─────────────────────────── */}
       <Section title="Profile">
-        <div className="flex items-center gap-4 mb-5 pb-5" style={{ borderBottom: "1px solid rgba(22, 50, 31, 0.08)" }}>
+        <div className="flex items-center gap-4 mb-5 pb-5 border-b" style={{ borderColor: "var(--numi-border)" }}>
           <div
             className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-white shrink-0"
             style={{ background: "var(--numi-landing-nav-bg)" }}
@@ -271,8 +275,8 @@ export default function SettingsPage() {
                 onClick={() => handleTheme(t)}
                 className="py-3 px-2 rounded-xl text-sm font-medium flex flex-col items-center gap-2 transition-colors"
                 style={{
-                  background: active ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
-                  border: `1px solid ${active ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                  background: active ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "var(--numi-elevated)",
+                  border: `1px solid ${active ? "var(--numi-landing-accent)" : "var(--numi-border)"}`,
                   color: active ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
                 }}
               >
@@ -302,14 +306,14 @@ export default function SettingsPage() {
           <ActionRow
             label="Export transactions"
             sub="CSV with all transactions"
-            right="↓ CSV"
+            right="CSV"
             rightColor="var(--numi-income)"
             onClick={handleExport}
           />
           <ActionRow
             label="Full report"
             sub="Accounts + Goals + Transactions this month"
-            right="↓ CSV"
+            right="CSV"
             rightColor="var(--numi-info)"
             onClick={handleFullReport}
           />
@@ -323,12 +327,7 @@ export default function SettingsPage() {
             <span className="text-sm text-[var(--numi-text-2)]">1.0.0-beta</span>
           </Row>
           <Row label="Database">
-            <span
-              className="text-xs font-medium px-2.5 py-1 rounded-full"
-              style={{ background: "rgba(16,185,129,0.15)", color: "var(--numi-income)" }}
-            >
-              Supabase connected
-            </span>
+            <Badge tone="income">Supabase connected</Badge>
           </Row>
         </div>
       </Section>
@@ -337,20 +336,14 @@ export default function SettingsPage() {
       <Section title="Account">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left hover:bg-[rgba(239,68,68,0.14)]"
           style={{
             background: "rgba(239,68,68,0.08)",
             border: "1px solid rgba(239,68,68,0.2)",
             color: "var(--numi-expense)",
           }}
-          onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.14)")
-          }
-          onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.08)")
-          }
         >
-          <LogoutIcon />
+          <LogOut size={16} className="shrink-0" />
           <span className="text-sm font-semibold">Log out</span>
         </button>
       </Section>
@@ -364,9 +357,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div className="mb-8">
       <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">{title}</p>
-      <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}>
-        {children}
-      </div>
+      <Card>{children}</Card>
     </div>
   );
 }
@@ -419,22 +410,16 @@ function EditRow({
         <p className="text-sm text-[var(--numi-text-2)] shrink-0">{label}</p>
         {editing ? (
           <div className="flex items-center gap-2 flex-1 justify-end">
-            <input
+            <Input
               type={type}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") save(); if (e.key === "Escape") setEditing(false); }}
               placeholder={placeholder}
               autoFocus
-              className="numi-landing-input px-3 py-1.5 max-w-[180px]"
+              className="px-3 py-1.5 max-w-[180px]"
             />
-            <button
-              onClick={save}
-              disabled={loading}
-              className="numi-pill-btn numi-pill-btn-accent text-xs px-3 py-1.5 disabled:opacity-60"
-            >
-              {loading ? "…" : "Save"}
-            </button>
+            <Button variant="accent" size="sm" loading={loading} onClick={save}>Save</Button>
             <button
               onClick={() => setEditing(false)}
               className="text-xs text-[var(--numi-text-3)] hover:text-[var(--numi-text-2)] transition-colors"
@@ -472,26 +457,15 @@ function ActionRow({
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed"
-      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
-      onMouseEnter={(e) => { if (!disabled) (e.currentTarget as HTMLElement).style.borderColor = "var(--numi-landing-accent)"; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(22, 50, 31, 0.08)"; }}
+      className="glass-card glass-card-interactive p-4 w-full flex items-center justify-between text-left disabled:opacity-40 disabled:pointer-events-none"
     >
       <div>
         <p className="text-sm font-semibold" style={{ color: "var(--numi-landing-heading)" }}>{label}</p>
         <p className="text-xs text-[var(--numi-text-3)] mt-0.5">{sub}</p>
       </div>
-      <span className="text-sm font-medium shrink-0 ml-3" style={{ color: rightColor }}>{right}</span>
+      <span className="text-sm font-medium shrink-0 ml-3 flex items-center gap-1.5" style={{ color: rightColor }}>
+        <Download size={13} /> {right}
+      </span>
     </button>
-  );
-}
-
-function LogoutIcon() {
-  return (
-    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-      <polyline points="16 17 21 12 16 7"/>
-      <line x1="21" y1="12" x2="9" y2="12"/>
-    </svg>
   );
 }

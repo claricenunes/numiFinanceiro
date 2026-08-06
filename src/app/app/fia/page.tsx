@@ -3,9 +3,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
-import { AlertTriangle, Zap, BarChart3, Lightbulb, Briefcase, type LucideIcon } from "lucide-react";
+import { AlertTriangle, Zap, BarChart3, Lightbulb, Briefcase, RotateCw, type LucideIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { ASSET_TYPE_ICON } from "@/lib/icons";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import type { FIAAnalysis, AllocationItem } from "@/types/fia";
 
 /* ── Palette ──────────────────────────────────────────── */
@@ -41,7 +44,7 @@ function ScoreRing({ score }: { score: number }) {
 
   return (
     <svg width={108} height={108} viewBox="0 0 108 108">
-      <circle cx={54} cy={54} r={r} fill="none" stroke="rgba(22, 50, 31, 0.08)" strokeWidth={8} />
+      <circle cx={54} cy={54} r={r} fill="none" stroke="var(--numi-border)" strokeWidth={8} />
       <motion.circle
         cx={54} cy={54} r={r}
         fill="none"
@@ -73,14 +76,11 @@ function AllocationCard({ rec, amount }: { rec: AllocationItem; amount: number }
   const rCol   = riskColor(rec.risk);
 
   return (
-    <div
-      className="rounded-2xl p-4"
-      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-    >
+    <Card padding="sm">
       <div className="flex items-start gap-3 mb-3">
         <span
           className="flex items-center justify-center w-9 h-9 rounded-xl shrink-0"
-          style={{ background: `${color}18`, border: `1px solid ${color}30`, color }}
+          style={{ background: `color-mix(in srgb, ${color} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 26%, transparent)`, color }}
         >
           <Icon size={18} />
         </span>
@@ -102,7 +102,7 @@ function AllocationCard({ rec, amount }: { rec: AllocationItem; amount: number }
         <Tag label={rec.expectedReturn} color={color} />
         <Tag label={rec.timeframe} color="var(--numi-text-3)" />
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -133,13 +133,13 @@ function LoadingState() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-32 rounded-2xl animate-pulse" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }} />
+          <div key={i} className="glass-card h-32 animate-pulse" />
         ))}
       </div>
-      <div className="h-64 rounded-2xl animate-pulse mb-4" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }} />
+      <div className="glass-card h-64 animate-pulse mb-4" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-36 rounded-2xl animate-pulse" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }} />
+          <div key={i} className="glass-card h-36 animate-pulse" />
         ))}
       </div>
     </div>
@@ -177,12 +177,7 @@ export default function FIAPage() {
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <AlertTriangle size={36} style={{ color: "var(--numi-warning)" }} />
         <p className="text-[var(--numi-text-2)] font-medium">{error ?? "Unknown error"}</p>
-        <button
-          onClick={fetchAnalysis}
-          className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce px-4 py-2 text-sm"
-        >
-          Try again
-        </button>
+        <Button variant="accent" onClick={fetchAnalysis}>Try again</Button>
       </div>
     );
   }
@@ -224,6 +219,8 @@ export default function FIAPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28 }}
     >
+      <PageHeader title="Smart Investing" actions={<Button variant="secondary" size="sm" icon={<RotateCw size={13} />} onClick={fetchAnalysis}>Re-analyze</Button>} />
+
       {/* ── Header ─────────────────────────────────── */}
       <div className="flex items-start justify-between mb-6 gap-4">
         <div>
@@ -244,21 +241,6 @@ export default function FIAPage() {
             Analysis generated on {generatedDate} · {analysis.confidence}% confidence
           </p>
         </div>
-        <button
-          onClick={fetchAnalysis}
-          className="text-sm font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shrink-0 transition-colors"
-          style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", color: "var(--numi-text-2)" }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.borderColor = "var(--numi-landing-accent)";
-            (e.currentTarget as HTMLElement).style.color = "var(--numi-landing-heading)";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(22, 50, 31, 0.08)";
-            (e.currentTarget as HTMLElement).style.color = "var(--numi-text-2)";
-          }}
-        >
-          ↻ Re-analyze
-        </button>
       </div>
 
       {/* ── Notice: rule-based analysis ─────── */}
@@ -281,10 +263,7 @@ export default function FIAPage() {
       {/* ── Score + Profile + Capacity ────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {/* Score */}
-        <div
-          className="rounded-2xl p-5 flex flex-col items-center gap-2"
-          style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-        >
+        <Card className="flex flex-col items-center gap-2">
           <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider">
             Financial Score
           </p>
@@ -293,13 +272,10 @@ export default function FIAPage() {
             {analysis.financialScore >= 70 ? "Good financial health" :
              analysis.financialScore >= 50 ? "Moderate situation" : "Needs attention"}
           </p>
-        </div>
+        </Card>
 
         {/* Profile */}
-        <div
-          className="rounded-2xl p-5 flex flex-col items-center justify-center gap-3"
-          style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-        >
+        <Card className="flex flex-col items-center justify-center gap-3">
           <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider">
             Detected Profile
           </p>
@@ -314,17 +290,14 @@ export default function FIAPage() {
               <span
                 key={p}
                 className="w-2 h-2 rounded-full transition-colors"
-                style={{ background: p === analysis.profile ? profileColor : "rgba(22, 50, 31, 0.12)" }}
+                style={{ background: p === analysis.profile ? profileColor : "var(--numi-border)" }}
               />
             ))}
           </div>
-        </div>
+        </Card>
 
         {/* Capacity */}
-        <div
-          className="rounded-2xl p-5"
-          style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-        >
+        <Card>
           <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
             Monthly Capacity
           </p>
@@ -337,14 +310,11 @@ export default function FIAPage() {
           <p className="text-xs text-[var(--numi-text-2)] leading-relaxed">
             {analysis.monthlyContribution.reason}
           </p>
-        </div>
+        </Card>
       </div>
 
       {/* ── Recommended distribution ────────────────── */}
-      <div
-        className="rounded-2xl p-5 mb-6"
-        style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-      >
+      <Card className="mb-6">
         <p className="text-sm font-semibold mb-5" style={{ color: "var(--numi-landing-heading)" }}>
           Recommended Distribution — {formatCurrency(aportBase)}/month
         </p>
@@ -369,8 +339,8 @@ export default function FIAPage() {
               <Tooltip
                 formatter={(v) => [`${v}%`, ""]}
                 contentStyle={{
-                  background: "#FFFFFF",
-                  border: "1px solid rgba(22, 50, 31, 0.08)",
+                  background: "var(--numi-elevated)",
+                  border: "1px solid var(--numi-border)",
                   borderRadius: "10px",
                   fontSize: "12px",
                   color: "var(--numi-landing-heading)",
@@ -403,7 +373,7 @@ export default function FIAPage() {
             })}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* ── Detailed portfolio ─────────────────────── */}
       <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
@@ -433,8 +403,7 @@ export default function FIAPage() {
         {analysis.insights.map((insight, i) => (
           <motion.div
             key={i}
-            className="rounded-xl px-4 py-3 text-sm text-[var(--numi-text-2)] leading-relaxed"
-            style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
+            className="glass-card px-4 py-3 text-sm text-[var(--numi-text-2)] leading-relaxed"
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 + i * 0.06 }}
@@ -448,10 +417,7 @@ export default function FIAPage() {
       <p className="text-xs font-semibold text-[var(--numi-text-3)] uppercase tracking-wider mb-3">
         Next Steps
       </p>
-      <div
-        className="rounded-2xl p-4 mb-8"
-        style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
-      >
+      <Card className="mb-8">
         <ol className="flex flex-col gap-3">
           {analysis.nextSteps.map((step, i) => (
             <motion.li
@@ -472,7 +438,7 @@ export default function FIAPage() {
             </motion.li>
           ))}
         </ol>
-      </div>
+      </Card>
 
       {/* ── Footer ────────────────────────────────── */}
       <p className="text-xs text-center text-[var(--numi-text-3)]">

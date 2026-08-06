@@ -27,8 +27,8 @@ export function InsightsBanner({ insights }: Props) {
   return (
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-semibold text-[var(--numi-text)] flex items-center gap-1.5"><Lightbulb size={15} /> Insights</p>
-        <Link href="/app/insights" className="text-xs text-[var(--numi-income)] hover:underline">
+        <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "var(--numi-landing-heading)" }}><Lightbulb size={15} /> Insights</p>
+        <Link href="/app/insights" className="text-xs hover:underline" style={{ color: "var(--numi-landing-tagline)" }}>
           View all
         </Link>
       </div>

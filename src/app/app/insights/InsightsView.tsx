@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertOctagon, TrendingUp, Trophy, Telescope, Sparkles, type LucideIcon } from "lucide-react";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Tabs } from "@/components/ui/Tabs";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Insight } from "@/lib/supabase/queries/insights";
 
 type TabValue = "all" | "alert" | "trend" | "win" | "forecast";
@@ -41,10 +45,10 @@ export function InsightsView({ insights, periodLabel }: Props) {
 
   return (
     <div>
-      {/* Header */}
+      <PageHeader title="Insights" />
+
       <div className="mb-6">
-        <h1 className="text-xl font-bold" style={{ color: "var(--numi-landing-heading)" }}>Insights</h1>
-        <p className="text-sm text-[var(--numi-text-3)] mt-0.5">
+        <p className="text-sm text-[var(--numi-text-3)]">
           {periodLabel} · {insights.length} insight{insights.length !== 1 ? "s" : ""}
         </p>
       </div>
@@ -57,39 +61,13 @@ export function InsightsView({ insights, periodLabel }: Props) {
         <StatCard count={counts.forecast} label="Forecasts" color="var(--numi-warning)" icon={Telescope} />
       </div>
 
-      {/* Tab bar */}
-      <div
-        className="flex gap-1 p-1 rounded-xl mb-6 overflow-x-auto"
-        style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
-      >
-        {TABS.map((t) => (
-          <button
-            key={t.value}
-            onClick={() => setTab(t.value)}
-            className="relative px-3 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-colors flex-shrink-0"
-            style={{ color: tab === t.value ? "var(--numi-landing-heading)" : "var(--numi-text-3)" }}
-          >
-            {tab === t.value && (
-              <motion.span
-                layoutId="insight-tab-bg"
-                className="absolute inset-0 rounded-lg"
-                style={{ background: "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" }}
-              />
-            )}
-            <span className="relative">{t.label}</span>
-          </button>
-        ))}
-      </div>
+      <Tabs tabs={TABS} value={tab} onChange={setTab} layoutId="insight-tab-bg" className="mb-6" />
 
       {/* Cards grid */}
       {filtered.length === 0 ? (
-        <div className="text-center py-20">
-          <Sparkles size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
-          <p className="text-[var(--numi-text-2)] font-medium">No insights in this category</p>
-          <p className="text-xs text-[var(--numi-text-3)] mt-1">
-            Keep tracking your finances to generate more insights
-          </p>
-        </div>
+        <Card>
+          <EmptyState icon={Sparkles} title="No insights in this category" description="Keep tracking your finances to generate more insights" />
+        </Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <AnimatePresence mode="popLayout">
@@ -118,10 +96,7 @@ function StatCard({
   count: number; label: string; color: string; icon: LucideIcon;
 }) {
   return (
-    <div
-      className="rounded-xl p-3 flex items-center gap-3"
-      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
-    >
+    <Card padding="sm" className="flex items-center gap-3">
       <span
         className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
         style={{ background: `color-mix(in srgb, ${color} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 19%, transparent)`, color }}
@@ -132,7 +107,7 @@ function StatCard({
         <p className="text-xl font-bold" style={{ color: "var(--numi-landing-heading)" }}>{count}</p>
         <p className="text-xs text-[var(--numi-text-3)]">{label}</p>
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -142,13 +117,10 @@ function InsightCard({ insight }: { insight: Insight }) {
   const borderColor =
     insight.severity === "alert"   ? "rgba(239,68,68,0.22)" :
     insight.severity === "warning" ? "rgba(245,158,11,0.18)"  :
-    "rgba(22, 50, 31, 0.08)";
+    "var(--numi-border)";
 
   return (
-    <div
-      className="rounded-2xl p-4 flex gap-4 h-full"
-      style={{ background: "#FFFFFF", border: `1px solid ${borderColor}`, boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-    >
+    <Card padding="sm" className="flex gap-4 h-full" style={{ borderColor }}>
       <span
         className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
         style={{ background: style.badge, border: `1px solid color-mix(in srgb, ${style.color} 19%, transparent)`, color: style.color }}
@@ -167,6 +139,6 @@ function InsightCard({ insight }: { insight: Insight }) {
         </div>
         <p className="text-xs text-[var(--numi-text-2)] leading-relaxed">{insight.description}</p>
       </div>
-    </div>
+    </Card>
   );
 }

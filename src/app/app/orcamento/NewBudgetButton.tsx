@@ -4,6 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
+import { Modal } from "@/components/ui/Modal";
+import { Select } from "@/components/ui/Select";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 
 interface Category { id: string; name: string; icon: string | null }
 interface SysCategory {
@@ -83,47 +87,22 @@ export function NewBudgetButton() {
     router.refresh();
   }
 
-  if (!open) {
-    return (
-      <button
-        onClick={openModal}
-        className="numi-pill-btn numi-pill-btn-outline-dark text-sm px-4 py-2"
-      >
-        + Category
-      </button>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={() => setOpen(false)} />
-      <div className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-           style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)" }}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>New Budget</h2>
-          <button onClick={() => setOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">✕</button>
-        </div>
+    <>
+      <Button variant="secondary" size="sm" onClick={openModal}>+ Category</Button>
+
+      <Modal open={open} onClose={() => setOpen(false)} title="New Budget">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <div>
-            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Category</label>
-            <select value={categoryId} onChange={e => setCategoryId(e.target.value)} required
-              className="numi-landing-input">
-              <option value="">Select category</option>
-              {cats.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Monthly limit ($)</label>
-            <input type="text" inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)}
-              placeholder="0.00" required
-              className="numi-landing-input" />
-          </div>
-          <button type="submit" disabled={loading}
-            className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base mt-1 disabled:opacity-60 disabled:pointer-events-none">
-            {loading ? "Saving..." : "Create budget"}
-          </button>
+          <Select label="Category" value={categoryId} onChange={e => setCategoryId(e.target.value)} required>
+            <option value="">Select category</option>
+            {cats.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+          </Select>
+          <Input label="Monthly limit ($)" type="text" inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" required />
+          <Button type="submit" variant="accent" loading={loading} className="w-full mt-1">
+            Create budget
+          </Button>
         </form>
-      </div>
-    </div>
+      </Modal>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { FadeIn } from "@/components/common/FadeIn";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DashboardGreeting } from "@/components/dashboard/DashboardGreeting";
+import { QuickAccessGrid } from "@/components/dashboard/QuickAccessGrid";
 import { KpiGrid } from "@/components/dashboard/KpiGrid";
 import { NetWorthTrend } from "@/components/dashboard/NetWorthTrend";
 import { SpendingHeatmap } from "@/components/dashboard/SpendingHeatmap";
@@ -61,7 +62,17 @@ export default async function DashboardPage({
           highlight={insights[0]}
         />
 
-        <KpiGrid data={dashData} />
+        <QuickAccessGrid />
+
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--numi-landing-tagline)" }}>
+            Overview
+          </p>
+          <div className="flex flex-col gap-4">
+            <KpiGrid data={dashData} />
+            <RecentTransactions transactions={transactions} />
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <NetWorthTrend history={dashData.netWorthHistory} />
@@ -92,8 +103,6 @@ export default async function DashboardPage({
         </div>
 
         <QuickActions />
-
-        <RecentTransactions transactions={transactions} />
       </div>
     </FadeIn>
   );

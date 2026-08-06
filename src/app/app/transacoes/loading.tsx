@@ -8,7 +8,7 @@ export default function TransacoesLoading() {
       {/* Summary */}
       <div className="grid grid-cols-3 gap-3 mb-5">
         {[0, 1, 2].map(i => (
-          <div key={i} className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}>
+          <div key={i} className="glass-card p-3">
             <Skeleton className="h-3 w-16 mx-auto mb-2" />
             <Skeleton className="h-5 w-24 mx-auto" />
           </div>
@@ -29,14 +29,14 @@ export default function TransacoesLoading() {
         <div key={g} className="mb-6">
           <div className="flex items-center gap-3 mb-2">
             <Skeleton className="h-3 w-16" />
-            <div className="flex-1 h-px" style={{ background: "rgba(22, 50, 31, 0.08)" }} />
+            <div className="flex-1 h-px" style={{ background: "var(--numi-border)" }} />
           </div>
-          <div className="rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}>
+          <div className="glass-card p-0 overflow-hidden">
             {[0, 1, 2].map((r, idx) => (
               <div
                 key={r}
                 className="flex items-center gap-3 px-4 py-3"
-                style={{ borderBottom: idx < 2 ? "1px solid rgba(22, 50, 31, 0.08)" : "none" }}
+                style={{ borderBottom: idx < 2 ? "1px solid var(--numi-border)" : "none" }}
               >
                 <Skeleton className="h-9 w-9 rounded-xl shrink-0" />
                 <div className="flex-1">

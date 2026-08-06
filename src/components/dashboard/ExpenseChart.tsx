@@ -27,7 +27,7 @@ export function ExpenseChart({ categories, compact = false, locale = "en-US" }: 
 
   return (
     <div className="glass-card p-5">
-      <p className="text-sm font-semibold text-[var(--numi-text)] mb-4">{title}</p>
+      <p className="text-sm font-semibold mb-4" style={{ color: "var(--numi-landing-heading)" }}>{title}</p>
 
       <div className={`flex flex-col ${compact ? "" : "lg:flex-row"} items-center gap-4`}>
         {/* Donut */}

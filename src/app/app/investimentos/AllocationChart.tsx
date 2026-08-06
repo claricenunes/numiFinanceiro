@@ -15,7 +15,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
   return (
     <div
       className="rounded-xl px-3 py-2 text-sm"
-      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)" }}
+      style={{ background: "var(--numi-elevated)", border: "1px solid var(--numi-border)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
     >
       <p className="font-semibold" style={{ color: "var(--numi-landing-heading)" }}>{entry.label}</p>
       <p style={{ color: entry.color }}>{entry.percent.toFixed(1)}%</p>

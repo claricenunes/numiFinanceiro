@@ -35,7 +35,7 @@ export function FlowChart({ data, locale = "en-US" }: Props) {
   return (
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-[var(--numi-text)]">{t.title}</p>
+        <p className="text-sm font-semibold" style={{ color: "var(--numi-landing-heading)" }}>{t.title}</p>
         <div className="flex items-center gap-3 text-xs text-[var(--numi-text-2)]">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-sm bg-[var(--numi-income)]" /> {t.income}

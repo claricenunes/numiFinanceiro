@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Pencil, Trash2 } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 
 export function BudgetCardActions({
   budgetId,
@@ -53,82 +56,43 @@ export function BudgetCardActions({
 
   if (editing) {
     return (
-      <form
-        onSubmit={handleEdit}
-        className="mt-3 pt-3 flex gap-2 items-center"
-        style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}
-      >
-        <span className="text-xs text-[var(--numi-text-3)] shrink-0">New limit:</span>
-        <input
-          value={newAmount}
-          onChange={e => setNewAmount(e.target.value)}
-          type="text"
-          inputMode="decimal"
-          autoFocus
-          className="flex-1 numi-landing-input py-1.5"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="numi-pill-btn numi-pill-btn-accent text-xs px-3 py-1.5 disabled:opacity-60 disabled:pointer-events-none"
-        >
-          {loading ? "..." : "Save"}
-        </button>
-        <button
-          type="button"
-          onClick={() => { setEditing(false); setNewAmount(budgeted.toFixed(2)); }}
-          className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}
-        >
-          Cancel
-        </button>
+      <form onSubmit={handleEdit} className="mt-3 pt-3 flex gap-2 items-end border-t" style={{ borderColor: "var(--numi-border)" }}>
+        <div className="flex-1">
+          <Input value={newAmount} onChange={e => setNewAmount(e.target.value)} type="text" inputMode="decimal" autoFocus className="py-1.5" />
+        </div>
+        <Button type="submit" variant="accent" size="sm" loading={loading}>Save</Button>
+        <Button type="button" variant="secondary" size="sm" onClick={() => { setEditing(false); setNewAmount(budgeted.toFixed(2)); }}>Cancel</Button>
       </form>
     );
   }
 
   if (confirmDel) {
     return (
-      <div
-        className="mt-3 pt-3 flex gap-2 items-center"
-        style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}
-      >
+      <div className="mt-3 pt-3 flex gap-2 items-center border-t" style={{ borderColor: "var(--numi-border)" }}>
         <span className="text-xs flex-1" style={{ color: "var(--numi-expense)" }}>
           Remove &quot;{categoryName}&quot;?
         </span>
-        <button
-          onClick={handleDelete}
-          disabled={loading}
-          className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "rgba(239,68,68,0.14)", color: "var(--numi-expense)", opacity: loading ? 0.6 : 1 }}
-        >
-          {loading ? "..." : "Remove"}
-        </button>
-        <button
-          onClick={() => setConfirmDel(false)}
-          className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}
-        >
-          Cancel
-        </button>
+        <Button variant="danger" size="sm" onClick={handleDelete} loading={loading}>Remove</Button>
+        <Button variant="secondary" size="sm" onClick={() => setConfirmDel(false)}>Cancel</Button>
       </div>
     );
   }
 
   return (
-    <div className="mt-3 pt-3 flex gap-2" style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}>
+    <div className="mt-3 pt-3 flex gap-2 border-t" style={{ borderColor: "var(--numi-border)" }}>
       <button
         onClick={() => setEditing(true)}
-        className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-        style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}
+        className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+        style={{ background: "color-mix(in srgb, var(--numi-landing-heading) 8%, transparent)", color: "var(--numi-landing-heading)" }}
       >
-        ✏️ Edit limit
+        <Pencil size={12} /> Edit limit
       </button>
       <button
         onClick={() => setConfirmDel(true)}
-        className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-        style={{ background: "rgba(239,68,68,0.07)", color: "var(--numi-expense)" }}
+        className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+        style={{ background: "rgba(239,68,68,0.08)", color: "var(--numi-expense)" }}
       >
-        🗑 Remove
+        <Trash2 size={12} /> Remove
       </button>
     </div>
   );

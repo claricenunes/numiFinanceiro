@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
+import { PieChart } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { getBudgetItems } from "@/lib/supabase/queries/budgets";
 import { parsePeriodFromParams } from "@/lib/utils/date";
 import type { BudgetItem } from "@/types/app";
 import { ProgressBar } from "@/components/common/ProgressBar";
 import { FadeIn } from "@/components/common/FadeIn";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export const metadata: Metadata = { title: "Budget" };
 
@@ -32,26 +37,19 @@ export default async function OrcamentoPage({
 
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--numi-landing-heading)" }}>Budget</h1>
-          <p className="text-sm text-[var(--numi-text-3)] mt-0.5 capitalize">{monthName}</p>
-        </div>
-        <NewBudgetButton />
+      <PageHeader title="Budget" actions={<NewBudgetButton />} />
+
+      <div className="mb-6">
+        <p className="text-sm text-[var(--numi-text-3)] capitalize">{monthName}</p>
       </div>
 
       {items.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-4xl mb-3">📊</p>
-          <p className="text-[var(--numi-text-2)] font-medium">No budgets yet</p>
-          <p className="text-sm text-[var(--numi-text-3)] mt-1">Click &quot;+ Category&quot; to set spending limits</p>
-        </div>
+        <Card>
+          <EmptyState icon={PieChart} title="No budgets yet" description={'Click "+ Category" to set spending limits'} />
+        </Card>
       ) : (
         <>
-          <div
-            className="rounded-2xl p-5 mb-6"
-            style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-          >
+          <Card className="mb-6">
             <div className="flex items-end justify-between mb-3">
               <div>
                 <p className="text-xs text-[var(--numi-text-2)] mb-1">Total spent</p>
@@ -60,12 +58,7 @@ export default async function OrcamentoPage({
               </div>
               <div className="text-right">
                 {overBudget > 0 && (
-                  <span
-                    className="text-xs font-semibold px-2.5 py-1 rounded-full"
-                    style={{ background: "rgba(239,68,68,0.14)", color: "var(--numi-expense)" }}
-                  >
-                    {overBudget} {overBudget === 1 ? "category over" : "categories over"}
-                  </span>
+                  <Badge tone="expense">{overBudget} {overBudget === 1 ? "category over" : "categories over"}</Badge>
                 )}
                 <p className="text-xs text-[var(--numi-text-3)] mt-2">{daysLeft} days left</p>
               </div>
@@ -84,7 +77,7 @@ export default async function OrcamentoPage({
                   : `${formatCurrency(totalBudgeted - totalSpent)} remaining`}
               </p>
             </div>
-          </div>
+          </Card>
 
           <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--numi-landing-tagline)" }}>
             By category
@@ -108,14 +101,14 @@ function BudgetCard({ item }: { item: BudgetItem }) {
   const barColor = over ? "var(--numi-expense)" : pct > 85 ? "var(--numi-warning)" : "var(--numi-income)";
 
   return (
-    <div
-      className="rounded-2xl p-4"
-      style={{ background: "#FFFFFF", border: `1px solid ${over ? "rgba(239,68,68,0.28)" : "rgba(22, 50, 31, 0.08)"}`, boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
+    <Card
+      padding="sm"
+      style={over ? { borderColor: "rgba(239,68,68,0.28)" } : undefined}
     >
       <div className="flex items-center gap-3 mb-3">
         <span
-          className="flex items-center justify-center text-base shrink-0"
-          style={{ width: 36, height: 36, borderRadius: 10, background: `${item.categoryColor}22`, border: `1px solid ${item.categoryColor}44` }}
+          className="flex items-center justify-center text-base shrink-0 rounded-[10px]"
+          style={{ width: 36, height: 36, background: `color-mix(in srgb, ${item.categoryColor} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${item.categoryColor} 26%, transparent)` }}
         >
           {item.categoryIcon}
         </span>
@@ -138,6 +131,6 @@ function BudgetCard({ item }: { item: BudgetItem }) {
         budgeted={item.budgeted}
         categoryName={item.categoryName}
       />
-    </div>
+    </Card>
   );
 }

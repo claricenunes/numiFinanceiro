@@ -5,6 +5,9 @@ import { getAccounts } from "@/lib/supabase/queries/accounts";
 import { ACCOUNT_TYPE_ICON } from "@/lib/icons";
 import type { AccountWithBalance } from "@/types/app";
 import { FadeIn } from "@/components/common/FadeIn";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { NewAccountButton } from "./NewAccountButton";
 import { EditAccountButton } from "./EditAccountButton";
 
@@ -39,11 +42,7 @@ export default async function ContasPage() {
 
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--numi-landing-heading)" }}>Accounts</h1>
-        <NewAccountButton />
-      </div>
+      <PageHeader title="Accounts" actions={<NewAccountButton />} />
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
@@ -78,11 +77,9 @@ export default async function ContasPage() {
         Your accounts
       </p>
       {accounts.length === 0 ? (
-        <div className="text-center py-20">
-          <Landmark size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
-          <p className="text-[var(--numi-text-2)] font-medium">No accounts yet</p>
-          <p className="text-sm text-[var(--numi-text-3)] mt-1">Click &quot;+ New Account&quot; to get started</p>
-        </div>
+        <Card>
+          <EmptyState icon={Landmark} title="No accounts yet" description={'Click "+ New Account" to get started'} />
+        </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {accounts.map(a => (
@@ -103,14 +100,11 @@ function SummaryCard({
   valueColor?: string; className?: string;
 }) {
   return (
-    <div
-      className={`rounded-2xl p-4 ${className ?? ""}`}
-      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-    >
+    <Card padding="sm" className={className}>
       <p className="text-xs text-[var(--numi-text-2)] mb-1">{label}</p>
       <p className="text-xl font-bold" style={{ color: valueColor ?? "var(--numi-landing-heading)" }}>{value}</p>
       <p className="text-xs text-[var(--numi-text-3)] mt-1">{sub}</p>
-    </div>
+    </Card>
   );
 }
 
@@ -125,19 +119,16 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
     : null;
 
   return (
-    <div
-      className="rounded-2xl p-5 flex flex-col gap-4"
-      style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-    >
+    <Card variant="interactive" className="flex flex-col gap-4">
       {/* Top row: icon + name + badge */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0">
           <span
-            className="flex items-center justify-center shrink-0"
+            className="flex items-center justify-center shrink-0 rounded-xl"
             style={{
-              width: 40, height: 40, borderRadius: 12,
-              background: `${color}22`,
-              border: `1px solid ${color}44`,
+              width: 40, height: 40,
+              background: `color-mix(in srgb, ${color} 14%, transparent)`,
+              border: `1px solid color-mix(in srgb, ${color} 28%, transparent)`,
               color,
             }}
           >
@@ -151,7 +142,7 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
         <div className="flex items-center gap-1 shrink-0">
           <span
             className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
-            style={{ background: `${color}22`, color }}
+            style={{ background: `color-mix(in srgb, ${color} 14%, transparent)`, color }}
           >
             {label}
           </span>
@@ -182,6 +173,6 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
           </p>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

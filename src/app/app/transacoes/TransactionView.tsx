@@ -2,10 +2,17 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
+import { Banknote, ArrowLeftRight, CreditCard, Pencil, Trash2, Upload, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { createClient } from "@/lib/supabase/client";
 import { useToastStore } from "@/stores/useToastStore";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Modal } from "@/components/ui/Modal";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { CSVImport } from "./CSVImport";
 import type { TransactionRow } from "@/types/app";
 
@@ -105,85 +112,47 @@ function EditTxModal({ tx, onClose }: { tx: TransactionRow; onClose: () => void 
   }
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={onClose} />
-      <div
-        className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-        style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)", maxHeight: "92dvh", overflowY: "auto" }}
-      >
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>Edit transaction</h2>
-          <button onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
-            ✕
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          {/* Type */}
-          {tx.type !== "transfer" && (
-            <div className="flex gap-2">
-              {(["income", "expense"] as const).map(t => (
+    <Modal open onClose={onClose} title="Edit transaction">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        {tx.type !== "transfer" && (
+          <div className="flex gap-2">
+            {(["income", "expense"] as const).map(t => {
+              const active = form.type === t;
+              const color = t === "income" ? "var(--numi-income)" : "var(--numi-expense)";
+              return (
                 <button key={t} type="button"
                   onClick={() => setForm(f => ({ ...f, type: t, categoryId: "" }))}
-                  className="flex-1 py-2 rounded-xl text-sm font-semibold"
+                  className="flex-1 py-2 rounded-xl text-sm font-semibold transition-colors"
                   style={{
-                    background: form.type === t ? (t === "income" ? "rgba(16,185,129,0.14)" : "rgba(239,68,68,0.14)") : "#FFFFFF",
-                    border: `1px solid ${form.type === t ? (t === "income" ? "var(--numi-income)" : "var(--numi-expense)") : "rgba(22, 50, 31, 0.12)"}`,
-                    color: form.type === t ? (t === "income" ? "var(--numi-income)" : "var(--numi-expense)") : "var(--numi-text-3)",
+                    background: active ? `color-mix(in srgb, ${color} 14%, transparent)` : "var(--numi-elevated)",
+                    border: `1px solid ${active ? color : "var(--numi-border)"}`,
+                    color: active ? color : "var(--numi-text-3)",
                   }}>
                   {t === "income" ? "Income" : "Expense"}
                 </button>
-              ))}
-            </div>
-          )}
-
-          {/* Description */}
-          <div>
-            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Description</label>
-            <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-              placeholder="e.g. Groceries, Paycheck..."
-              className="numi-landing-input" />
+              );
+            })}
           </div>
+        )}
 
-          {/* Amount */}
-          <div>
-            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Amount ($)</label>
-            <input value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
-              type="text" inputMode="decimal" placeholder="0.00" required
-              className="numi-landing-input" />
-          </div>
+        <Input label="Description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="e.g. Groceries, Paycheck..." />
+        <Input label="Amount ($)" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} type="text" inputMode="decimal" placeholder="0.00" required />
+        <Input label="Date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} type="date" required style={{ colorScheme: "light" }} />
 
-          {/* Date */}
-          <div>
-            <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Date</label>
-            <input value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-              type="date" required
-              className="numi-landing-input"
-              style={{ colorScheme: "light" }} />
-          </div>
+        {filtered.length > 0 && (
+          <Select label="Category" value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}>
+            <option value="">— No category —</option>
+            {filtered.map(c => (
+              <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+            ))}
+          </Select>
+        )}
 
-          {/* Category */}
-          {filtered.length > 0 && (
-            <div>
-              <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Category</label>
-              <select value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}
-                className="numi-landing-input">
-                <option value="">— No category —</option>
-                {filtered.map(c => (
-                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <button type="submit" disabled={loading}
-            className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base mt-1 disabled:opacity-60 disabled:pointer-events-none">
-            {loading ? "Saving..." : "Save changes"}
-          </button>
-        </form>
-      </div>
-    </div>
+        <Button type="submit" variant="accent" loading={loading} className="w-full mt-1">
+          Save changes
+        </Button>
+      </form>
+    </Modal>
   );
 }
 
@@ -209,30 +178,15 @@ function DeleteModal({ txId, description, onClose }: { txId: string; description
   }
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={onClose} />
-      <div
-        className="relative w-full max-w-sm mx-4 rounded-2xl p-5 flex flex-col gap-4"
-        style={{ background: "#FFFDF9", border: "1px solid rgba(239,68,68,0.2)" }}
-      >
-        <p className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>Delete transaction?</p>
-        <p className="text-sm text-[var(--numi-text-3)]">
-          {description ? `"${description}"` : "This transaction"} will be permanently removed.
-        </p>
-        <div className="flex gap-3">
-          <button onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
-            style={{ background: "rgba(22, 50, 31, 0.08)", color: "var(--numi-landing-heading)" }}>
-            Cancel
-          </button>
-          <button onClick={handleDelete} disabled={loading}
-            className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
-            style={{ background: "var(--numi-expense)", color: "#fff", opacity: loading ? 0.6 : 1 }}>
-            {loading ? "Deleting..." : "Delete"}
-          </button>
-        </div>
+    <Modal open onClose={onClose} title="Delete transaction?" maxWidth="sm:max-w-sm">
+      <p className="text-sm text-[var(--numi-text-3)]">
+        {description ? `"${description}"` : "This transaction"} will be permanently removed.
+      </p>
+      <div className="flex gap-3">
+        <Button variant="secondary" onClick={onClose} className="flex-1">Cancel</Button>
+        <Button variant="danger" onClick={handleDelete} loading={loading} className="flex-1">Delete</Button>
       </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -274,44 +228,36 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
 
   return (
     <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--numi-landing-heading)" }}>Transactions</h1>
-        <button
-          onClick={() => setShowImport(true)}
-          className="numi-pill-btn numi-pill-btn-outline-dark text-sm px-3 py-1.5 gap-1.5"
-        >
-          <span>↑</span> Import CSV
-        </button>
-      </div>
+      <PageHeader
+        title="Transactions"
+        actions={
+          <Button variant="secondary" size="sm" icon={<Upload size={14} />} onClick={() => setShowImport(true)}>
+            Import CSV
+          </Button>
+        }
+      />
 
       {/* Summary strip */}
       <div className="grid grid-cols-3 gap-3 mb-5">
-        <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}>
+        <Card padding="sm" className="text-center">
           <p className="text-xs text-[var(--numi-text-2)] mb-0.5">Income</p>
           <p className="text-base font-bold" style={{ color: "var(--numi-income)" }}>{formatCurrency(totalIncome)}</p>
-        </div>
-        <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}>
+        </Card>
+        <Card padding="sm" className="text-center">
           <p className="text-xs text-[var(--numi-text-2)] mb-0.5">Expenses</p>
           <p className="text-base font-bold" style={{ color: "var(--numi-expense)" }}>{formatCurrency(totalExpense)}</p>
-        </div>
-        <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}>
+        </Card>
+        <Card padding="sm" className="text-center">
           <p className="text-xs text-[var(--numi-text-2)] mb-0.5">Balance</p>
           <p className="text-base font-bold" style={{ color: balance >= 0 ? "var(--numi-info)" : "var(--numi-expense)" }}>
             {formatCurrency(balance)}
           </p>
-        </div>
+        </Card>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col gap-3 mb-5">
-        <input
-          type="search"
-          placeholder="Search transactions..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="numi-landing-input"
-        />
+        <Input type="search" placeholder="Search transactions..." value={search} onChange={e => setSearch(e.target.value)} />
         <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-none">
           {(["all", "income", "expense", "transfer"] as const).map(f => {
             const labels = { all: "All", income: "Income", expense: "Expenses", transfer: "Transfers" };
@@ -322,9 +268,9 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
                 onClick={() => setTypeFilter(f)}
                 className="text-xs font-medium px-3 py-1.5 rounded-full shrink-0 transition-colors"
                 style={{
-                  background: active ? "var(--numi-landing-accent)" : "#FFFFFF",
+                  background: active ? "var(--numi-landing-accent)" : "var(--numi-elevated)",
                   color:      active ? "var(--numi-landing-accent-text)" : "var(--numi-text-2)",
-                  border:     active ? "none" : "1px solid rgba(22, 50, 31, 0.12)",
+                  border:     active ? "none" : "1px solid var(--numi-border)",
                 }}
               >
                 {labels[f]}
@@ -332,23 +278,16 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
             );
           })}
         </div>
-        <select
-          value={category}
-          onChange={e => setCategory(e.target.value)}
-          className="numi-landing-input"
-          style={{ appearance: "none" }}
-        >
+        <Select value={category} onChange={e => setCategory(e.target.value)}>
           <option value="all">All categories</option>
           {categories.slice(1).map(c => (
             <option key={c} value={c}>{c}</option>
           ))}
-        </select>
+        </Select>
       </div>
 
       {/* Modals */}
-      <AnimatePresence>
-        {showImport && <CSVImport onClose={() => setShowImport(false)} />}
-      </AnimatePresence>
+      <CSVImport open={showImport} onClose={() => setShowImport(false)} />
 
       {editTx && (
         <EditTxModal tx={editTx} onClose={() => setEditTx(null)} />
@@ -364,11 +303,9 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
 
       {/* Transaction groups */}
       {groups.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-4xl mb-3">🔍</p>
-          <p className="text-[var(--numi-text-2)] font-medium">No transactions found</p>
-          <p className="text-sm text-[var(--numi-text-3)] mt-1">Try adjusting the filters</p>
-        </div>
+        <Card>
+          <EmptyState icon={Search} title="No transactions found" description="Try adjusting the filters" />
+        </Card>
       ) : (
         <div className="flex flex-col gap-6">
           {groups.map(([date, rows]) => (
@@ -377,15 +314,12 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--numi-landing-tagline)" }}>
                   {formatGroupHeader(date)}
                 </p>
-                <div className="flex-1 h-px" style={{ background: "rgba(22, 50, 31, 0.08)" }} />
+                <div className="flex-1 h-px" style={{ background: "var(--numi-border)" }} />
                 <p className="text-xs text-[var(--numi-text-3)]">
                   {rows.length} {rows.length === 1 ? "item" : "items"}
                 </p>
               </div>
-              <div
-                className="rounded-2xl overflow-hidden"
-                style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}
-              >
+              <Card padding="none" className="overflow-hidden">
                 {rows.map((t, idx) => (
                   <TxRow
                     key={t.id}
@@ -395,7 +329,7 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
                     onDelete={handleDelete}
                   />
                 ))}
-              </div>
+              </Card>
             </div>
           ))}
         </div>
@@ -416,24 +350,25 @@ function TxRow({
 }) {
   const isIncome   = tx.type === "income";
   const isTransfer = tx.type === "transfer";
-  const icon       = tx.categoryIcon  ?? (isIncome ? "💰" : isTransfer ? "↔️" : "💳");
+  const FallbackIcon = isIncome ? Banknote : isTransfer ? ArrowLeftRight : CreditCard;
   const iconColor  = tx.categoryColor ?? "#94A3B8";
 
   return (
     <div
       className="flex items-center gap-3 px-4 py-3 hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_4%,transparent)] transition-colors group"
-      style={{ borderBottom: last ? "none" : "1px solid rgba(22, 50, 31, 0.08)" }}
+      style={{ borderBottom: last ? "none" : "1px solid var(--numi-border)" }}
     >
       {/* Icon */}
       <span
-        className="flex items-center justify-center text-base shrink-0"
+        className="flex items-center justify-center text-base shrink-0 rounded-[10px]"
         style={{
-          width: 38, height: 38, borderRadius: 10,
-          background: `${iconColor}22`,
-          border: `1px solid ${iconColor}33`,
+          width: 38, height: 38,
+          background: `color-mix(in srgb, ${iconColor} 14%, transparent)`,
+          border: `1px solid color-mix(in srgb, ${iconColor} 20%, transparent)`,
+          color: iconColor,
         }}
       >
-        {icon}
+        {tx.categoryIcon ?? <FallbackIcon size={16} />}
       </span>
 
       {/* Description + meta */}
@@ -473,26 +408,20 @@ function TxRow({
       </p>
 
       {/* Actions — visible on hover (desktop) and always visible (mobile) */}
-      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 opacity-100">
+      <div className="flex items-center gap-1 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         <button
           onClick={() => onEdit(tx)}
           title="Edit"
-          className="w-7 h-7 flex items-center justify-center rounded-lg text-xs transition-colors"
-          style={{ color: "var(--numi-text-3)", background: "transparent" }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "color-mix(in srgb, var(--numi-landing-heading) 8%, transparent)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-landing-heading)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text-3)"; }}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--numi-text-3)] transition-colors hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_8%,transparent)] hover:text-[var(--numi-landing-heading)]"
         >
-          ✏️
+          <Pencil size={14} />
         </button>
         <button
           onClick={() => onDelete(tx.id, tx.description)}
           title="Delete"
-          className="w-7 h-7 flex items-center justify-center rounded-lg text-xs transition-colors"
-          style={{ color: "var(--numi-text-3)", background: "transparent" }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.14)"; (e.currentTarget as HTMLElement).style.color = "var(--numi-expense)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--numi-text-3)"; }}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--numi-text-3)] transition-colors hover:bg-[rgba(239,68,68,0.14)] hover:text-[var(--numi-expense)]"
         >
-          🗑
+          <Trash2 size={14} />
         </button>
       </div>
     </div>

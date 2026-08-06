@@ -13,8 +13,12 @@ export function Header() {
 
   return (
     <header
-      className="flex items-center justify-between gap-4 px-5 lg:px-6 h-16 flex-shrink-0 sticky top-0 z-40 border-b"
-      style={{ background: "var(--numi-elevated)", borderColor: "var(--numi-border)" }}
+      className="flex items-center justify-between gap-4 px-5 lg:px-6 h-16 flex-shrink-0 sticky top-3 z-40 mt-3 mb-3 mr-3 ml-3 lg:ml-0 rounded-[22px] border"
+      style={{
+        background: "var(--numi-elevated)",
+        borderColor: "var(--numi-border)",
+        boxShadow: "0 10px 30px -16px rgba(22, 50, 31, 0.18), 0 2px 8px -4px rgba(22, 50, 31, 0.08)",
+      }}
     >
       {/* Left: menu toggle + page identity */}
       <div className="flex items-center gap-3 min-w-0">

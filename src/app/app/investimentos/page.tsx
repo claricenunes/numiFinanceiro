@@ -6,6 +6,9 @@ import { ASSET_TYPE_ICON, DEFAULT_ICON } from "@/lib/icons";
 import type { PositionRow } from "@/types/app";
 import { AllocationChart } from "./AllocationChart";
 import { FadeIn } from "@/components/common/FadeIn";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { NewPositionButton } from "./NewPositionButton";
 import { UpdatePricesButton } from "./UpdatePricesButton";
 
@@ -28,17 +31,17 @@ export default async function InvestimentosPage() {
 
   return (
     <FadeIn className="px-4 py-5 lg:px-8 lg:py-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--numi-landing-heading)" }}>Investments</h1>
-        <div className="flex items-center gap-2">
-          <UpdatePricesButton
-            positions={positions.map((p) => ({ id: p.id, name: p.name, ticker: p.ticker }))}
-          />
-          <NewPositionButton />
-        </div>
-      </div>
+      <PageHeader
+        title="Investments"
+        actions={
+          <div className="flex items-center gap-2">
+            <UpdatePricesButton positions={positions.map((p) => ({ id: p.id, name: p.name, ticker: p.ticker }))} />
+            <NewPositionButton />
+          </div>
+        }
+      />
 
-      <div className="rounded-2xl p-5 mb-6" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}>
+      <Card className="mb-6">
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="col-span-2 lg:col-span-1">
             <p className="text-xs text-[var(--numi-text-2)] mb-1">Current value</p>
@@ -72,17 +75,15 @@ export default async function InvestimentosPage() {
             <p className="text-xs text-[var(--numi-text-3)] mt-1 capitalize">{monthLabel}</p>
           </div>
         </div>
-      </div>
+      </Card>
 
       {positions.length === 0 ? (
-        <div className="text-center py-20">
-          <TrendingUp size={40} className="mx-auto mb-3" style={{ color: "var(--numi-text-3)" }} />
-          <p className="text-[var(--numi-text-2)] font-medium">No positions yet</p>
-          <p className="text-sm text-[var(--numi-text-3)] mt-1">Add your investments to track your portfolio</p>
-        </div>
+        <Card>
+          <EmptyState icon={TrendingUp} title="No positions yet" description="Add your investments to track your portfolio" />
+        </Card>
       ) : (
         <>
-          <div className="rounded-2xl p-5 mb-6" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}>
+          <Card className="mb-6">
             <p className="text-sm font-semibold mb-4" style={{ color: "var(--numi-landing-heading)" }}>Allocation</p>
             <div className="flex flex-col lg:flex-row gap-6 items-center">
               <div className="w-full lg:w-56 shrink-0">
@@ -103,7 +104,7 @@ export default async function InvestimentosPage() {
                 ))}
               </div>
             </div>
-          </div>
+          </Card>
 
           <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--numi-landing-tagline)" }}>Positions</p>
           <div className="flex flex-col gap-2">
@@ -122,11 +123,11 @@ function PositionCard({ pos }: { pos: PositionRow }) {
   const plColor    = plPositive ? "var(--numi-income)" : "var(--numi-expense)";
 
   return (
-    <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(22, 50, 31, 0.08)", boxShadow: "0 8px 20px -12px rgba(22, 50, 31, 0.15)" }}>
+    <Card variant="interactive" padding="sm">
       <div className="flex items-start gap-3">
         <span
-          className="flex items-center justify-center shrink-0"
-          style={{ width: 40, height: 40, borderRadius: 12, background: `${meta.color}22`, border: `1px solid ${meta.color}44`, color: meta.color }}
+          className="flex items-center justify-center shrink-0 rounded-xl"
+          style={{ width: 40, height: 40, background: `color-mix(in srgb, ${meta.color} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${meta.color} 28%, transparent)`, color: meta.color }}
         >
           <Icon size={18} />
         </span>
@@ -135,7 +136,7 @@ function PositionCard({ pos }: { pos: PositionRow }) {
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 {pos.ticker && <p className="text-sm font-bold" style={{ color: "var(--numi-landing-heading)" }}>{pos.ticker}</p>}
-                <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: `${meta.color}22`, color: meta.color }}>
+                <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: `color-mix(in srgb, ${meta.color} 14%, transparent)`, color: meta.color }}>
                   {meta.label}
                 </span>
               </div>
@@ -152,7 +153,7 @@ function PositionCard({ pos }: { pos: PositionRow }) {
               )}
             </div>
           </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-2 pt-2" style={{ borderTop: "1px solid rgba(22, 50, 31, 0.08)" }}>
+          <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-2 pt-2 border-t" style={{ borderColor: "var(--numi-border)" }}>
             <p className="text-xs text-[var(--numi-text-3)]">Qty: <span className="text-[var(--numi-text-2)]">{pos.quantity}</span></p>
             <p className="text-xs text-[var(--numi-text-3)]">Avg: <span className="text-[var(--numi-text-2)]">{formatCurrency(pos.averagePrice)}</span></p>
             {pos.currentPrice && (
@@ -161,6 +162,6 @@ function PositionCard({ pos }: { pos: PositionRow }) {
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

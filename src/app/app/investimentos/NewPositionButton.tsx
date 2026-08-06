@@ -2,20 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
 import { ASSET_TYPE_ICON } from "@/lib/icons";
+import { Modal } from "@/components/ui/Modal";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Button } from "@/components/ui/Button";
+import { IconPicker } from "@/components/ui/IconPicker";
 
 type AssetType = "stock" | "etf" | "fii" | "fixed_income" | "crypto" | "cash";
 
-const TYPE_OPTIONS: { value: AssetType; label: string }[] = [
-  { value: "stock",        label: "Stock" },
-  { value: "etf",          label: "ETF" },
-  { value: "fii",          label: "REIT" },
-  { value: "fixed_income", label: "Fixed Income" },
-  { value: "crypto",       label: "Crypto" },
-  { value: "cash",         label: "Cash" },
+const TYPE_OPTIONS = [
+  { value: "stock" as AssetType, label: "Stock", icon: ASSET_TYPE_ICON.stock },
+  { value: "etf" as AssetType, label: "ETF", icon: ASSET_TYPE_ICON.etf },
+  { value: "fii" as AssetType, label: "REIT", icon: ASSET_TYPE_ICON.fii },
+  { value: "fixed_income" as AssetType, label: "Fixed Income", icon: ASSET_TYPE_ICON.fixed_income },
+  { value: "crypto" as AssetType, label: "Crypto", icon: ASSET_TYPE_ICON.crypto },
+  { value: "cash" as AssetType, label: "Cash", icon: ASSET_TYPE_ICON.cash },
 ];
 
 type Account = { id: string; name: string };
@@ -55,6 +59,8 @@ export function NewPositionButton() {
     setCurrentPrice(""); setAccountId("");
   }
 
+  function handleClose() { setOpen(false); reset(); }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const qty = parseFloat(quantity.replace(",", "."));
@@ -87,112 +93,38 @@ export function NewPositionButton() {
     if (error) { show("Error: " + error.message, "error"); return; }
 
     show("Position added!", "success");
-    setOpen(false);
-    reset();
+    handleClose();
     router.refresh();
   }
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce text-sm px-4 py-2"
-      >
-        + New Position
-      </button>
+      <Button variant="accent" size="sm" onClick={() => setOpen(true)}>+ New Position</Button>
 
-      {open && (
-        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={() => { setOpen(false); reset(); }} />
+      <Modal open={open} onClose={handleClose} title="New Position">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <IconPicker label="Type" options={TYPE_OPTIONS} value={type} onChange={setType} />
 
-          <div
-            className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 flex flex-col gap-4"
-            style={{ background: "#FFFDF9", border: "1px solid rgba(22, 50, 31, 0.08)", maxHeight: "92dvh", overflowY: "auto" }}
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold" style={{ color: "var(--numi-landing-heading)" }}>New Position</h2>
-              <button onClick={() => { setOpen(false); reset(); }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--numi-text-4)] hover:text-[var(--numi-landing-heading)] hover:bg-[color-mix(in_srgb,var(--numi-landing-heading)_6%,transparent)]">
-                <X size={16} />
-              </button>
-            </div>
+          <Input label="Name / Ticker" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. AAPL, VTI, Treasury Bond..." required autoFocus />
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              {/* Type */}
-              <div>
-                <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>Type</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {TYPE_OPTIONS.map(opt => {
-                    const Icon = ASSET_TYPE_ICON[opt.value];
-                    return (
-                      <button key={opt.value} type="button" onClick={() => setType(opt.value)}
-                        className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-xs font-medium transition-colors"
-                        style={{
-                          background: type === opt.value ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)" : "#FFFFFF",
-                          border: `1px solid ${type === opt.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
-                          color: type === opt.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
-                        }}>
-                        <Icon size={18} />
-                        <span>{opt.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+          {accounts.length > 0 && (
+            <Select label="Investment account" value={accountId} onChange={e => setAccountId(e.target.value)}>
+              {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </Select>
+          )}
 
-              {/* Name */}
-              <Field label="Name / Ticker">
-                <input value={name} onChange={e => setName(e.target.value)}
-                  placeholder="e.g. AAPL, VTI, Treasury Bond..." required autoFocus
-                  className="numi-landing-input" />
-              </Field>
-
-              {/* Account */}
-              {accounts.length > 0 && (
-                <Field label="Investment account">
-                  <select value={accountId} onChange={e => setAccountId(e.target.value)}
-                    className="numi-landing-input">
-                    {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                  </select>
-                </Field>
-              )}
-
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Quantity">
-                  <input value={quantity} onChange={e => setQuantity(e.target.value)}
-                    type="text" inputMode="decimal" placeholder="0" required
-                    className="numi-landing-input" />
-                </Field>
-                <Field label="Average price ($)">
-                  <input value={avgPrice} onChange={e => setAvgPrice(e.target.value)}
-                    type="text" inputMode="decimal" placeholder="0.00" required
-                    className="numi-landing-input" />
-                </Field>
-              </div>
-
-              <Field label="Current price ($) — optional">
-                <input value={currentPrice} onChange={e => setCurrentPrice(e.target.value)}
-                  type="text" inputMode="decimal" placeholder="0.00"
-                  className="numi-landing-input" />
-              </Field>
-
-              <button type="submit" disabled={loading}
-                className="numi-pill-btn numi-pill-btn-accent numi-cta-bounce w-full py-3 text-base mt-1 disabled:opacity-60 disabled:pointer-events-none">
-                {loading ? "Saving..." : "Add position"}
-              </button>
-            </form>
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="Quantity" value={quantity} onChange={e => setQuantity(e.target.value)} type="text" inputMode="decimal" placeholder="0" required />
+            <Input label="Average price ($)" value={avgPrice} onChange={e => setAvgPrice(e.target.value)} type="text" inputMode="decimal" placeholder="0.00" required />
           </div>
-        </div>
-      )}
-    </>
-  );
-}
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-sm font-medium mb-1.5 block" style={{ color: "var(--numi-landing-heading)" }}>{label}</label>
-      {children}
-    </div>
+          <Input label="Current price ($) — optional" value={currentPrice} onChange={e => setCurrentPrice(e.target.value)} type="text" inputMode="decimal" placeholder="0.00" />
+
+          <Button type="submit" variant="accent" loading={loading} className="w-full mt-1">
+            Add position
+          </Button>
+        </form>
+      </Modal>
+    </>
   );
 }
