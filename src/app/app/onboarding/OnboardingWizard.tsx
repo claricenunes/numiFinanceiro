@@ -100,7 +100,7 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
               style={{
                 width: i === step ? 24 : 8,
                 height: 8,
-                background: i <= step ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.15)",
+                background: i <= step ? "var(--numi-landing-accent)" : "color-mix(in srgb, var(--numi-landing-heading) 15%, transparent)",
               }}
             />
           ))}
@@ -183,8 +183,8 @@ export function OnboardingWizard({ initialStep, userName }: Props) {
                         style={{
                           background: accountType === t.value
                             ? "color-mix(in srgb, var(--numi-landing-accent) 14%, transparent)"
-                            : "#FFFFFF",
-                          border: `1.5px solid ${accountType === t.value ? "var(--numi-landing-accent)" : "rgba(22, 50, 31, 0.12)"}`,
+                            : "var(--numi-elevated)",
+                          border: `1.5px solid ${accountType === t.value ? "var(--numi-landing-accent)" : "color-mix(in srgb, var(--numi-landing-heading) 12%, transparent)"}`,
                           color: accountType === t.value ? "var(--numi-landing-heading)" : "var(--numi-text-2)",
                         }}
                       >

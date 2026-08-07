@@ -138,7 +138,7 @@ export function Hero() {
   const heroCopy = (
     <>
       <h1
-        className="text-6xl sm:text-7xl lg:text-7xl xl:text-8xl font-extrabold leading-[0.95] tracking-tight mb-7"
+        className="text-3xl sm:text-6xl lg:text-5xl xl:text-7xl font-extrabold leading-[0.95] tracking-tight mb-7"
         style={{ color: "var(--numi-landing-heading)" }}
       >
         Your finances,
@@ -148,11 +148,11 @@ export function Hero() {
         />
       </h1>
 
-      <p className="text-3xl sm:text-4xl font-bold mb-7" style={{ color: "var(--numi-landing-tagline)" }}>
+      <p className="text-xl sm:text-3xl lg:text-2xl xl:text-4xl font-bold mb-7" style={{ color: "var(--numi-landing-tagline)" }}>
         Simpler. Clearer. In control.
       </p>
 
-      <p className="text-lg sm:text-xl text-[var(--numi-text-2)] max-w-lg mb-10">
+      <p className="text-base sm:text-lg lg:text-xl text-[var(--numi-text-2)] max-w-lg mb-10">
         Numi is the AI finance assistant that helps you understand where your money goes —
         accounts, spending, goals, and investments, all in one place.
       </p>
@@ -167,7 +167,7 @@ export function Hero() {
     <section ref={sectionRef} className="relative" style={{ height: reducedMotion ? undefined : `${SECTION_HEIGHT_VH}vh` }}>
       <OrganicWave />
 
-      <div className="sticky top-0 h-screen overflow-hidden flex items-center pt-48 lg:pt-56 px-6 lg:px-12 xl:px-16">
+      <div className="sticky top-0 h-screen overflow-hidden flex items-center pt-28 sm:pt-36 lg:pt-56 px-4 sm:px-6 lg:px-12 xl:px-16">
         {!reducedMotion && (
           <motion.div
             aria-hidden="true"

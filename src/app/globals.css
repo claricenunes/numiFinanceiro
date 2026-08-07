@@ -49,6 +49,34 @@
   --numi-expense: #F87171;
   --numi-warning: #FBBF24;
   --numi-info:    #38BDF8;
+
+  /* ── Brand — identidade fixa da Numi, igual nos dois temas ─────────
+     (pill-nav/sidebar sempre verde-escuro, CTA sempre coral) — só o
+     texto/fundo que se apoia no fundo da PÁGINA precisa inverter entre
+     claro/escuro; isso fica em html.light / html:not(.light) abaixo. */
+  --numi-landing-nav-bg:      #16321F;
+  --numi-landing-nav-text:    #E9F3E4;
+  --numi-landing-nav-muted:   #B9D2B5;
+  --numi-landing-accent:      #E2896B;
+  --numi-landing-accent-text: #2A150D;
+
+  --numi-gradient-pink:  linear-gradient(135deg, #F472B6, #A78BFA);
+  --numi-gradient-warm:  linear-gradient(135deg, #FBBF24, #FB923C);
+  --numi-gradient-cool:  linear-gradient(135deg, #34D399, #38BDF8);
+  --numi-gradient-alert: linear-gradient(135deg, #F87171, #EC4899);
+}
+
+/* ── Modo escuro — identidade própria (não é só "o oposto do claro"):
+   verde-floresta profundo em vez de cinza genérico, mantendo a mesma
+   família de cor do modo claro (heading/tagline vêm do mesmo verde,
+   só invertidos em luminosidade) em vez de cair num dark mode neutro
+   sem relação com a marca. ── */
+html:not(.light) {
+  --numi-landing-heading:   #EAF1E6;
+  --numi-landing-tagline:   #8FAE8C;
+  --numi-landing-wave:      rgba(233, 243, 228, 0.08);
+  --numi-landing-hero-bg:   #1B3324;
+  --numi-landing-hero-bg-2: #0F1D15;
 }
 
 /* ── Modo claro (paleta unificada com a landing: creme quente + verde-
@@ -72,19 +100,9 @@ html.light {
   --numi-warning: #F59E0B;
   --numi-info:    #3B82F6;
 
-  --numi-gradient-pink: linear-gradient(135deg, #F472B6, #A78BFA);
-  --numi-gradient-warm: linear-gradient(135deg, #FBBF24, #FB923C);
-  --numi-gradient-cool: linear-gradient(135deg, #34D399, #38BDF8);
-  --numi-gradient-alert: linear-gradient(135deg, #F87171, #EC4899);
-
   /* ── Landing (pill-nav / hero) — paleta própria da Numi ────── */
-  --numi-landing-nav-bg:      #16321F;
-  --numi-landing-nav-text:    #E9F3E4;
-  --numi-landing-nav-muted:   #B9D2B5;
   --numi-landing-heading:     #16321F;
   --numi-landing-tagline:     #4F7A5B;
-  --numi-landing-accent:      #E2896B;
-  --numi-landing-accent-text: #2A150D;
   --numi-landing-wave:        rgba(22, 50, 31, 0.12);
   --numi-landing-hero-bg:     #FAE4D3;
   --numi-landing-hero-bg-2:   #F6D5BC;
@@ -333,12 +351,22 @@ html:not(.light) .glass-card {
 
 /* ── Landing: auth card + input — same warm/cream language as the hero,
    used by (auth)/* so login/register/etc. read as a continuation of the
-   landing rather than the generic app's cool-gray dashboard theme ──── */
+   landing rather than the generic app's cool-gray dashboard theme.
+   Hardcoded to the light-mode values here (auth pages previously never
+   reached dark mode at all); dark equivalents are the html:not(.light)
+   overrides right below, in the same deep-forest-green mood as the
+   dark hero band instead of the app's unrelated navy surfaces. ──── */
 .numi-landing-auth-card {
   background: #FFFDF9;
   border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: 0 30px 60px -20px rgba(22, 50, 31, 0.18), 0 10px 24px -10px rgba(22, 50, 31, 0.1);
+}
+
+html:not(.light) .numi-landing-auth-card {
+  background: #1F3B2A;
+  border: 1px solid rgba(233, 243, 228, 0.1);
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.4), 0 10px 24px -10px rgba(0, 0, 0, 0.3);
 }
 
 .numi-landing-input {
@@ -351,6 +379,11 @@ html:not(.light) .glass-card {
   font-size: 0.9375rem;
   line-height: 1.5;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+html:not(.light) .numi-landing-input {
+  background: #16281D;
+  border: 1.5px solid rgba(233, 243, 228, 0.14);
 }
 
 .numi-landing-input::placeholder {

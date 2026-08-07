@@ -82,9 +82,9 @@ export default function LoginPage() {
       </button>
 
       <div className="flex items-center gap-3 mb-5">
-        <div className="flex-1 h-px" style={{ background: "rgba(22, 50, 31, 0.12)" }} />
+        <div className="flex-1 h-px" style={{ background: "color-mix(in srgb, var(--numi-landing-heading) 15%, transparent)" }} />
         <span className="text-xs text-[var(--numi-text-3)]">or with email</span>
-        <div className="flex-1 h-px" style={{ background: "rgba(22, 50, 31, 0.12)" }} />
+        <div className="flex-1 h-px" style={{ background: "color-mix(in srgb, var(--numi-landing-heading) 15%, transparent)" }} />
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">

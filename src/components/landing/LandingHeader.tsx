@@ -31,11 +31,11 @@ export function LandingHeader() {
   return (
     <header className="fixed top-6 inset-x-0 z-[100] w-full px-4 lg:px-6">
       <div className="max-w-[1500px] mx-auto">
-        <div className="numi-pill-nav h-[92px] lg:h-[104px] px-7 lg:px-10 flex items-center justify-between gap-6 shadow-lg shadow-black/10">
-          <div className="flex items-center gap-8 lg:gap-12">
+        <div className="numi-pill-nav h-[64px] sm:h-[92px] lg:h-[104px] px-4 sm:px-7 lg:px-10 flex items-center justify-between gap-3 sm:gap-6 shadow-lg shadow-black/10">
+          <div className="flex items-center gap-4 sm:gap-8 lg:gap-12">
             <Link href="/" className="shrink-0 flex items-center">
               <span
-                className="text-5xl lg:text-6xl leading-none"
+                className="text-2xl sm:text-5xl lg:text-6xl leading-none"
                 style={{ color: "var(--numi-landing-nav-muted)", fontFamily: "var(--font-logo)" }}
               >
                 numi
@@ -55,14 +55,14 @@ export function LandingHeader() {
             </nav>
           </div>
 
-          <div className="flex items-center gap-3 lg:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
             <Link href="/register" className="numi-pill-btn numi-pill-btn-outline hidden sm:inline-flex text-lg px-6 py-3">
               See pricing
             </Link>
-            <Link href="/login" className="numi-pill-btn numi-pill-btn-outline text-lg px-6 py-3">
+            <Link href="/login" className="numi-pill-btn numi-pill-btn-outline text-xs sm:text-lg px-3 py-2 sm:px-6 sm:py-3">
               Log in
             </Link>
-            <Link href="/register" className="numi-pill-btn numi-pill-btn-accent text-lg px-6 py-3">
+            <Link href="/register" className="numi-pill-btn numi-pill-btn-accent text-xs sm:text-lg px-3 py-2 sm:px-6 sm:py-3">
               Sign up
             </Link>
           </div>

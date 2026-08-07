@@ -87,7 +87,7 @@ export function PeriodSelector() {
     <div className="relative" ref={ref}>
       <div
         className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium transition-colors"
-        style={{ border: "1px solid rgba(22, 50, 31, 0.12)", color: "var(--numi-landing-heading)" }}
+        style={{ border: "1px solid color-mix(in srgb, var(--numi-landing-heading) 12%, transparent)", color: "var(--numi-landing-heading)" }}
       >
         <button
           type="button"
