@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
 import { Modal } from "@/components/ui/Modal";
@@ -89,7 +90,9 @@ export function NewBudgetButton() {
 
   return (
     <>
-      <Button variant="secondary" size="sm" onClick={openModal}>+ Category</Button>
+      <Button variant="secondary" size="sm" icon={<Plus size={14} />} onClick={openModal}>
+        <span className="hidden sm:inline">Category</span>
+      </Button>
 
       <Modal open={open} onClose={() => setOpen(false)} title="New Budget">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">

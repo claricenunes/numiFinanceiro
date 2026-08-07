@@ -5,9 +5,12 @@ type RawTx = {
   id: string; date: string; description: string | null;
   type: string; amount: number; status: string; currency_code: string;
   installment_number: number | null; installment_total: number | null;
+  is_recurring: boolean;
   user_categories: { name: string; icon: string | null; color: string | null } | null;
   accounts: { name: string; color: string | null } | null;
 };
+
+const TX_SELECT = "id,date,description,type,amount,status,currency_code,installment_number,installment_total,is_recurring,user_categories(name,icon,color),accounts(name,color)";
 
 function mapTx(t: RawTx): TransactionRow {
   return {
@@ -25,6 +28,7 @@ function mapTx(t: RawTx): TransactionRow {
     accountColor:  t.accounts?.color ?? null,
     installmentNumber: t.installment_number ?? null,
     installmentTotal:  t.installment_total  ?? null,
+    isRecurring: t.is_recurring ?? false,
   };
 }
 
@@ -38,7 +42,7 @@ export async function getTransactions(
 
   let query = supabase
     .from("transactions")
-    .select("id,date,description,type,amount,status,currency_code,installment_number,installment_total,user_categories(name,icon,color),accounts(name,color)")
+    .select(TX_SELECT)
     .eq("user_id", user.id)
     .is("deleted_at", null)
     .order("date", { ascending: false })
@@ -66,7 +70,7 @@ export async function getMonthTransactions(
 
   const { data } = await supabase
     .from("transactions")
-    .select("id,date,description,type,amount,status,currency_code,installment_number,installment_total,user_categories(name,icon,color),accounts(name,color)")
+    .select(TX_SELECT)
     .eq("user_id", user.id)
     .is("deleted_at", null)
     .neq("status", "cancelled")

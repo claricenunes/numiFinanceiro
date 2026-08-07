@@ -92,6 +92,16 @@ export interface Database {
         Insert: Omit<FinancialEvent, "id" | "created_at" | "is_read">;
         Update: Pick<FinancialEvent, "is_read">;
       };
+      chat_sessions: {
+        Row: ChatSessionRow;
+        Insert: Omit<ChatSessionRow, "id" | "created_at" | "updated_at">;
+        Update: Partial<Pick<ChatSessionRow, "title" | "updated_at">>;
+      };
+      chat_messages: {
+        Row: ChatMessageRow;
+        Insert: Omit<ChatMessageRow, "id" | "created_at">;
+        Update: never;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -350,4 +360,22 @@ export interface FinancialEvent {
   is_read: boolean;
   created_at: string;
   expires_at: string | null;
+}
+
+export interface ChatSessionRow {
+  id: string;
+  user_id: string;
+  title: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChatMessageRow {
+  id: string;
+  session_id: string;
+  user_id: string;
+  role: "user" | "assistant";
+  content: string;
+  metadata: Json | null;
+  created_at: string;
 }

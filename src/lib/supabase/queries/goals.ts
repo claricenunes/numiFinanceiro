@@ -2,6 +2,23 @@ import { createClient } from "@/lib/supabase/server";
 import type { GoalWithProgress } from "@/types/app";
 import type { Goal, GoalContribution } from "@/types/database";
 
+/** Just a count, no progress math — skips `goal_contributions` entirely.
+ * For anything that needs progress/deadline data, use `getGoals()` instead. */
+export async function getActiveGoalsCount(): Promise<number> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const { count } = await supabase
+    .from("goals")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .is("deleted_at", null)
+    .eq("status", "active");
+
+  return count ?? 0;
+}
+
 export async function getGoals(): Promise<GoalWithProgress[]> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

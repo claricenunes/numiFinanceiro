@@ -37,16 +37,17 @@ export function Header() {
           <Menu size={16} />
         </button>
 
-        {title ? (
-          <h1 className="text-base font-semibold truncate" style={{ color: "var(--numi-landing-heading)" }}>
+        {/* Mobile always keeps the brand mark — no sidebar there to carry
+            identity, so the logo can't be swapped out for a page title. */}
+        <div className="flex lg:hidden items-center">
+          <span className="text-2xl leading-none" style={{ color: "var(--numi-landing-heading)", fontFamily: "var(--font-logo)" }}>
+            numi
+          </span>
+        </div>
+        {title && (
+          <h1 className="hidden lg:block text-base font-semibold truncate" style={{ color: "var(--numi-landing-heading)" }}>
             {title}
           </h1>
-        ) : (
-          <div className="flex lg:hidden items-center">
-            <span className="text-2xl leading-none" style={{ color: "var(--numi-landing-heading)", fontFamily: "var(--font-logo)" }}>
-              numi
-            </span>
-          </div>
         )}
       </div>
 

@@ -78,8 +78,9 @@ function toISO(date: Date): string {
   return date.toISOString().split("T")[0];
 }
 
-/** Período anterior de mesma duração, imediatamente antes de `period`. */
-function getPreviousPeriodRange(period: Period): { startDate: string; endDate: string } {
+/** Período anterior de mesma duração, imediatamente antes de `period`. Exportado
+ * para o chat reusar o mesmo cálculo de período em vez de duplicá-lo. */
+export function getPreviousPeriodRange(period: Period): { startDate: string; endDate: string } {
   const start = new Date(period.startDate + "T12:00:00");
   const end = new Date(period.endDate + "T12:00:00");
   const days = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
@@ -90,6 +91,89 @@ function getPreviousPeriodRange(period: Period): { startDate: string; endDate: s
   prevStart.setDate(prevStart.getDate() - days + 1);
 
   return { startDate: toISO(prevStart), endDate: toISO(prevEnd) };
+}
+
+type BalanceAccountRow = { id: string; type: string; initial_balance: number };
+type BalanceLedgerRow = { account_id: string; direction: string; amount: number };
+type BalanceBillRow = { account_id: string; total_amount: number };
+
+/** Pure balance math, shared by `getDashboardData` (which already has these
+ * rows fetched for other purposes) and `getAccountBalances` (which fetches
+ * only these three tables, for callers that need just the numbers). */
+function computeAccountBalances(
+  accounts: BalanceAccountRow[],
+  entries: BalanceLedgerRow[],
+  bills: BalanceBillRow[]
+): { availableCash: number; invested: number; netWorth: number } {
+  const ledgerDelta = new Map<string, number>();
+  for (const e of entries) {
+    ledgerDelta.set(e.account_id, (ledgerDelta.get(e.account_id) ?? 0) + (e.direction === "credit" ? +e.amount : -+e.amount));
+  }
+  const billMap = new Map<string, number>();
+  for (const b of bills) billMap.set(b.account_id, +b.total_amount);
+
+  const accs = accounts.map((a) => ({
+    type: a.type,
+    balance: +a.initial_balance + (ledgerDelta.get(a.id) ?? 0),
+    bill: billMap.get(a.id) ?? 0,
+  }));
+
+  const availableCash = accs.filter(a => ["checking","savings","cash","joint"].includes(a.type)).reduce((s, a) => s + a.balance, 0);
+  const invested      = accs.filter(a => a.type === "investment").reduce((s, a) => s + a.balance, 0);
+  const totalBills    = accs.filter(a => a.type === "credit_card").reduce((s, a) => s + a.bill, 0);
+  const netWorth       = availableCash + invested - totalBills;
+
+  return { availableCash, invested, netWorth };
+}
+
+/** Narrow alternative to `getDashboardData()` for callers that only need
+ * balances — 3 queries instead of 11 (skips transactions, goals, snapshots,
+ * profile). Used by the chat assistant's `savings`/`summary` intents. */
+export async function getAccountBalances(): Promise<{ availableCash: number; invested: number; netWorth: number }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { availableCash: 0, invested: 0, netWorth: 0 };
+
+  const [accountsRes, entriesRes, billsRes] = await Promise.all([
+    supabase.from("accounts").select("id,type,initial_balance").eq("user_id", user.id).eq("is_active", true).is("deleted_at", null),
+    supabase.from("ledger_entries").select("account_id,direction,amount").eq("user_id", user.id),
+    supabase.from("credit_card_bills").select("account_id,total_amount").eq("user_id", user.id).eq("status", "open"),
+  ]);
+
+  return computeAccountBalances(
+    (accountsRes.data as BalanceAccountRow[] | null) ?? [],
+    (entriesRes.data as BalanceLedgerRow[] | null) ?? [],
+    (billsRes.data as BalanceBillRow[] | null) ?? []
+  );
+}
+
+/** Narrow alternative to `getDashboardData()` for callers that only need
+ * income/expense/savings for one period — 1 query instead of 11, no joins.
+ * Used by the chat assistant's `income`/`savings`/`period_comparison`/
+ * `forecast`/`summary` intents. */
+export async function getPeriodTotals(
+  startDate: string,
+  endDate: string
+): Promise<{ income: number; expense: number; savings: number; savingsRate: number }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { income: 0, expense: 0, savings: 0, savingsRate: 0 };
+
+  const { data } = await supabase
+    .from("transactions")
+    .select("type,amount")
+    .eq("user_id", user.id)
+    .is("deleted_at", null)
+    .neq("status", "cancelled")
+    .gte("date", startDate)
+    .lte("date", endDate);
+
+  const rows = (data as { type: string; amount: number }[] | null) ?? [];
+  const income  = rows.filter(t => t.type === "income").reduce((s, t) => s + +t.amount, 0);
+  const expense = rows.filter(t => t.type === "expense").reduce((s, t) => s + +t.amount, 0);
+  const savings = income - expense;
+
+  return { income, expense, savings, savingsRate: income > 0 ? (savings / income) * 100 : 0 };
 }
 
 function summarizeCategories(rows: { type: string; amount: number; user_categories: { name: string } | null }[]): CategorySpending[] {
@@ -184,24 +268,7 @@ export async function getDashboardData(inputPeriod?: Period): Promise<DashboardD
   const snapshotRows = (results[10].data as { year: number; month: number; net_worth: number }[] | null) ?? [];
 
   // ── Account balances ────────────────────────────────────
-  const ledgerDelta = new Map<string, number>();
-  for (const e of entries) {
-    ledgerDelta.set(e.account_id, (ledgerDelta.get(e.account_id) ?? 0) + (e.direction === "credit" ? +e.amount : -+e.amount));
-  }
-  const billMap = new Map<string, number>();
-  for (const b of bills) billMap.set(b.account_id, +b.total_amount);
-
-  const accs = accounts.map((a) => ({
-    id: a.id,
-    type: a.type,
-    balance: +a.initial_balance + (ledgerDelta.get(a.id) ?? 0),
-    bill: billMap.get(a.id) ?? 0,
-  }));
-
-  const availableCash = accs.filter(a => ["checking","savings","cash","joint"].includes(a.type)).reduce((s, a) => s + a.balance, 0);
-  const invested      = accs.filter(a => a.type === "investment").reduce((s, a) => s + a.balance, 0);
-  const totalBills    = accs.filter(a => a.type === "credit_card").reduce((s, a) => s + a.bill, 0);
-  const netWorth       = availableCash + invested - totalBills;
+  const { availableCash, invested, netWorth } = computeAccountBalances(accounts, entries, bills);
 
   // ── Income / expense ────────────────────────────────────
   const income  = txRaw.filter(t => t.type === "income").reduce((s, t) => s + +t.amount, 0);

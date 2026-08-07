@@ -88,7 +88,7 @@ export function UpdatePricesButton({ positions }: Props) {
       }}
     >
       <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-      {loading ? "Updating..." : "Update prices"}
+      <span className="hidden sm:inline">{loading ? "Updating..." : "Update prices"}</span>
     </button>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
 import { Modal } from "@/components/ui/Modal";
@@ -71,7 +72,9 @@ export function NewAccountButton() {
 
   return (
     <>
-      <Button variant="accent" onClick={() => setOpen(true)}>+ New Account</Button>
+      <Button variant="accent" size="sm" icon={<Plus size={14} />} onClick={() => setOpen(true)}>
+        <span className="hidden sm:inline">New Account</span>
+      </Button>
 
       <Modal open={open} onClose={handleClose} title="New Account">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">

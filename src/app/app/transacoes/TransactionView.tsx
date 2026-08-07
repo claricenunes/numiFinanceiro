@@ -232,7 +232,7 @@ export function TransactionView({ transactions }: { transactions: TransactionRow
         title="Transactions"
         actions={
           <Button variant="secondary" size="sm" icon={<Upload size={14} />} onClick={() => setShowImport(true)}>
-            Import CSV
+            <span className="hidden sm:inline">Import CSV</span>
           </Button>
         }
       />

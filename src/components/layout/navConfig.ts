@@ -1,6 +1,6 @@
 import {
   LayoutGrid, Landmark, ArrowLeftRight, PieChart, Target, TrendingUp,
-  Sparkles, Bot, Bell, type LucideIcon,
+  Sparkles, Bot, MessageCircle, Bell, type LucideIcon,
 } from "lucide-react";
 
 export interface NavItem {
@@ -30,6 +30,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Intelligence",
     items: [
+      { label: "Assistant", href: "/app/chat", icon: MessageCircle },
       { label: "Insights", href: "/app/insights", icon: Sparkles },
       { label: "Financial AI", href: "/app/fia", icon: Bot },
     ],

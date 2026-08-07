@@ -78,6 +78,7 @@ export interface TransactionRow {
   currencyCode: string;
   installmentNumber?: number | null;
   installmentTotal?: number | null;
+  isRecurring?: boolean;
 }
 
 /* ── Metas (computado) ───────────────────────────────── */

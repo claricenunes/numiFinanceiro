@@ -2,6 +2,7 @@ import type { FIAAnalysis, AIProvider } from "@/types/fia";
 import { getDashboardData } from "@/lib/supabase/queries/dashboard";
 import { getInvestments }   from "@/lib/supabase/queries/investments";
 import { getBudgetItems }   from "@/lib/supabase/queries/budgets";
+import { GEMINI_ACTIVE, DEEPSEEK_ACTIVE, callGeminiJSON, callDeepSeekJSON } from "@/lib/ai/providers";
 
 /* ── Rate limiting ────────────────────────────────────── */
 // In-memory store: resets on cold start (acceptable for serverless MVP)
@@ -23,13 +24,6 @@ function checkRateLimit(userId: string): { allowed: boolean; remaining: number; 
   entry.count++;
   return { allowed: true, remaining: RL_LIMIT - entry.count, resetAt: entry.resetAt };
 }
-
-/* ── Env ──────────────────────────────────────────────── */
-const GEMINI_KEY   = process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? "";
-const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY ?? "";
-
-const GEMINI_ACTIVE   = !!GEMINI_KEY   && !GEMINI_KEY.includes("your-");
-const DEEPSEEK_ACTIVE = !!DEEPSEEK_KEY && !DEEPSEEK_KEY.includes("your-");
 
 /* ── Real-data context ────────────────────────────────── */
 
@@ -163,78 +157,22 @@ function stamp(raw: RawAnalysis, provider: AIProvider): FIAAnalysis {
   return { ...raw, generatedAt: new Date().toISOString(), aiProvider: provider };
 }
 
-async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    p,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(`Timeout after ${ms}ms`)), ms)
-    ),
-  ]);
-}
-
-/* ── Providers ────────────────────────────────────────── */
+/* ── Providers (HTTP plumbing lives in @/lib/ai/providers, shared with
+   the chat assistant) ──────────────────────────────────────────────── */
 
 async function tryGemini(prompt: string): Promise<FIAAnalysis | null> {
   if (!GEMINI_ACTIVE) return null;
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
-  const res = await withTimeout(
-    fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.4,
-          maxOutputTokens: 2048,
-        },
-      }),
-    }),
-    14000
-  );
-
-  if (!res.ok) throw new Error(`Gemini HTTP ${res.status}`);
-  const data = await res.json() as {
-    candidates?: Array<{ content: { parts: Array<{ text: string }> } }>;
-  };
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  const text = await callGeminiJSON(prompt, { temperature: 0.4, maxOutputTokens: 2048, timeoutMs: 14000 });
   return stamp(parseJSON(text), "gemini");
 }
 
 async function tryDeepSeek(prompt: string): Promise<FIAAnalysis | null> {
   if (!DEEPSEEK_ACTIVE) return null;
-
-  const res = await withTimeout(
-    fetch("https://api.deepseek.com/chat/completions", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${DEEPSEEK_KEY}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert financial analyst. Respond ONLY with valid JSON.",
-          },
-          { role: "user", content: prompt },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.3,
-        max_tokens: 2048,
-      }),
-    }),
-    16000
+  const text = await callDeepSeekJSON(
+    "You are an expert financial analyst. Respond ONLY with valid JSON.",
+    prompt,
+    { temperature: 0.3, maxTokens: 2048, timeoutMs: 16000 }
   );
-
-  if (!res.ok) throw new Error(`DeepSeek HTTP ${res.status}`);
-  const data = await res.json() as {
-    choices?: Array<{ message: { content: string } }>;
-  };
-  const text = data.choices?.[0]?.message?.content ?? "";
   return stamp(parseJSON(text), "deepseek");
 }
 

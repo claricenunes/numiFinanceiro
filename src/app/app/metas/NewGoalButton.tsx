@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
 import { GOAL_ICON_MAP, GOAL_ICON_KEYS } from "@/lib/icons";
@@ -53,7 +54,9 @@ export function NewGoalButton() {
 
   return (
     <>
-      <Button variant="accent" onClick={() => setOpen(true)}>+ New Goal</Button>
+      <Button variant="accent" size="sm" icon={<Plus size={14} />} onClick={() => setOpen(true)}>
+        <span className="hidden sm:inline">New Goal</span>
+      </Button>
 
       <Modal open={open} onClose={handleClose} title="New Goal">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">

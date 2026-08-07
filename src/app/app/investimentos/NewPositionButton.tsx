@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import { useToastStore } from "@/stores/useToastStore";
 import { createClient } from "@/lib/supabase/client";
 import { ASSET_TYPE_ICON } from "@/lib/icons";
@@ -99,7 +100,9 @@ export function NewPositionButton() {
 
   return (
     <>
-      <Button variant="accent" size="sm" onClick={() => setOpen(true)}>+ New Position</Button>
+      <Button variant="accent" size="sm" icon={<Plus size={14} />} onClick={() => setOpen(true)}>
+        <span className="hidden sm:inline">New Position</span>
+      </Button>
 
       <Modal open={open} onClose={handleClose} title="New Position">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">

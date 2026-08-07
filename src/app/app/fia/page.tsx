@@ -219,7 +219,14 @@ export default function FIAPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28 }}
     >
-      <PageHeader title="Smart Investing" actions={<Button variant="secondary" size="sm" icon={<RotateCw size={13} />} onClick={fetchAnalysis}>Re-analyze</Button>} />
+      <PageHeader
+        title="Smart Investing"
+        actions={
+          <Button variant="secondary" size="sm" icon={<RotateCw size={13} />} onClick={fetchAnalysis}>
+            <span className="hidden sm:inline">Re-analyze</span>
+          </Button>
+        }
+      />
 
       {/* ── Header ─────────────────────────────────── */}
       <div className="flex items-start justify-between mb-6 gap-4">
